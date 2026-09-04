@@ -3,313 +3,1175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tony Liu — Product Manager &amp; UX Designer</title>
-<meta name="description" content="Tony Liu — Product Manager & UX Designer. CMU Entertainment Technology. Product strategy intern at Tencent IEG Global.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231c3a2b'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle' fill='%23e08a4b' font-family='sans-serif' font-weight='700'%3ET%3C/text%3E%3C/svg%3E">
+<title>Tony Liu &mdash; Home</title>
+<meta name="description" content="Tony Liu — Product Manager &amp; UX Designer. CMU Entertainment Technology.">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #0a0a0a;
+    --ink-soft: #6b6b6b;
+    --line: #e4e4e4;
+    --grid-dot: #ececec;
+    --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-pixel: "Press Start 2P", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    font-family: var(--font-display);
+  }
+  a { color: inherit; }
+  ::selection { background: var(--ink); color: var(--paper); }
+
+  /* ---- shared type helpers ---- */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-pixel);
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--ink);
+    flex: none;
+  }
+
+  /* ---- header ---- */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px clamp(20px, 5vw, 48px);
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-header .mark {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+  .site-header nav {
+    display: flex;
+    gap: clamp(14px, 3vw, 28px);
+  }
+  .site-header nav a {
+    font-family: var(--font-pixel);
+    font-size: 0.56rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+    padding: 4px 2px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .site-header nav a:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ---- hero ---- */
+  .hero {
+    position: relative;
+    height: min(78vh, 640px);
+    min-height: 440px;
+    border-bottom: 2px solid var(--ink);
+    overflow: hidden;
+    background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .hero .stage {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+  }
+  .hero-copy {
+    position: absolute;
+    left: clamp(20px, 5vw, 48px);
+    bottom: clamp(20px, 5vw, 40px);
+    right: clamp(20px, 5vw, 48px);
+    pointer-events: none;
+  }
+  .hero-copy .eyebrow { margin-bottom: 14px; }
+  .hero-copy h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2.2rem, 7vw, 4.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .hero-copy .tagline {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    margin: 0 0 10px;
+    max-width: 46ch;
+  }
+  .hero-copy .hint {
+    font-family: var(--font-pixel);
+    font-size: 0.56rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+    margin: 0;
+    transition: opacity 0.5s ease;
+  }
+  .hero-copy .hint.is-faded { opacity: 0.3; }
+  .hero-copy .hint kbd {
+    font-family: var(--font-pixel);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 5px;
+    border-radius: 2px;
+  }
+  .hero-hud {
+    position: absolute;
+    top: 14px; right: clamp(20px, 5vw, 48px);
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero-hud b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .hero-scroll {
+    position: absolute;
+    right: clamp(20px, 5vw, 48px);
+    bottom: clamp(20px, 5vw, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-pixel);
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    pointer-events: none;
+  }
+  .hero-scroll .chev {
+    width: 8px; height: 8px;
+    border-right: 2px solid var(--ink-soft);
+    border-bottom: 2px solid var(--ink-soft);
+    transform: rotate(45deg);
+    animation: chevBob 1.8s ease-in-out infinite;
+  }
+  @keyframes chevBob {
+    0%, 100% { transform: rotate(45deg) translate(0, 0); }
+    50% { transform: rotate(45deg) translate(3px, 3px); }
+  }
+
+  .treat {
+    position: absolute;
+    width: 18px; height: 18px;
+    margin-left: -9px; margin-top: -9px;
+    transform: scale(0);
+    animation: treatIn 0.28s cubic-bezier(.34,1.56,.64,1) forwards;
+    pointer-events: none;
+  }
+  .treat svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; }
+  .treat.is-eaten { animation: treatOut 0.2s ease-in forwards; }
+  @keyframes treatIn { to { transform: scale(1); } }
+  @keyframes treatOut { to { transform: scale(0); } }
+
+  .slide-dash {
+    position: absolute;
+    width: 9px; height: 4px;
+    margin-left: -4px; margin-top: -2px;
+    background: var(--ink-soft);
+    opacity: 0.5;
+    animation: dashFade 0.4s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes dashFade { to { opacity: 0; transform: scaleX(0.2); } }
+
+  .pixel-trail {
+    position: absolute;
+    width: 4px; height: 4px;
+    margin-left: -2px; margin-top: -2px;
+    background: var(--ink-soft);
+    opacity: 0.45;
+    pointer-events: none;
+    animation: trailFade 0.5s ease-out forwards;
+  }
+  @keyframes trailFade { to { opacity: 0; transform: scale(0.3); } }
+
+  canvas#penguinCanvas {
+    position: absolute;
+    left: 0; top: 0;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+  }
+
+  /* ---- generic section rhythm ---- */
+  section {
+    padding: clamp(56px, 10vw, 96px) clamp(20px, 5vw, 48px);
+    border-bottom: 1px solid var(--line);
+  }
+  section .eyebrow { margin-bottom: 18px; }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+    margin: 0 0 22px;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+
+  /* ---- about ---- */
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: clamp(24px, 5vw, 56px);
+    align-items: start;
+  }
+  .about-lede {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+    line-height: 1.35;
+    max-width: 34ch;
+    margin: 0 0 14px;
+  }
+  .about-body {
+    font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0 0 24px;
+  }
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .pill {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border: 1px solid var(--ink);
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+  .about-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .about-more:hover { color: var(--ink-soft); border-color: var(--ink-soft); }
+  .about-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 4px;
+  }
+  .fact {
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+  .fact .fact-num {
+    font-family: var(--font-pixel);
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .fact .fact-label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  /* ---- work ---- */
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .work-card {
+    background: var(--paper);
+    padding: 26px 22px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .work-card:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .work-card:hover .work-cat { color: var(--paper); opacity: 0.65; }
+  .work-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .work-num {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--ink-soft);
+  }
+  .work-card:hover .work-num { color: var(--paper); opacity: 0.5; }
+  .work-cat {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .work-icon {
+    width: 26px; height: 26px;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .work-icon svg { width: 100%; height: 100%; shape-rendering: crispEdges; }
+  .work-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin: 0 0 10px;
+  }
+  .work-blurb {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .work-card:hover .work-blurb { color: var(--paper); opacity: 0.85; }
+  .work-arrow {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    margin-top: 18px;
+  }
+
+  /* ---- contact ---- */
+  .contact-section { border-bottom: none; }
+  .contact-body {
+    font-size: clamp(1rem, 1.6vw, 1.1rem);
+    line-height: 1.6;
+    max-width: 56ch;
+    margin: 0 0 28px;
+    color: var(--ink-soft);
+  }
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .contact-links a {
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    padding: 12px 20px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .contact-links a:hover { background: var(--ink); color: var(--paper); }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    justify-content: space-between;
+    padding: 18px clamp(20px, 5vw, 48px) 28px;
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 720px) {
+    .about-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .treat { animation: none; transform: scale(1); }
+    .slide-dash { display: none; }
+    .pixel-trail { display: none; }
+    .hero-scroll .chev { animation: none; }
+  }
+</style>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
+<header class="site-header">
+  <div class="mark">TONY LIU</div>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
 
-<nav class="site-nav">
-  <div class="container nav-inner">
-    <a href="index.html" class="brand">Tony Liu<span>.</span></a>
-    <div class="nav-links">
-      <a href="#top" data-i18n="nav.home">Home</a>
-      <a href="#about" data-i18n="nav.about">About</a>
-      <a href="#experience" data-i18n="nav.experience">Experience</a>
-      <a href="#work" data-i18n="nav.work">Work</a>
-      <a href="#contact" data-i18n="nav.contact">Contact</a>
-    </div>
-    <div class="nav-actions">
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" data-lang-btn="en">EN</button>
-        <button type="button" data-lang-btn="zh">中文</button>
+<section class="hero" id="home">
+  <div class="stage" id="stage">
+    <div class="hero-hud">TREATS EATEN <b id="treatCount">0</b></div>
+  </div>
+  <div class="hero-copy">
+    <div class="eyebrow">Product Manager &middot; UX Designer</div>
+    <h1>Tony Liu</h1>
+    <p class="tagline">I chase the why, then ship the what.</p>
+    <p class="hint" id="hint">CLICK TO DROP A TREAT &middot; <kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> TO WADDLE HIM YOURSELF</p>
+  </div>
+  <div class="hero-scroll"><span>SCROLL</span><span class="chev"></span></div>
+</section>
+
+<section id="about">
+  <div class="eyebrow">About</div>
+  <h2 class="section-title">Product thinking, shaped by design training.</h2>
+  <div class="about-grid">
+    <div>
+      <p class="about-lede">A product manager with a UX design background.</p>
+      <p class="about-body">I turn storytelling into playful, user-focused digital experiences and games &mdash; where curiosity meets function, and an idea becomes something people actually want to explore.</p>
+      <div class="pill-row">
+        <span class="pill">Product Strategy</span>
+        <span class="pill">0&rarr;1 Product Definition</span>
+        <span class="pill">UX Research</span>
+        <span class="pill">Rapid Prototyping</span>
       </div>
-      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-      </button>
+    </div>
+    <div class="about-facts">
+      <div class="fact">
+        <span class="fact-num">1M+</span>
+        <span class="fact-label">DAU on the overseas game I shipped features for</span>
+      </div>
+      <div class="fact">
+        <span class="fact-num">20%+</span>
+        <span class="fact-label">Engagement lift from playtest-driven iteration</span>
+      </div>
+      <div class="fact">
+        <span class="fact-num">37%</span>
+        <span class="fact-label">Faster task time, Xbox Adaptive Controller project</span>
+      </div>
     </div>
   </div>
-  <div class="mobile-panel">
-    <a href="#top" data-i18n="nav.home">Home</a>
-    <a href="#about" data-i18n="nav.about">About</a>
-    <a href="#experience" data-i18n="nav.experience">Experience</a>
-    <a href="#work" data-i18n="nav.work">Work</a>
-    <a href="#contact" data-i18n="nav.contact">Contact</a>
+</section>
+
+<section id="work">
+  <div class="eyebrow">Selected Work</div>
+  <h2 class="section-title">Product and design work, end to end.</h2>
+  <div class="work-grid">
+    <a class="work-card" href="https://devpost.com/software/flow-ai-intelligent-chrome-extension-for-focus" target="_blank" rel="noopener">
+      <div class="work-card-top"><span class="work-num">01</span><span class="work-cat">AI Product</span></div>
+      <div class="work-icon"><svg viewBox="0 0 8 8"><rect x="3" y="0" width="2" height="2" fill="currentColor"/><rect x="0" y="3" width="2" height="2" fill="currentColor"/><rect x="6" y="3" width="2" height="2" fill="currentColor"/><rect x="3" y="6" width="2" height="2" fill="currentColor"/><rect x="3" y="3" width="2" height="2" fill="currentColor"/></svg></div>
+      <h3 class="work-title">Flow AI &mdash; an LLM focus-management agent</h3>
+      <p class="work-blurb">A 0&rarr;1 Chrome AI agent that catches focus drift and steps in before you doomscroll.</p>
+      <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
+    </a>
+    <a class="work-card" href="https://youtu.be/CJBFbNF9Kvg?si=xt4HUOxi7_ByT3LR" target="_blank" rel="noopener">
+      <div class="work-card-top"><span class="work-num">02</span><span class="work-cat">Game &middot; Production</span></div>
+      <div class="work-icon"><svg viewBox="0 0 8 8"><rect x="0" y="2" width="8" height="4" fill="currentColor"/><rect x="1" y="3" width="1" height="2" fill="#fff"/><rect x="5" y="3" width="1" height="1" fill="#fff"/><rect x="6" y="4" width="1" height="1" fill="#fff"/></svg></div>
+      <h3 class="work-title">Building Virtual World &mdash; embodied game sprints</h3>
+      <p class="work-blurb">Producer &amp; UX designer across 4 embodied-game sprints &mdash; one cut task time 37% for adaptive-controller players.</p>
+      <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
+    </a>
+    <a class="work-card" href="https://shuchangliu.framer.website/work/youtube" target="_blank" rel="noopener">
+      <div class="work-card-top"><span class="work-num">03</span><span class="work-cat">Ed-Tech</span></div>
+      <div class="work-icon"><svg viewBox="0 0 8 8"><rect x="2" y="1" width="1" height="6" fill="currentColor"/><rect x="2" y="2" width="2" height="4" fill="currentColor"/><rect x="4" y="3" width="2" height="2" fill="currentColor"/></svg></div>
+      <h3 class="work-title">FocusTube &mdash; a distraction-free YouTube</h3>
+      <p class="work-blurb">A YouTube redesign that halves UI clutter so learners stay on-topic.</p>
+      <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
+    </a>
+    <a class="work-card" href="https://shuchangliu.framer.website/work/favor-treasure-hunt" target="_blank" rel="noopener">
+      <div class="work-card-top"><span class="work-num">04</span><span class="work-cat">Game &middot; AR</span></div>
+      <div class="work-icon"><svg viewBox="0 0 8 8"><rect x="3" y="0" width="2" height="1" fill="currentColor"/><rect x="3" y="7" width="2" height="1" fill="currentColor"/><rect x="0" y="3" width="1" height="2" fill="currentColor"/><rect x="7" y="3" width="1" height="2" fill="currentColor"/><rect x="3" y="3" width="2" height="2" fill="currentColor"/></svg></div>
+      <h3 class="work-title">Favor Treasure Hunt &mdash; AR for neighbors</h3>
+      <p class="work-blurb">A mobile AR experience that turns everyday favors into a playful, hyperlocal treasure hunt.</p>
+      <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
+    </a>
+    <a class="work-card" href="https://shuchangliu.framer.website/work/pharmily" target="_blank" rel="noopener">
+      <div class="work-card-top"><span class="work-num">05</span><span class="work-cat">Healthcare</span></div>
+      <div class="work-icon"><svg viewBox="0 0 8 8"><rect x="3" y="0" width="2" height="8" fill="currentColor"/><rect x="0" y="3" width="8" height="2" fill="currentColor"/></svg></div>
+      <h3 class="work-title">Pharmily &mdash; campus pharmacy pickup, redesigned</h3>
+      <p class="work-blurb">A campus pharmacy pickup redesign, kiosk to app, grounded in real student research.</p>
+      <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
+    </a>
   </div>
-</nav>
+</section>
 
-<main id="top">
-
-  <!-- Hero: minimal + playable -->
-  <header class="hero-play">
-    <div class="hero-play-copy">
-      <div class="eyebrow" data-i18n="hero.eyebrow">Product Manager · UX Designer</div>
-      <h1 data-i18n="hero.name">Tony Liu</h1>
-      <p class="hero-play-tagline" data-i18n="hero.tagline">I turn research into features that ship.</p>
-      <p class="hero-play-hint" data-i18n="hero.hint">Click anywhere to toss a treat 🦴 — or use ← → to walk him yourself.</p>
-    </div>
-    <div class="hero-stage" id="heroStage">
-      <div class="dog-pos" id="dogPos">
-        <div class="dog-facing" id="dogFacing">
-          <div class="dog" id="dogEl">
-            <svg viewBox="0 0 220 160" width="100%" height="100%" aria-hidden="true">
-              <ellipse class="dog-shadow" cx="110" cy="150" rx="70" ry="7"></ellipse>
-              <g class="dog-tail"><path d="M58 92 C 30 78, 22 55, 34 38 C 40 55, 48 72, 62 86 Z" fill="#c98a4b"></path></g>
-              <g class="leg leg-bl"><rect x="72" y="112" width="16" height="34" rx="8" fill="#a9713c"></rect></g>
-              <g class="leg leg-br"><rect x="132" y="112" width="16" height="34" rx="8" fill="#a9713c"></rect></g>
-              <ellipse class="dog-body" cx="112" cy="102" rx="58" ry="34" fill="#d9974f"></ellipse>
-              <ellipse cx="120" cy="112" rx="34" ry="18" fill="#f6e3c9"></ellipse>
-              <g class="leg leg-fl"><rect x="92" y="118" width="16" height="34" rx="8" fill="#d9974f"></rect></g>
-              <g class="leg leg-fr"><rect x="150" y="118" width="16" height="34" rx="8" fill="#d9974f"></rect></g>
-              <path class="dog-collar" d="M148 88 Q168 96 148 106" stroke="#1c3a2b" stroke-width="7" fill="none" stroke-linecap="round"></path>
-              <circle cx="148" cy="97" r="4.5" fill="#e08a4b"></circle>
-              <g class="dog-head">
-                <ellipse class="ear ear-back" cx="182" cy="52" rx="13" ry="20" fill="#a9713c" transform="rotate(18 182 52)"></ellipse>
-                <circle cx="176" cy="72" r="32" fill="#d9974f"></circle>
-                <ellipse cx="196" cy="82" rx="16" ry="12" fill="#f6e3c9"></ellipse>
-                <circle class="dog-nose" cx="210" cy="80" r="5" fill="#2b241d"></circle>
-                <ellipse class="dog-eye" cx="184" cy="66" rx="4.5" ry="5.5" fill="#2b241d"></ellipse>
-                <ellipse class="ear ear-front" cx="160" cy="50" rx="13" ry="22" fill="#c98a4b" transform="rotate(-12 160 50)"></ellipse>
-              </g>
-            </svg>
-          </div>
-        </div>
-      </div>
-      <div class="treats-layer" id="treatsLayer"></div>
-    </div>
-  </header>
-
-  <!-- About -->
-  <section id="about">
-    <div class="container">
-      <div class="section-head" data-reveal>
-        <div class="eyebrow" data-i18n="about.eyebrow">About</div>
-        <h2 data-i18n="about.title">Product thinking, shaped by design training.</h2>
-      </div>
-      <div class="hero-stats mt-lg" data-reveal>
-        <div class="stat"><b data-i18n="hero.stat1.num">1M+</b><span data-i18n="hero.stat1.label">DAU on the overseas game I shipped features for</span></div>
-        <div class="stat"><b data-i18n="hero.stat2.num">20%+</b><span data-i18n="hero.stat2.label">Engagement lift from playtest-driven iteration</span></div>
-        <div class="stat"><b data-i18n="hero.stat3.num">37%</b><span data-i18n="hero.stat3.label">Faster task time, Xbox Adaptive Controller project</span></div>
-        <div class="stat"><b data-i18n="hero.stat4.num">3.89</b><span data-i18n="hero.stat4.label">GPA, M.S. Entertainment Technology, CMU</span></div>
-      </div>
-      <div class="about-grid mt-lg">
-        <div class="about-card" data-reveal>
-          <div class="about-byline">
-            <img src="assets/photo/tony.jpg" alt="Portrait of Tony Liu" width="56" height="56">
-            <div>
-              <strong data-i18n="hero.name">Tony Liu</strong>
-              <span data-i18n="hero.eyebrow">Product Manager · UX Designer</span>
-            </div>
-          </div>
-          <p data-i18n="about.body">I'm a product manager with a UX design background...</p>
-          <div class="pill-row">
-            <span class="pill" data-i18n="about.pill1">Product Strategy</span>
-            <span class="pill" data-i18n="about.pill2">0→1 Product Definition</span>
-            <span class="pill" data-i18n="about.pill3">UX Research</span>
-            <span class="pill" data-i18n="about.pill4">Rapid Prototyping</span>
-            <span class="pill" data-i18n="about.pill5">AIGC Workflows</span>
-            <span class="pill" data-i18n="about.pill6">Cross-functional Delivery</span>
-          </div>
-        </div>
-        <div class="about-card" data-reveal>
-          <h4 data-i18n="about.edu.title" style="margin-bottom:16px;">Education</h4>
-          <div class="edu-list">
-            <div class="edu-item">
-              <div>
-                <h4 data-i18n="about.cmu.name">Carnegie Mellon University</h4>
-                <p style="font-weight:600;color:var(--green-800);margin-bottom:2px;" data-i18n="about.cmu.role">Master of Entertainment Technology</p>
-                <p data-i18n="about.cmu.meta">Expected May 2027</p>
-              </div>
-              <div class="edu-gpa" data-i18n="about.cmu.gpa">GPA 3.89/4.0</div>
-            </div>
-            <div class="edu-item">
-              <div>
-                <h4 data-i18n="about.ucsd.name">UC San Diego</h4>
-                <p style="font-weight:600;color:var(--green-800);margin-bottom:2px;" data-i18n="about.ucsd.role">B.A. Cognitive Science (HCI) &amp; Communication</p>
-                <p data-i18n="about.ucsd.meta">Cognitive science, HCI focus</p>
-              </div>
-              <div class="edu-gpa" data-i18n="about.ucsd.gpa">GPA 3.95/4.0</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Experience -->
-  <section id="experience">
-    <div class="container">
-      <div class="section-head" data-reveal>
-        <div class="eyebrow" data-i18n="exp.eyebrow">Experience</div>
-        <h2 data-i18n="exp.title">Where the product thinking comes from.</h2>
-      </div>
-      <div class="timeline">
-
-        <article class="exp-card" data-reveal>
-          <div class="exp-head">
-            <div>
-              <h3 data-i18n="exp.tencent.company">Tencent · IEG Global</h3>
-              <div class="exp-role" data-i18n="exp.tencent.role">Product Strategy Intern</div>
-            </div>
-            <div class="exp-meta" data-i18n="exp.tencent.meta">Shenzhen · Jun 2026 – Present</div>
-          </div>
-          <ul class="exp-bullets">
-            <li data-i18n-html="exp.tencent.b1.html"></li>
-            <li data-i18n-html="exp.tencent.b2.html"></li>
-            <li data-i18n-html="exp.tencent.b3.html"></li>
-          </ul>
-        </article>
-
-        <article class="exp-card" data-reveal>
-          <div class="exp-head">
-            <div>
-              <h3 data-i18n="exp.joyfun.company">Joyfun Interactive</h3>
-              <div class="exp-role" data-i18n="exp.joyfun.role">Game Interaction Design Intern</div>
-            </div>
-            <div class="exp-meta" data-i18n="exp.joyfun.meta">Wuhan · May – Aug 2025</div>
-          </div>
-          <ul class="exp-bullets">
-            <li data-i18n-html="exp.joyfun.b1.html"></li>
-            <li data-i18n-html="exp.joyfun.b2.html"></li>
-            <li data-i18n-html="exp.joyfun.b3.html"></li>
-          </ul>
-        </article>
-
-        <article class="exp-card" data-reveal>
-          <div class="exp-head">
-            <div>
-              <h3 data-i18n="exp.xbotgo.company">Blink Tech · XbotGo</h3>
-              <div class="exp-role" data-i18n="exp.xbotgo.role">Product Strategy &amp; User Research Intern</div>
-            </div>
-            <div class="exp-meta" data-i18n="exp.xbotgo.meta">Mountain View, CA · May – Sep 2023</div>
-          </div>
-          <ul class="exp-bullets">
-            <li data-i18n-html="exp.xbotgo.b1.html"></li>
-            <li data-i18n-html="exp.xbotgo.b2.html"></li>
-            <li data-i18n-html="exp.xbotgo.b3.html"></li>
-          </ul>
-        </article>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Work -->
-  <section id="work">
-    <div class="container">
-      <div class="section-head" data-reveal>
-        <div class="eyebrow" data-i18n="work.eyebrow">Selected Work</div>
-        <h2 data-i18n="work.title">Product and design work, end to end.</h2>
-      </div>
-
-      <div class="project-grid featured">
-        <a class="project-card" href="projects/flow-ai.html" data-reveal>
-          <div class="project-cover"><img src="assets/covers/flow-ai.svg" alt="Flow AI cover art"></div>
-          <div class="project-body">
-            <div class="project-cat" data-i18n="proj.flowai.cat">AI Product</div>
-            <h3 data-i18n="proj.flowai.title">Flow AI — an LLM focus-management agent</h3>
-            <p data-i18n="proj.flowai.blurb">A 0→1 Chrome extension AI agent...</p>
-            <div class="project-tags"><span>Product</span><span>AI</span><span>UX</span></div>
-            <span class="project-link" data-i18n="work.viewall">View full case study
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
-            </span>
-          </div>
-        </a>
-
-        <a class="project-card" href="projects/building-virtual-world.html" data-reveal>
-          <div class="project-cover"><img src="assets/covers/building-virtual-world.svg" alt="Building Virtual World cover art"></div>
-          <div class="project-body">
-            <div class="project-cat" data-i18n="proj.bvw.cat">Game · Production</div>
-            <h3 data-i18n="proj.bvw.title">Building Virtual World — embodied game sprints</h3>
-            <p data-i18n="proj.bvw.blurb">Producer &amp; UX designer on 4 sprints...</p>
-            <div class="project-tags"><span>Producer</span><span>UX</span><span>Unity</span></div>
-            <span class="project-link" data-i18n="work.viewall">View full case study
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
-            </span>
-          </div>
-        </a>
-
-        <a class="project-card" href="projects/focustube.html" data-reveal>
-          <div class="project-cover"><img src="assets/covers/focustube.svg" alt="FocusTube cover art"></div>
-          <div class="project-body">
-            <div class="project-cat" data-i18n="proj.focustube.cat">Ed-Tech</div>
-            <h3 data-i18n="proj.focustube.title">FocusTube — a distraction-free YouTube</h3>
-            <p data-i18n="proj.focustube.blurb">A distraction-free redesign of YouTube...</p>
-            <div class="project-tags"><span>Product</span><span>UX Research</span><span>UI</span></div>
-            <span class="project-link" data-i18n="work.viewall">View full case study
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
-            </span>
-          </div>
-        </a>
-      </div>
-
-      <h3 class="mt-lg" data-i18n="work.more" style="margin-bottom:20px;">More Work</h3>
-      <div class="project-grid">
-        <a class="project-card" href="projects/favor-treasure-hunt.html" data-reveal>
-          <div class="project-cover"><img src="assets/covers/favor-treasure-hunt.svg" alt="Favor Treasure Hunt cover art"></div>
-          <div class="project-body">
-            <div class="project-cat" data-i18n="proj.favor.cat">Game · AR</div>
-            <h3 data-i18n="proj.favor.title">Favor Treasure Hunt — AR for neighbors</h3>
-            <p data-i18n="proj.favor.blurb">A mobile AR experience...</p>
-            <div class="project-tags"><span>UX Design</span><span>Rapid Prototyping</span></div>
-            <span class="project-link" data-i18n="work.viewall">View full case study
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
-            </span>
-          </div>
-        </a>
-
-        <a class="project-card" href="projects/pharmily.html" data-reveal>
-          <div class="project-cover"><img src="assets/covers/pharmily.svg" alt="Pharmily cover art"></div>
-          <div class="project-body">
-            <div class="project-cat" data-i18n="proj.pharmily.cat">Healthcare</div>
-            <h3 data-i18n="proj.pharmily.title">Pharmily — campus pharmacy pickup, redesigned</h3>
-            <p data-i18n="proj.pharmily.blurb">A service redesign for campus pharmacy pickup...</p>
-            <div class="project-tags"><span>Service Design</span><span>User Study</span></div>
-            <span class="project-link" data-i18n="work.viewall">View full case study
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
-            </span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact">
-    <div class="container">
-      <div class="contact-band" data-reveal>
-        <h2 data-i18n="contact.title">Let's build something worth shipping.</h2>
-        <p data-i18n="contact.body">Open to Product Manager and UX Designer roles for 2026.</p>
-        <div class="contact-actions">
-          <a class="btn btn-primary" href="mailto:shuchangliucareer@gmail.com" data-i18n="contact.email">Email Me</a>
-          <a class="btn btn-outline" href="https://www.linkedin.com/" target="_blank" rel="noopener" data-i18n="contact.linkedin">LinkedIn</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-row">
-      <span data-i18n="footer.tagline">Product-minded, design-trained.</span>
-      <div class="footer-links">
-        <a href="mailto:shuchangliucareer@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
-      </div>
-      <span><span data-year></span> · <span data-i18n="footer.rights">hand-built for CMU 15-113</span></span>
-    </div>
+<section id="contact" class="contact-section">
+  <div class="eyebrow">Contact</div>
+  <h2 class="section-title">Let's build something worth shipping.</h2>
+  <p class="contact-body">Open to Product Manager and UX Designer roles for 2026 &mdash; always up for a conversation about what's next.</p>
+  <div class="contact-links">
+    <a href="mailto:shuchangliucareer@gmail.com">Email Me</a>
+    <a href="https://www.linkedin.com/in/shuchang-liu/" target="_blank" rel="noopener">LinkedIn</a>
   </div>
+</section>
+
+<footer>
+  <span>PRODUCT-MINDED, DESIGN-TRAINED. OPEN TO PRODUCT / UX ROLES FOR 2026.</span>
+  <span>&copy; 2026 TONY LIU &middot; HAND-BUILT FOR CMU 15-113</span>
 </footer>
 
-<script src="js/i18n.js"></script>
-<script src="js/main.js"></script>
-<script src="js/hero-pet.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var stage = document.getElementById("stage");
+  var canvas = document.createElement("canvas");
+  canvas.id = "penguinCanvas";
+  stage.appendChild(canvas);
+  var ctx = canvas.getContext("2d");
+  var hint = document.getElementById("hint");
+  var treatCountEl = document.getElementById("treatCount");
+  var REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- pixel sprite definition (grid units) ----
+  // Traced 1:1 from Tony's two reference images (thresholded to pure
+  // black/white, cropped, then reduced to a clean grid — not hand-drawn
+  // approximations). Each pose is three layers: BASE (black silhouette —
+  // body, tuft, beak, flippers, feet all in one mask), FACE (the white
+  // interior — belly/face patch, painted on top of BASE), and EYES (small
+  // black squares painted last, on top of FACE, offset by eyeShift for the
+  // glance animation).
+  var GRID_W = 70, GRID_H = 42;
+  var PX = 3; // internal px per grid unit (canvas backing resolution)
+  var DISPLAY_SCALE = 2.2; // on-screen size multiplier
+
+  var STAND_BASE = [[40, 0, 2, 1], [39, 1, 4, 1], [30, 2, 9, 1], [29, 3, 10, 1], [26, 4, 18, 1], [26, 5, 19, 1], [24, 6, 22, 2], [24, 36, 22, 1], [22, 8, 3, 2], [22, 34, 3, 2], [29, 8, 6, 1], [40, 8, 8, 2], [30, 9, 5, 1], [22, 10, 1, 7], [31, 10, 3, 1], [42, 10, 6, 7], [42, 34, 6, 2], [32, 11, 2, 1], [29, 14, 5, 3], [21, 17, 2, 1], [30, 17, 4, 1], [42, 17, 7, 1], [20, 18, 3, 3], [20, 32, 3, 2], [42, 18, 8, 1], [42, 33, 8, 1], [44, 19, 6, 2], [44, 29, 6, 3], [18, 21, 5, 1], [44, 21, 8, 2], [18, 22, 4, 1], [16, 23, 6, 2], [44, 23, 10, 2], [14, 25, 8, 4], [44, 25, 12, 4], [14, 29, 4, 1], [20, 29, 2, 3], [52, 29, 4, 1], [43, 32, 7, 1], [24, 37, 8, 1], [36, 37, 9, 1], [24, 38, 7, 2], [37, 38, 7, 2]];
+  var STAND_FACE = [[25, 8, 4, 1], [35, 8, 5, 2], [25, 9, 5, 1], [23, 10, 8, 1], [34, 10, 8, 2], [34, 16, 8, 2], [23, 11, 9, 1], [23, 12, 3, 4], [27, 12, 11, 1], [39, 12, 3, 4], [28, 13, 9, 1], [28, 14, 1, 2], [34, 14, 3, 2], [23, 16, 6, 1], [23, 17, 7, 1], [23, 18, 19, 1], [23, 33, 19, 1], [23, 19, 21, 2], [22, 21, 22, 11], [23, 32, 20, 1], [25, 34, 17, 2]];
+  var STAND_EYES = [[26, 12, 1, 1], [37, 12, 2, 4], [26, 13, 2, 3]];
+
+  // Belly-slide, mirrored so the head leads on the right — matching this
+  // sprite's existing facing convention (facing=1 shows the base art as-is).
+  var SLIDE_BASE = [[39, 18, 3, 2], [42, 20, 9, 2], [36, 22, 20, 1], [19, 23, 38, 2], [15, 25, 44, 1], [14, 26, 36, 2], [59, 27, 1, 2], [12, 28, 37, 1], [59, 29, 2, 1], [12, 29, 35, 2], [59, 30, 3, 1], [54, 30, 2, 3], [59, 31, 7, 1], [59, 34, 7, 1], [37, 31, 10, 2], [7, 31, 25, 2], [59, 32, 8, 2], [32, 33, 13, 2], [9, 33, 16, 2], [60, 35, 2, 1], [25, 35, 16, 1], [3, 35, 20, 1], [61, 36, 1, 1], [24, 36, 13, 1], [3, 36, 19, 1], [23, 37, 12, 1], [3, 37, 17, 1], [8, 38, 50, 1], [9, 39, 49, 1]];
+  var SLIDE_FACE = [[32, 31, 5, 2], [25, 33, 7, 2]];
+  var SLIDE_EYES = [[59, 37, 1, 1]];
+
+  function drawPenguin(pose, opts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var rock = opts.rock || 0;
+    var bob = opts.bob || 0;
+    var eyeShift = opts.eyeShift || 0;
+    var base = pose === "slide" ? SLIDE_BASE : STAND_BASE;
+    var face = pose === "slide" ? SLIDE_FACE : STAND_FACE;
+    var eyes = pose === "slide" ? SLIDE_EYES : STAND_EYES;
+
+    ctx.fillStyle = "#0a0a0a";
+    base.forEach(function (r) {
+      ctx.fillRect((r[0] + rock) * PX, (r[1] + bob) * PX, r[2] * PX, r[3] * PX);
+    });
+    ctx.fillStyle = "#ffffff";
+    face.forEach(function (r) {
+      ctx.fillRect((r[0] + rock) * PX, (r[1] + bob) * PX, r[2] * PX, r[3] * PX);
+    });
+    ctx.fillStyle = "#0a0a0a";
+    eyes.forEach(function (r) {
+      ctx.fillRect((r[0] + rock + eyeShift) * PX, (r[1] + bob) * PX, r[2] * PX, r[3] * PX);
+    });
+  }
+
+  function resizeCanvas() {
+    canvas.width = GRID_W * PX;
+    canvas.height = GRID_H * PX;
+  }
+
+  // ---- state ----
+  // Locomotion is hop-based, like the reference site's rabbit: short leaps
+  // in bursts of a few, each landing with a squash before the next, then a
+  // pause before the next burst fires off in a new direction. It runs
+  // continuously and never settles into a single smooth glide.
+  var state = {
+    x: 0, y: 0,
+    facing: 1,
+    keys: { up: false, down: false, left: false, right: false },
+    treats: [],
+    mode: "resting", // resting | hopping | waddling | noticing | sliding | eating
+    hop: null, // {fromX,fromY,toX,toY,dur,t}
+    hopsLeftInBurst: 0,
+    hasArrived: false,
+    restTimer: 0,
+    noticeTimer: 0,
+    eatRemaining: 0,
+    walkTimer: 0,
+    walkFrame: 0,
+    rockPhase: 0,
+    dashTimer: 0,
+    trailTimer: 0,
+    treatsEaten: 0,
+  };
+  var treatSeq = 0;
+  var WADDLE_SPEED = 175;
+  var SLIDE_SPEED = 270;
+  var EAT_DIST = 13;
+  var HOP_SPEED = 340;       // px/s, sets how long each leap takes
+  var HOP_MIN_DIST = 40;
+  var HOP_MAX_DIST = 130;
+  var HOP_HEIGHT = 32;       // px, visual peak lift mid-leap
+  var BURST_MIN = 1, BURST_MAX = 4;
+  var REST_MIN = 0.5, REST_MAX = 2.2;
+  var NOTICE_MIN = 0.35, NOTICE_MAX = 0.65;
+
+  var spriteW, spriteH, spriteHalfW, spriteHalfH;
+
+  function layoutSprite() {
+    var displayW = GRID_W * DISPLAY_SCALE;
+    var displayH = GRID_H * DISPLAY_SCALE;
+    canvas.style.width = displayW + "px";
+    canvas.style.height = displayH + "px";
+    spriteW = displayW; spriteH = displayH;
+    spriteHalfW = spriteW / 2; spriteHalfH = spriteH / 2;
+  }
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  function rand(min, max) { return min + Math.random() * (max - min); }
+  function stageRect() { return stage.getBoundingClientRect(); }
+
+  function clampToStage(x, y) {
+    var r = stageRect();
+    var minX = spriteHalfW * 0.5, maxX = Math.max(minX, r.width - spriteHalfW * 0.5);
+    var minY = spriteHalfH, maxY = Math.max(minY, r.height - spriteHalfH);
+    return { x: clamp(x, minX, maxX), y: clamp(y, minY, maxY) };
+  }
+
+  function clampPos() {
+    var p = clampToStage(state.x, state.y);
+    state.x = p.x; state.y = p.y;
+  }
+
+  function enterRest(short) {
+    state.mode = "resting";
+    state.restTimer = short ? rand(0.15, 0.4) : rand(REST_MIN, REST_MAX);
+    state.rockPhase = 0;
+  }
+
+  // Kicks off a single leap. Until the penguin has arrived from off-screen,
+  // hops are chained straight toward a home spot (a few leaps, not one big
+  // glide). Afterwards they're small random leaps in any direction — but a
+  // random leap aimed at a wall would get clamped down to almost no travel
+  // and read as "stuck", so near an edge we retry toward a direction that
+  // actually has room, biasing back toward center as a last resort.
+  function startHop() {
+    var r = stageRect();
+    var p;
+    if (!state.hasArrived) {
+      var homeX = r.width * 0.3, homeY = r.height * 0.5;
+      var dx = homeX - state.x, dy = homeY - state.y;
+      var d = Math.sqrt(dx * dx + dy * dy) || 1;
+      var stride = Math.min(d, HOP_MAX_DIST * 1.4);
+      p = clampToStage(state.x + (dx / d) * stride, state.y + (dy / d) * stride);
+      if (d - stride < 24) state.hasArrived = true;
+    } else {
+      var cx = r.width / 2, cy = r.height / 2;
+      var ang, dist, travel;
+      for (var attempt = 0; attempt < 6; attempt++) {
+        ang = attempt < 4
+          ? rand(0, Math.PI * 2)
+          : Math.atan2(cy - state.y, cx - state.x) + rand(-0.6, 0.6);
+        dist = rand(HOP_MIN_DIST, HOP_MAX_DIST);
+        p = clampToStage(state.x + Math.cos(ang) * dist, state.y + Math.sin(ang) * dist * 0.5);
+        travel = Math.hypot(p.x - state.x, p.y - state.y);
+        if (travel >= HOP_MIN_DIST * 0.6) break;
+      }
+    }
+    var travelDist = Math.max(1, Math.hypot(p.x - state.x, p.y - state.y));
+    if (p.x - state.x > 2) state.facing = 1;
+    else if (p.x - state.x < -2) state.facing = -1;
+    state.hop = { fromX: state.x, fromY: state.y, toX: p.x, toY: p.y, dur: clamp(travelDist / HOP_SPEED, 0.22, 0.5), t: 0 };
+    state.mode = "hopping";
+  }
+
+  function moveToward(tx, ty, speed, dt) {
+    var dx = tx - state.x, dy = ty - state.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 2) return 0;
+    var step = Math.min(dist, speed * dt);
+    state.x += (dx / dist) * step;
+    state.y += (dy / dist) * step;
+    if (Math.abs(dx) > 1.5) state.facing = dx > 0 ? 1 : -1;
+    return dist;
+  }
+
+  function spawnDash() {
+    var el = document.createElement("div");
+    el.className = "slide-dash";
+    el.style.left = (state.x - state.facing * spriteHalfW * 0.55) + "px";
+    el.style.top = (state.y + spriteHalfH * 0.35) + "px";
+    stage.appendChild(el);
+    window.setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 420);
+  }
+
+  function spawnTrailPixel(x, y) {
+    var el = document.createElement("div");
+    el.className = "pixel-trail";
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    stage.appendChild(el);
+    window.setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 500);
+  }
+
+  function render(dt) {
+    var pose = "stand";
+    var rock = 0, bob = 0, eyeShift = 0;
+    var hopLift = 0, scaleX = 1, scaleY = 1, tilt = 0;
+
+    if (state.mode === "sliding") {
+      pose = "slide";
+      bob = 0;
+      tilt = -5; // a light forward lean; the arched silhouette carries the glide
+    } else if (state.mode === "noticing") {
+      // a beat of surprise before committing to the slide
+      state.rockPhase += dt * 10;
+      rock = Math.sin(state.rockPhase) * 1.3;
+      eyeShift = Math.sin(state.rockPhase) > 0 ? 1 : -1;
+    } else if (state.mode === "waddling") {
+      state.walkTimer += dt;
+      if (state.walkTimer > 0.16) {
+        state.walkTimer = 0;
+        state.walkFrame = state.walkFrame === 0 ? 1 : 0;
+      }
+      rock = state.walkFrame === 0 ? -1 : 1;
+    } else if (state.mode === "hopping" && state.hop) {
+      var p = Math.min(1, state.hop.t / state.hop.dur);
+      var arc = Math.sin(p * Math.PI); // 0 at takeoff/landing, 1 mid-air
+      hopLift = -arc * HOP_HEIGHT;
+      scaleY = 0.82 + arc * 0.38;   // squashed at ends, stretched mid-leap
+      scaleX = 1.16 - arc * 0.26;
+    } else if (state.mode === "eating") {
+      bob = -Math.sin((0.5 - state.eatRemaining) * 14) * 1.2;
+    } else {
+      // resting: idle breathing bob, with an occasional glance
+      state.rockPhase += dt * 5.5;
+      var glance = Math.sin(state.rockPhase);
+      bob = Math.sin(state.rockPhase * 0.35) * 0.3;
+      if (state.restTimer < 0.9) {
+        rock = glance * 1.6;
+        eyeShift = glance > 0 ? 1 : -1;
+      }
+    }
+
+    drawPenguin(pose, { rock: rock, bob: bob, eyeShift: eyeShift });
+
+    canvas.style.left = (state.x - spriteHalfW) + "px";
+    canvas.style.top = (state.y - spriteHalfH + hopLift) + "px";
+    canvas.style.transform = "scaleX(" + (state.facing * scaleX) + ") scaleY(" + scaleY + ") rotate(" + tilt + "deg)";
+    canvas.style.transformOrigin = "center bottom";
+  }
+
+  // Three treats, traced 1:1 from Tony's reference icons (thresholded to
+  // pure black ink, cropped, then reduced to a clean grid) — a random one
+  // is picked each time a treat is dropped.
+  var SHRIMP_SVG = '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect x="7" y="0" width="29" height="3" fill="#0a0a0a"/>' +
+    '<rect x="35" y="3" width="4" height="3" fill="#0a0a0a"/>' +
+    '<rect x="35" y="13" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="35" y="18" width="4" height="3" fill="#0a0a0a"/>' +
+    '<rect x="36" y="6" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="17" y="7" width="19" height="3" fill="#0a0a0a"/>' +
+    '<rect x="39" y="7" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="39" y="29" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="10" width="9" height="3" fill="#0a0a0a"/>' +
+    '<rect x="33" y="10" width="5" height="3" fill="#0a0a0a"/>' +
+    '<rect x="42" y="10" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="8" y="13" width="10" height="1" fill="#0a0a0a"/>' +
+    '<rect x="45" y="13" width="3" height="4" fill="#0a0a0a"/>' +
+    '<rect x="8" y="14" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="8" y="18" width="9" height="3" fill="#0a0a0a"/>' +
+    '<rect x="26" y="14" width="3" height="6" fill="#0a0a0a"/>' +
+    '<rect x="36" y="14" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="36" y="17" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="6" y="15" width="11" height="2" fill="#0a0a0a"/>' +
+    '<rect x="36" y="15" width="4" height="2" fill="#0a0a0a"/>' +
+    '<rect x="3" y="17" width="14" height="1" fill="#0a0a0a"/>' +
+    '<rect x="3" y="38" width="14" height="1" fill="#0a0a0a"/>' +
+    '<rect x="42" y="17" width="6" height="3" fill="#0a0a0a"/>' +
+    '<rect x="3" y="18" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="3" y="19" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="3" y="35" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="41" y="20" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="21" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="14" y="21" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="33" y="21" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="38" y="21" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="38" y="31" width="7" height="2" fill="#0a0a0a"/>' +
+    '<rect x="38" y="45" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="22" width="3" height="5" fill="#0a0a0a"/>' +
+    '<rect x="0" y="31" width="3" height="4" fill="#0a0a0a"/>' +
+    '<rect x="32" y="22" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="38" y="22" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="26" y="23" width="10" height="1" fill="#0a0a0a"/>' +
+    '<rect x="38" y="23" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="17" y="24" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="17" y="35" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="29" y="24" width="10" height="1" fill="#0a0a0a"/>' +
+    '<rect x="30" y="25" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="30" y="26" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="27" width="7" height="2" fill="#0a0a0a"/>' +
+    '<rect x="17" y="27" width="18" height="1" fill="#0a0a0a"/>' +
+    '<rect x="20" y="28" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="29" width="30" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="30" width="23" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="31" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="20" y="32" width="6" height="2" fill="#0a0a0a"/>' +
+    '<rect x="37" y="33" width="8" height="1" fill="#0a0a0a"/>' +
+    '<rect x="17" y="34" width="15" height="1" fill="#0a0a0a"/>' +
+    '<rect x="36" y="34" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="23" y="35" width="10" height="2" fill="#0a0a0a"/>' +
+    '<rect x="35" y="35" width="10" height="1" fill="#0a0a0a"/>' +
+    '<rect x="35" y="36" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="15" y="37" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="23" y="37" width="3" height="5" fill="#0a0a0a"/>' +
+    '<rect x="29" y="37" width="15" height="1" fill="#0a0a0a"/>' +
+    '<rect x="32" y="38" width="16" height="4" fill="#0a0a0a"/>' +
+    '<rect x="5" y="39" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="40" width="11" height="1" fill="#0a0a0a"/>' +
+    '<rect x="6" y="41" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="8" y="42" width="3" height="3" fill="#0a0a0a"/>' +
+    '<rect x="23" y="42" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="32" y="42" width="13" height="3" fill="#0a0a0a"/>' +
+    '<rect x="20" y="43" width="4" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="45" width="25" height="3" fill="#0a0a0a"/>' +
+    '</svg>';
+
+  var FISH_SVG = '<svg viewBox="0 0 44 22" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect x="15" y="0" width="7" height="2" fill="#0a0a0a"/>' +
+    '<rect x="13" y="2" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="13" y="3" width="13" height="1" fill="#0a0a0a"/>' +
+    '<rect x="7" y="4" width="20" height="1" fill="#0a0a0a"/>' +
+    '<rect x="39" y="4" width="5" height="2" fill="#0a0a0a"/>' +
+    '<rect x="39" y="19" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="5" width="23" height="1" fill="#0a0a0a"/>' +
+    '<rect x="4" y="6" width="26" height="1" fill="#0a0a0a"/>' +
+    '<rect x="37" y="6" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="37" y="18" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="2" y="7" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="10" y="7" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="10" y="16" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="19" y="7" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="36" y="7" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="42" y="7" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="42" y="16" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="2" y="8" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="11" y="8" width="2" height="4" fill="#0a0a0a"/>' +
+    '<rect x="11" y="14" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="22" y="8" width="9" height="1" fill="#0a0a0a"/>' +
+    '<rect x="35" y="8" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="40" y="8" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="40" y="15" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="9" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="14" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="25" y="9" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="10" width="2" height="4" fill="#0a0a0a"/>' +
+    '<rect x="5" y="10" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="15" y="10" width="6" height="2" fill="#0a0a0a"/>' +
+    '<rect x="30" y="10" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="39" y="10" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="31" y="11" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="31" y="14" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="37" y="11" width="4" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="12" width="9" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="20" width="9" height="2" fill="#0a0a0a"/>' +
+    '<rect x="39" y="13" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="15" y="14" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="41" y="14" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="2" y="15" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="15" y="15" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="29" y="15" width="8" height="1" fill="#0a0a0a"/>' +
+    '<rect x="2" y="16" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="25" y="16" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="35" y="16" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="4" y="17" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="23" y="17" width="8" height="1" fill="#0a0a0a"/>' +
+    '<rect x="35" y="17" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="18" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="18" width="10" height="1" fill="#0a0a0a"/>' +
+    '<rect x="7" y="19" width="17" height="1" fill="#0a0a0a"/>' +
+    '<rect x="25" y="19" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="25" y="20" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="40" y="20" width="4" height="1" fill="#0a0a0a"/>' +
+    '</svg>';
+
+  var SQUID_SVG = '<svg viewBox="0 0 28 34" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect x="11" y="0" width="6" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="21" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="9" y="2" width="10" height="2" fill="#0a0a0a"/>' +
+    '<rect x="9" y="4" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="15" y="4" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="7" y="5" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="16" y="5" width="5" height="2" fill="#0a0a0a"/>' +
+    '<rect x="7" y="6" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="7" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="18" y="7" width="5" height="2" fill="#0a0a0a"/>' +
+    '<rect x="18" y="28" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="8" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="14" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="17" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="5" y="28" width="4" height="2" fill="#0a0a0a"/>' +
+    '<rect x="3" y="9" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="9" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="19" width="6" height="2" fill="#0a0a0a"/>' +
+    '<rect x="3" y="10" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="20" y="10" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="3" y="11" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="22" y="11" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="5" y="13" width="3" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="13" width="4" height="2" fill="#0a0a0a"/>' +
+    '<rect x="19" y="17" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="29" width="4" height="1" fill="#0a0a0a"/>' +
+    '<rect x="6" y="15" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="19" y="15" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="4" y="18" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="18" width="5" height="1" fill="#0a0a0a"/>' +
+    '<rect x="3" y="19" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="11" y="19" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="11" y="28" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="15" y="19" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="15" y="28" width="2" height="4" fill="#0a0a0a"/>' +
+    '<rect x="2" y="20" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="1" y="21" width="8" height="2" fill="#0a0a0a"/>' +
+    '<rect x="19" y="21" width="7" height="1" fill="#0a0a0a"/>' +
+    '<rect x="13" y="22" width="2" height="1" fill="#0a0a0a"/>' +
+    '<rect x="19" y="22" width="8" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="23" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="7" y="23" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="19" y="23" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="22" y="23" width="6" height="1" fill="#0a0a0a"/>' +
+    '<rect x="0" y="24" width="5" height="2" fill="#0a0a0a"/>' +
+    '<rect x="23" y="24" width="5" height="2" fill="#0a0a0a"/>' +
+    '<rect x="8" y="25" width="12" height="1" fill="#0a0a0a"/>' +
+    '<rect x="7" y="26" width="14" height="2" fill="#0a0a0a"/>' +
+    '<rect x="5" y="30" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="10" y="30" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="20" y="30" width="3" height="2" fill="#0a0a0a"/>' +
+    '<rect x="9" y="32" width="2" height="2" fill="#0a0a0a"/>' +
+    '<rect x="17" y="32" width="2" height="2" fill="#0a0a0a"/>' +
+    '</svg>';
+
+  var TREAT_SVGS = [SHRIMP_SVG, FISH_SVG, SQUID_SVG];
+
+  function dropTreat(clientX, clientY) {
+    var r = stageRect();
+    // Reachable bounds must match clampToStage's — otherwise a treat can
+    // land somewhere the penguin's own position clamp won't let it reach,
+    // and it stalls at the wall forever "sliding toward" an unreachable spot.
+    var p = clampToStage(clientX - r.left, clientY - r.top);
+    var id = "t" + treatSeq++;
+    var el = document.createElement("div");
+    el.className = "treat";
+    el.innerHTML = TREAT_SVGS[Math.floor(Math.random() * TREAT_SVGS.length)];
+    el.style.left = p.x + "px";
+    el.style.top = p.y + "px";
+    stage.appendChild(el);
+    state.treats.push({ id: id, x: p.x, y: p.y, el: el });
+    if (hint) hint.classList.add("is-faded");
+  }
+
+  function nearestTreat() {
+    var best = null, bestD = Infinity;
+    state.treats.forEach(function (t) {
+      var dx = t.x - state.x, dy = t.y - state.y;
+      var d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = t; }
+    });
+    return best;
+  }
+
+  function eatTreat(t) {
+    state.treats = state.treats.filter(function (o) { return o.id !== t.id; });
+    t.el.classList.add("is-eaten");
+    window.setTimeout(function () {
+      if (t.el.parentNode) t.el.parentNode.removeChild(t.el);
+    }, 200);
+    state.treatsEaten++;
+    treatCountEl.textContent = String(state.treatsEaten);
+  }
+
+  function onKey(e, isDown) {
+    switch (e.key) {
+      case "ArrowUp": case "w": case "W": state.keys.up = isDown; break;
+      case "ArrowDown": case "s": case "S": state.keys.down = isDown; break;
+      case "ArrowLeft": case "a": case "A": state.keys.left = isDown; break;
+      case "ArrowRight": case "d": case "D": state.keys.right = isDown; break;
+    }
+  }
+
+  window.addEventListener("keydown", function (e) { onKey(e, true); });
+  window.addEventListener("keyup", function (e) { onKey(e, false); });
+
+  stage.addEventListener("click", function (e) {
+    dropTreat(e.clientX, e.clientY);
+  });
+  stage.addEventListener(
+    "touchstart",
+    function (e) {
+      if (e.touches && e.touches[0]) {
+        dropTreat(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    },
+    { passive: true }
+  );
+
+  var lastTrailAt = 0;
+  stage.addEventListener("mousemove", function (e) {
+    if (REDUCED_MOTION) return;
+    var now = performance.now();
+    if (now - lastTrailAt < 45) return; // throttle so it doesn't flood the DOM
+    lastTrailAt = now;
+    var r = stageRect();
+    spawnTrailPixel(e.clientX - r.left, e.clientY - r.top);
+  });
+
+  var last = 0;
+  function tick(now) {
+    var dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
+    last = now;
+
+    var kx = (state.keys.right ? 1 : 0) - (state.keys.left ? 1 : 0);
+    var ky = (state.keys.down ? 1 : 0) - (state.keys.up ? 1 : 0);
+    var keyMoving = kx !== 0 || ky !== 0;
+    var hasTreat = state.treats.length > 0;
+
+    // Notice the treat first, like the rabbit reference does — a short
+    // beat of surprise before committing to the slide, not an instant snap.
+    if (hasTreat && state.mode !== "sliding" && state.mode !== "eating" && state.mode !== "noticing") {
+      state.mode = "noticing";
+      state.noticeTimer = rand(NOTICE_MIN, NOTICE_MAX);
+      state.rockPhase = 0;
+    }
+
+    if (state.mode === "noticing") {
+      state.noticeTimer -= dt;
+      if (state.noticeTimer <= 0) state.mode = "sliding";
+    } else if (state.mode === "sliding") {
+      var target = nearestTreat();
+      if (!target) {
+        enterRest(true);
+      } else {
+        var dx = target.x - state.x, dy = target.y - state.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < EAT_DIST) {
+          eatTreat(target);
+          state.mode = "eating";
+          state.eatRemaining = 0.5;
+        } else {
+          moveToward(target.x, target.y, SLIDE_SPEED, dt);
+          if (!REDUCED_MOTION) {
+            state.dashTimer -= dt;
+            if (state.dashTimer <= 0) {
+              spawnDash();
+              state.dashTimer = 0.05;
+            }
+          }
+        }
+      }
+    } else if (state.mode === "eating") {
+      state.eatRemaining -= dt;
+      if (state.eatRemaining <= 0) enterRest(true);
+    } else if (keyMoving) {
+      var len = Math.sqrt(kx * kx + ky * ky) || 1;
+      state.x += (kx / len) * WADDLE_SPEED * dt;
+      state.y += (ky / len) * WADDLE_SPEED * dt;
+      if (kx !== 0) state.facing = kx > 0 ? 1 : -1;
+      state.mode = "waddling";
+    } else if (state.mode === "waddling") {
+      enterRest(true);
+    } else if (state.mode === "hopping") {
+      state.hop.t += dt;
+      if (state.hop.t >= state.hop.dur) {
+        state.x = state.hop.toX;
+        state.y = state.hop.toY;
+        state.hop = null;
+        state.hopsLeftInBurst--;
+        if (!state.hasArrived || (state.hopsLeftInBurst > 0 && !REDUCED_MOTION)) {
+          startHop();
+        } else {
+          enterRest(false);
+        }
+      } else {
+        // interpolate mid-leap (visual lift/squash handled in render)
+        var hp = state.hop.t / state.hop.dur;
+        state.x = state.hop.fromX + (state.hop.toX - state.hop.fromX) * hp;
+        state.y = state.hop.fromY + (state.hop.toY - state.hop.fromY) * hp;
+      }
+    } else {
+      // resting between hops
+      state.restTimer -= dt;
+      if (state.restTimer <= 0) {
+        if (REDUCED_MOTION) {
+          state.restTimer = 999; // stay put; still reachable via keys/treats
+        } else {
+          state.hopsLeftInBurst = Math.floor(rand(BURST_MIN, BURST_MAX + 1));
+          startHop();
+        }
+      }
+    }
+
+    clampPos();
+    render(dt);
+    requestAnimationFrame(tick);
+  }
+
+  function init() {
+    resizeCanvas();
+    layoutSprite();
+    var r = stageRect();
+
+    if (REDUCED_MOTION) {
+      state.x = r.width * 0.32;
+      state.y = r.height / 2;
+      state.hasArrived = true;
+      state.mode = "resting";
+      state.restTimer = 999; // no ambient auto-hopping; keys/treats still work
+    } else {
+      state.x = -spriteHalfW - 30;
+      state.y = r.height / 2;
+      state.mode = "resting";
+      state.restTimer = 0; // fires the first hop immediately, leaping in from off-screen
+    }
+
+    clampPos();
+    render(0);
+    requestAnimationFrame(tick);
+
+    window.addEventListener("resize", function () {
+      clampPos();
+    });
+  }
+
+  // Wait a frame past DOMContentLoaded so the stage has its real, laid-out
+  // size (web font swap / flex layout can still be settling right at
+  // DOMContentLoaded) before we compute any position from it.
+  function start() {
+    requestAnimationFrame(function () { requestAnimationFrame(init); });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+})();
+</script>
 </body>
 </html>
