@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tony Liu — Product Manager &amp; UX Designer</title>
+<meta name="description" content="Tony Liu — Product Manager & UX Designer. CMU Entertainment Technology. Product strategy intern at Tencent IEG Global.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%231c3a2b'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle' fill='%23e08a4b' font-family='sans-serif' font-weight='700'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">Tony Liu<span>.</span></a>
+    <div class="nav-links">
+      <a href="#top" data-i18n="nav.home">Home</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#experience" data-i18n="nav.experience">Experience</a>
+      <a href="#work" data-i18n="nav.work">Work</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-btn="en">EN</button>
+        <button type="button" data-lang-btn="zh">中文</button>
+      </div>
+      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-panel">
+    <a href="#top" data-i18n="nav.home">Home</a>
+    <a href="#about" data-i18n="nav.about">About</a>
+    <a href="#experience" data-i18n="nav.experience">Experience</a>
+    <a href="#work" data-i18n="nav.work">Work</a>
+    <a href="#contact" data-i18n="nav.contact">Contact</a>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- Hero: minimal + playable -->
+  <header class="hero-play">
+    <div class="hero-play-copy">
+      <div class="eyebrow" data-i18n="hero.eyebrow">Product Manager · UX Designer</div>
+      <h1 data-i18n="hero.name">Tony Liu</h1>
+      <p class="hero-play-tagline" data-i18n="hero.tagline">I turn research into features that ship.</p>
+      <p class="hero-play-hint" data-i18n="hero.hint">Click anywhere to toss a treat 🦴 — or use ← → to walk him yourself.</p>
+    </div>
+    <div class="hero-stage" id="heroStage">
+      <div class="dog-pos" id="dogPos">
+        <div class="dog-facing" id="dogFacing">
+          <div class="dog" id="dogEl">
+            <svg viewBox="0 0 220 160" width="100%" height="100%" aria-hidden="true">
+              <ellipse class="dog-shadow" cx="110" cy="150" rx="70" ry="7"></ellipse>
+              <g class="dog-tail"><path d="M58 92 C 30 78, 22 55, 34 38 C 40 55, 48 72, 62 86 Z" fill="#c98a4b"></path></g>
+              <g class="leg leg-bl"><rect x="72" y="112" width="16" height="34" rx="8" fill="#a9713c"></rect></g>
+              <g class="leg leg-br"><rect x="132" y="112" width="16" height="34" rx="8" fill="#a9713c"></rect></g>
+              <ellipse class="dog-body" cx="112" cy="102" rx="58" ry="34" fill="#d9974f"></ellipse>
+              <ellipse cx="120" cy="112" rx="34" ry="18" fill="#f6e3c9"></ellipse>
+              <g class="leg leg-fl"><rect x="92" y="118" width="16" height="34" rx="8" fill="#d9974f"></rect></g>
+              <g class="leg leg-fr"><rect x="150" y="118" width="16" height="34" rx="8" fill="#d9974f"></rect></g>
+              <path class="dog-collar" d="M148 88 Q168 96 148 106" stroke="#1c3a2b" stroke-width="7" fill="none" stroke-linecap="round"></path>
+              <circle cx="148" cy="97" r="4.5" fill="#e08a4b"></circle>
+              <g class="dog-head">
+                <ellipse class="ear ear-back" cx="182" cy="52" rx="13" ry="20" fill="#a9713c" transform="rotate(18 182 52)"></ellipse>
+                <circle cx="176" cy="72" r="32" fill="#d9974f"></circle>
+                <ellipse cx="196" cy="82" rx="16" ry="12" fill="#f6e3c9"></ellipse>
+                <circle class="dog-nose" cx="210" cy="80" r="5" fill="#2b241d"></circle>
+                <ellipse class="dog-eye" cx="184" cy="66" rx="4.5" ry="5.5" fill="#2b241d"></ellipse>
+                <ellipse class="ear ear-front" cx="160" cy="50" rx="13" ry="22" fill="#c98a4b" transform="rotate(-12 160 50)"></ellipse>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="treats-layer" id="treatsLayer"></div>
+    </div>
+  </header>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div class="eyebrow" data-i18n="about.eyebrow">About</div>
+        <h2 data-i18n="about.title">Product thinking, shaped by design training.</h2>
+      </div>
+      <div class="hero-stats mt-lg" data-reveal>
+        <div class="stat"><b data-i18n="hero.stat1.num">1M+</b><span data-i18n="hero.stat1.label">DAU on the overseas game I shipped features for</span></div>
+        <div class="stat"><b data-i18n="hero.stat2.num">20%+</b><span data-i18n="hero.stat2.label">Engagement lift from playtest-driven iteration</span></div>
+        <div class="stat"><b data-i18n="hero.stat3.num">37%</b><span data-i18n="hero.stat3.label">Faster task time, Xbox Adaptive Controller project</span></div>
+        <div class="stat"><b data-i18n="hero.stat4.num">3.89</b><span data-i18n="hero.stat4.label">GPA, M.S. Entertainment Technology, CMU</span></div>
+      </div>
+      <div class="about-grid mt-lg">
+        <div class="about-card" data-reveal>
+          <div class="about-byline">
+            <img src="assets/photo/tony.jpg" alt="Portrait of Tony Liu" width="56" height="56">
+            <div>
+              <strong data-i18n="hero.name">Tony Liu</strong>
+              <span data-i18n="hero.eyebrow">Product Manager · UX Designer</span>
+            </div>
+          </div>
+          <p data-i18n="about.body">I'm a product manager with a UX design background...</p>
+          <div class="pill-row">
+            <span class="pill" data-i18n="about.pill1">Product Strategy</span>
+            <span class="pill" data-i18n="about.pill2">0→1 Product Definition</span>
+            <span class="pill" data-i18n="about.pill3">UX Research</span>
+            <span class="pill" data-i18n="about.pill4">Rapid Prototyping</span>
+            <span class="pill" data-i18n="about.pill5">AIGC Workflows</span>
+            <span class="pill" data-i18n="about.pill6">Cross-functional Delivery</span>
+          </div>
+        </div>
+        <div class="about-card" data-reveal>
+          <h4 data-i18n="about.edu.title" style="margin-bottom:16px;">Education</h4>
+          <div class="edu-list">
+            <div class="edu-item">
+              <div>
+                <h4 data-i18n="about.cmu.name">Carnegie Mellon University</h4>
+                <p style="font-weight:600;color:var(--green-800);margin-bottom:2px;" data-i18n="about.cmu.role">Master of Entertainment Technology</p>
+                <p data-i18n="about.cmu.meta">Expected May 2027</p>
+              </div>
+              <div class="edu-gpa" data-i18n="about.cmu.gpa">GPA 3.89/4.0</div>
+            </div>
+            <div class="edu-item">
+              <div>
+                <h4 data-i18n="about.ucsd.name">UC San Diego</h4>
+                <p style="font-weight:600;color:var(--green-800);margin-bottom:2px;" data-i18n="about.ucsd.role">B.A. Cognitive Science (HCI) &amp; Communication</p>
+                <p data-i18n="about.ucsd.meta">Cognitive science, HCI focus</p>
+              </div>
+              <div class="edu-gpa" data-i18n="about.ucsd.gpa">GPA 3.95/4.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div class="eyebrow" data-i18n="exp.eyebrow">Experience</div>
+        <h2 data-i18n="exp.title">Where the product thinking comes from.</h2>
+      </div>
+      <div class="timeline">
+
+        <article class="exp-card" data-reveal>
+          <div class="exp-head">
+            <div>
+              <h3 data-i18n="exp.tencent.company">Tencent · IEG Global</h3>
+              <div class="exp-role" data-i18n="exp.tencent.role">Product Strategy Intern</div>
+            </div>
+            <div class="exp-meta" data-i18n="exp.tencent.meta">Shenzhen · Jun 2026 – Present</div>
+          </div>
+          <ul class="exp-bullets">
+            <li data-i18n-html="exp.tencent.b1.html"></li>
+            <li data-i18n-html="exp.tencent.b2.html"></li>
+            <li data-i18n-html="exp.tencent.b3.html"></li>
+          </ul>
+        </article>
+
+        <article class="exp-card" data-reveal>
+          <div class="exp-head">
+            <div>
+              <h3 data-i18n="exp.joyfun.company">Joyfun Interactive</h3>
+              <div class="exp-role" data-i18n="exp.joyfun.role">Game Interaction Design Intern</div>
+            </div>
+            <div class="exp-meta" data-i18n="exp.joyfun.meta">Wuhan · May – Aug 2025</div>
+          </div>
+          <ul class="exp-bullets">
+            <li data-i18n-html="exp.joyfun.b1.html"></li>
+            <li data-i18n-html="exp.joyfun.b2.html"></li>
+            <li data-i18n-html="exp.joyfun.b3.html"></li>
+          </ul>
+        </article>
+
+        <article class="exp-card" data-reveal>
+          <div class="exp-head">
+            <div>
+              <h3 data-i18n="exp.xbotgo.company">Blink Tech · XbotGo</h3>
+              <div class="exp-role" data-i18n="exp.xbotgo.role">Product Strategy &amp; User Research Intern</div>
+            </div>
+            <div class="exp-meta" data-i18n="exp.xbotgo.meta">Mountain View, CA · May – Sep 2023</div>
+          </div>
+          <ul class="exp-bullets">
+            <li data-i18n-html="exp.xbotgo.b1.html"></li>
+            <li data-i18n-html="exp.xbotgo.b2.html"></li>
+            <li data-i18n-html="exp.xbotgo.b3.html"></li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section id="work">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div class="eyebrow" data-i18n="work.eyebrow">Selected Work</div>
+        <h2 data-i18n="work.title">Product and design work, end to end.</h2>
+      </div>
+
+      <div class="project-grid featured">
+        <a class="project-card" href="projects/flow-ai.html" data-reveal>
+          <div class="project-cover"><img src="assets/covers/flow-ai.svg" alt="Flow AI cover art"></div>
+          <div class="project-body">
+            <div class="project-cat" data-i18n="proj.flowai.cat">AI Product</div>
+            <h3 data-i18n="proj.flowai.title">Flow AI — an LLM focus-management agent</h3>
+            <p data-i18n="proj.flowai.blurb">A 0→1 Chrome extension AI agent...</p>
+            <div class="project-tags"><span>Product</span><span>AI</span><span>UX</span></div>
+            <span class="project-link" data-i18n="work.viewall">View full case study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="project-card" href="projects/building-virtual-world.html" data-reveal>
+          <div class="project-cover"><img src="assets/covers/building-virtual-world.svg" alt="Building Virtual World cover art"></div>
+          <div class="project-body">
+            <div class="project-cat" data-i18n="proj.bvw.cat">Game · Production</div>
+            <h3 data-i18n="proj.bvw.title">Building Virtual World — embodied game sprints</h3>
+            <p data-i18n="proj.bvw.blurb">Producer &amp; UX designer on 4 sprints...</p>
+            <div class="project-tags"><span>Producer</span><span>UX</span><span>Unity</span></div>
+            <span class="project-link" data-i18n="work.viewall">View full case study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="project-card" href="projects/focustube.html" data-reveal>
+          <div class="project-cover"><img src="assets/covers/focustube.svg" alt="FocusTube cover art"></div>
+          <div class="project-body">
+            <div class="project-cat" data-i18n="proj.focustube.cat">Ed-Tech</div>
+            <h3 data-i18n="proj.focustube.title">FocusTube — a distraction-free YouTube</h3>
+            <p data-i18n="proj.focustube.blurb">A distraction-free redesign of YouTube...</p>
+            <div class="project-tags"><span>Product</span><span>UX Research</span><span>UI</span></div>
+            <span class="project-link" data-i18n="work.viewall">View full case study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <h3 class="mt-lg" data-i18n="work.more" style="margin-bottom:20px;">More Work</h3>
+      <div class="project-grid">
+        <a class="project-card" href="projects/favor-treasure-hunt.html" data-reveal>
+          <div class="project-cover"><img src="assets/covers/favor-treasure-hunt.svg" alt="Favor Treasure Hunt cover art"></div>
+          <div class="project-body">
+            <div class="project-cat" data-i18n="proj.favor.cat">Game · AR</div>
+            <h3 data-i18n="proj.favor.title">Favor Treasure Hunt — AR for neighbors</h3>
+            <p data-i18n="proj.favor.blurb">A mobile AR experience...</p>
+            <div class="project-tags"><span>UX Design</span><span>Rapid Prototyping</span></div>
+            <span class="project-link" data-i18n="work.viewall">View full case study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="project-card" href="projects/pharmily.html" data-reveal>
+          <div class="project-cover"><img src="assets/covers/pharmily.svg" alt="Pharmily cover art"></div>
+          <div class="project-body">
+            <div class="project-cat" data-i18n="proj.pharmily.cat">Healthcare</div>
+            <h3 data-i18n="proj.pharmily.title">Pharmily — campus pharmacy pickup, redesigned</h3>
+            <p data-i18n="proj.pharmily.blurb">A service redesign for campus pharmacy pickup...</p>
+            <div class="project-tags"><span>Service Design</span><span>User Study</span></div>
+            <span class="project-link" data-i18n="work.viewall">View full case study
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H9M17 7V15"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-band" data-reveal>
+        <h2 data-i18n="contact.title">Let's build something worth shipping.</h2>
+        <p data-i18n="contact.body">Open to Product Manager and UX Designer roles for 2026.</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="mailto:shuchangliucareer@gmail.com" data-i18n="contact.email">Email Me</a>
+          <a class="btn btn-outline" href="https://www.linkedin.com/" target="_blank" rel="noopener" data-i18n="contact.linkedin">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-row">
+      <span data-i18n="footer.tagline">Product-minded, design-trained.</span>
+      <div class="footer-links">
+        <a href="mailto:shuchangliucareer@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <span><span data-year></span> · <span data-i18n="footer.rights">hand-built for CMU 15-113</span></span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script src="js/hero-pet.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="FocusTube cover">
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c3a2b"/>
+      <stop offset="1" stop-color="#0f1f17"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#g3)"/>
+  <circle cx="90" cy="90" r="110" fill="#e08a4b" opacity="0.15"/>
+  <g transform="translate(400,250)">
+    <rect x="-160" y="-100" width="320" height="200" rx="20" fill="#fbf8f3" opacity="0.06"/>
+    <rect x="-120" y="-70" width="240" height="140" rx="16" fill="#fbf8f3"/>
+    <circle r="42" fill="#e08a4b"/>
+    <polygon points="-12,-22 -12,22 26,0" fill="#fbf8f3"/>
+  </g>
+  <text x="60" y="60" font-family="Sora, sans-serif" font-size="22" font-weight="700" fill="#fbf8f3" opacity="0.85">FocusTube</text>
+</svg>
