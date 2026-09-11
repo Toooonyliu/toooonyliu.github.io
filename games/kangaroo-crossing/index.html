@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kangaroo Crossing | Tony Liu</title>
+  <meta name="description" content="Play Tony Liu’s Kangaroo Crossing: a browser arcade game with voxel-style graphics, lakes, traffic, and original synthesized audio.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="transitions.css">
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="../../index.html#work"><span class="brand-icon">↟</span> TONY LIU · PORTFOLIO</a>
+      <span class="tag">A ONE-MORE-TRY KIND OF GAME</span>
+    </header>
+    <section class="intro"><div><p class="eyebrow">SMALL HOPS. BIG ADVENTURE.</p><h1>Look both ways.<br>Then make your move.</h1></div><p class="description">An endless road. One brave little kangaroo.<br>How far can you go?</p></section>
+    <section class="game-shell" aria-label="Little Crossing game">
+      <div class="hud"><div class="scores"><div><span>DISTANCE</span><strong id="score">0</strong></div><div><span>PERSONAL BEST</span><strong id="best">0</strong></div></div><button id="sound" aria-pressed="false">Sound on</button><button id="pause" aria-label="Pause game">Ⅱ</button></div>
+      <canvas id="game" width="900" height="630" tabindex="0" aria-label="Cross the roads using arrow keys or WASD. Avoid cars. Press P to pause."></canvas>
+      <div id="overlay" class="overlay"><div class="modal"><span id="modal-icon">✦</span><p id="modal-label" class="eyebrow">READY WHEN YOU ARE</p><h2 id="modal-title">KANGAROO<br>CROSSING</h2><p id="modal-copy">Dodge traffic, jump on logs and lily pads, and keep moving.</p><button id="start" class="primary">Let's cross <span>↗</span></button></div></div>
+      <div class="game-footer"><span><i></i> GRASS IS YOUR SAFE SPOT</span><span>KEEP HOPPING. THE SCREEN KEEPS MOVING.</span></div>
+    </section>
+    <footer><div><span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span><span class="control-copy">to hop <b>·</b> WASD works too</span></div><span class="control-copy">P to pause <b>·</b> R to restart</span></footer>
+    <nav class="touch-controls" aria-label="Movement controls"><button data-dx="0" data-dy="1" aria-label="Hop forward">↑</button><div><button data-dx="-1" data-dy="0" aria-label="Hop left">←</button><button data-dx="0" data-dy="-1" aria-label="Hop backward">↓</button><button data-dx="1" data-dy="0" aria-label="Hop right">→</button></div></nav>
+    <p class="credit">Made for the journey. Not the destination.</p><div id="announcement" class="sr-only" aria-live="polite"></div>
+  </main>
+  <script src="renderer.js"></script>
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
