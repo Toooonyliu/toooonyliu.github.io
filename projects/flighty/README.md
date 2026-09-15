@@ -1,15 +1,35 @@
-# Flighty — From flights to journeys
+# Flighty, a new chapter
 
-Independent concept by Tony Liu. The case study follows the existing portfolio's white/black palette, Space Grotesk type, pixel labels, dotted background, and section rules. The demo retains the Flighty-inspired dark mobile UI.
+Independent Flighty product-design case study by Tony Liu. Updated September 15, 2026 to use the selected Flighty website visual language: a floating pill navigation, two-feature hero, dark aircraft scene, pale product cards and purple history/loyalty accents. The portfolio homepage is unchanged.
 
 - Case study: https://toooonyliu.github.io/projects/flighty/
-- Interactive demo: https://toooonyliu.github.io/projects/flighty/demo/
-- `index.html`, `portfolio.css`, `case-study.css`: static case study, no build needed.
-- `images/`: actual prototype captures, not original account screenshots.
-- `demo/`: committed static production build, served directly by GitHub Pages.
-- `source/`: source snapshot of the implemented prototype (original commit 9da7c721601f49abf04950ae0185b4da6752e514). No credentials or private QA captures included. The existing Sites deployment is separate.
+- Working prototype: https://toooonyliu.github.io/projects/flighty/demo/
+- PRD: https://toooonyliu.github.io/projects/flighty/documents/Flighty_Travel_Profile_PRD_v1.0.pdf
 
-## Rebuild the demo
+## Page structure
+
+Hero → Why Flighty → competitive tasks and selected review evidence → How might we / business hypotheses → original PRD and scope addendum → Trips → Mileage & status → on-demand prototype → proposed validation.
+
+The page distinguishes Trips as the core concept from the more speculative loyalty pilot. Historical reviews are labeled; no representative sentiment percentages, market-share inference or measured commercial impact are claimed. The original PRD PDF is preserved byte-for-byte.
+
+## Files and behavior
+
+- `index.html`, `case-study.css`, `case-study.js`: static case study, no build step. Native system font; locally bundled imagery and Phosphor icons.
+- `images/`: prototype captures, city images and attributed Flighty artwork. See `images/ASSETS.md`.
+- `documents/`: original PRD v1.0 and dated scope addendum.
+- `demo/`: existing static app served by GitHub Pages; unchanged in this case-study revision.
+- `source/`: original prototype source snapshot (9da7c721601f49abf04950ae0185b4da6752e514). The separate Sites deployment is unchanged.
+- `portfolio.css`: retained legacy style file from the earlier page; no longer loaded by this case study.
+
+Hero tabs change phone screenshots and benefit cards. Comparison tabs switch traveler jobs. The trip chart switches distance/time and provides a data table. The loyalty chart switches three sample accounts and earned-only versus booked-estimate progress. Values mirror `source/src/domain.ts` and `source/src/loyalty.ts`; update the explanatory fixtures together if those source examples change.
+
+Aircraft motion uses a transform of the attributed captured artwork, pauses offscreen and in hidden tabs, supports a pause control, and is disabled for reduced motion. The demo iframe and its WebGL assets load only on request. The hero is a narrated preview; full editing happens in the prototype.
+
+## Preview
+
+Serve the repository root with a static HTTP server and open `/projects/flighty/`. No Node packages or third-party analytics are needed by the case study itself.
+
+## Rebuild the separate demo
 
 Use Node 24 and npm. From `projects/flighty/source`:
 
@@ -20,8 +40,8 @@ cd ..
 node export-demo.mjs
 ```
 
-Commit updated source and `demo/` together. The export scopes root-relative asset references to `/projects/flighty/demo/assets/`, including globe textures and phone assets, without changing the protected mobile runtime. Worker output is not needed on GitHub Pages. Preview from the repository root with `python3 -m http.server 8000`.
+Commit source and demo together when changing the app. The export scopes asset references to `/projects/flighty/demo/assets/` without changing the protected mobile runtime. No demo rebuild is needed for case-study edits.
 
-## Data and scope
+## Data and verification
 
-Sample/manual loyalty records, local browser persistence, no production account or live flight integrations. This is not an official Flighty project. No customer research or measured business outcomes are claimed. Asset provenance is in `source/public/assets/SOURCES.md`.
+The prototype uses sample/manual loyalty records and local browser persistence. It has no production loyalty connection. Research context is desk research; business outcomes remain hypotheses. See `design-qa.md` for browser verification and remaining limits.
