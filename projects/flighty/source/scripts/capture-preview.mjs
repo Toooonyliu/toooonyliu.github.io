@@ -1,0 +1,10 @@
+import {chromium} from '@playwright/test';
+const browser=await chromium.launch({headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const page=await browser.newPage({viewport:{width:1400,height:1200},deviceScaleFactor:1});
+page.on('pageerror',e=>console.log('PAGEERROR',e.message));
+await page.goto('http://127.0.0.1:4174/');
+await page.locator('.native-nav').waitFor();
+await page.screenshot({path:'qa/before-full.png'});
+await page.locator('.device-screen').screenshot({path:'qa/before-phone.png'});
+console.log(await page.locator('.device-screen').boundingBox());
+await browser.close();

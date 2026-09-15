@@ -1,0 +1,8 @@
+import {chromium} from '@playwright/test';
+const b=await chromium.launch({headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const p=await b.newPage({viewport:{width:1400,height:1200}});const c=()=>p.getByTestId('flow-current');
+const snap=async(n)=>{await p.waitForTimeout(900);await p.locator('.device-screen').screenshot({path:`qa/frequent-flyer-audit/${n}.png`});console.log(n,await c().innerText());};
+await p.goto('http://127.0.0.1:4174');console.log(await c().innerText());await p.getByRole('button',{name:'Expand panel',exact:true}).click();await c().locator('.benefit-heading').scrollIntoViewIfNeeded();await snap('01-mileage');
+await c().getByRole('button',{name:'View all',exact:true}).click();await snap('02-programs');await p.getByRole('button',{name:'Done',exact:true}).click();
+await p.getByRole('navigation').getByRole('button',{name:'Passport',exact:true}).click();await p.getByRole('button',{name:'Expand panel',exact:true}).click();console.log(await c().innerText());await p.getByRole('region',{name:'Passport year'}).getByRole('button',{name:'2026',exact:true}).click();await c().getByRole('group',{name:'Past flights display'}).getByRole('button',{name:'Trips',exact:true}).click();await c().locator('.history-toggle').scrollIntoViewIfNeeded();await snap('03-trips');
+await c().getByRole('button',{name:'Review trip: Japan',exact:true}).click();await snap('04-review');await c().getByRole('button',{name:'Save Trip',exact:true}).scrollIntoViewIfNeeded();await snap('05-review-actions');await c().getByRole('button',{name:'Save Trip',exact:true}).click();await c().locator('.note-section').scrollIntoViewIfNeeded();await snap('06-saved-trip');await b.close();

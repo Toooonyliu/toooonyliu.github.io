@@ -1,0 +1,4 @@
+import {chromium} from '@playwright/test';
+const b=await chromium.launch({headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1400,height:1200}});await p.goto('http://127.0.0.1:4174/');await p.locator('.earth-view[data-ready=true]').waitFor();
+await p.evaluate(()=>{document.addEventListener('click',e=>console.log('CLICK',e.target.closest('button')?.getAttribute('aria-label')),true)});p.on('console',m=>{if(m.text().startsWith('CLICK'))console.log(m.text())});
+console.log('before',await p.locator('.earth-view').getAttribute('data-distance'));await p.getByRole('button',{name:'Zoom in',exact:true}).click();await p.waitForTimeout(500);console.log('after',await p.locator('.earth-view').getAttribute('data-distance'));await b.close();

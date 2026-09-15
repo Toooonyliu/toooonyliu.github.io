@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flighty — From Flights to Journeys · Tony Liu</title>
+<meta name="description" content="Tony Liu's independent Flighty redesign concept: reviewed trip groups, personal travel memories, and transparent mileage goals. Read the design story and try the interactive demo.">
+<meta property="og:title" content="Flighty — From Flights to Journeys · Tony Liu">
+<meta property="og:description" content="A frequent-flyer concept for trip memories and loyalty clarity. Explore the design decisions and play with the prototype.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://toooonyliu.github.io/projects/flighty/">
+<meta property="og:image" content="https://toooonyliu.github.io/projects/flighty/images/trip.png">
+<link rel="canonical" href="https://toooonyliu.github.io/projects/flighty/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portfolio.css">
+<link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to case study</a>
+<header class="site-header">
+<a class="mark" href="../../">TONY LIU</a>
+<nav aria-label="Main navigation"><a href="../../about.html">About</a><a href="../../#work">Work</a><a href="../../#contact">Contact</a></nav>
+</header>
+<main id="main">
+<section class="case-hero">
+<div class="hero-story">
+<a class="back-link" href="../../#work">&larr; BACK TO SELECTED WORK</a>
+<div class="eyebrow">Independent concept · 2026</div>
+<h1>Flighty.<br>From flights<br>to journeys.</h1>
+<p class="case-lede">Making a frequent flyer's history feel personal—and their mileage progress easier to understand.</p>
+<div class="actions"><a class="button primary" href="demo/">Try the live demo <span aria-hidden="true">↗</span></a><a class="text-link" href="#why">Read the design story ↓</a></div>
+<p class="small-note">Interactive web prototype · No sign-in required</p>
+</div>
+<figure class="hero-preview"><img src="images/trip.png" alt="Chicago trip detail showing a focused route globe, two flights, distance, and trip summary." width="393" height="852" fetchpriority="high"><figcaption>A flight record becomes a trip story.</figcaption></figure>
+</section>
+<div class="project-meta" aria-label="Project overview">
+<div><span class="eyebrow">My focus</span><p>Product direction &amp; interaction design</p></div>
+<div><span class="eyebrow">Audience</span><p>Frequent flyers across multiple programs</p></div>
+<div><span class="eyebrow">Deliverable</span><p>AI-assisted, interactive web prototype</p></div>
+</div>
+<section id="why" class="story-section">
+<div><div class="eyebrow">01 · The opportunity</div><h2 class="section-title">The flight ends.<br>The journey doesn't.</h2></div>
+<div class="prose"><p class="large-copy">I wanted to explore what Flighty could do for a frequent flyer between flights.</p><p>The reference experience makes an individual flight and its details easy to explore. Passport turns those records into a bigger picture of travel. My question was: could that history also help me remember a whole trip and understand progress across my loyalty accounts?</p><p>A Tokyo journey can involve several flight legs, different airlines, and a train between airports. A mileage goal has a different set of rules again. I designed this concept around those two needs, while keeping the next flight at the center of My Flights.</p><p class="small-note">Starting point: my Flighty screenshots and flight-detail walkthroughs. These are design hypotheses from that review, not findings from a customer research study.</p></div>
+</section>
+<section id="changes">
+<div class="eyebrow">02 · What changes</div><h2 class="section-title">Two additions.<br>A familiar foundation.</h2>
+<div class="comparison" role="table" aria-label="Reference flow and redesign comparison">
+<div class="comparison-row comparison-head" role="row"><div role="columnheader">Focus</div><div role="columnheader">Reference experience</div><div role="columnheader">This concept</div></div>
+<div class="comparison-row" role="row"><h3 role="rowheader">Travel history</h3><p role="cell">Past Flights lists individual legs, with sorting and detailed flight information.</p><p role="cell"><strong>Trips</strong> brings related legs together, with destination thumbnails, notes, and a review step before saving.</p></div>
+<div class="comparison-row" role="row"><h3 role="rowheader">Travel statistics</h3><p role="cell">Passport summarizes flights across a year or all time.</p><p role="cell"><strong>Trip summaries</strong> add a focused route view and a smaller Passport for one journey.</p></div>
+<div class="comparison-row" role="row"><h3 role="rowheader">Mileage clarity</h3><p role="cell">Flight details and Passport show the geographic distance traveled.</p><p role="cell"><strong>Mileage &amp; status</strong> adds program-specific goals, distinguishing distance, redeemable rewards, and qualifying progress.</p></div>
+<div class="comparison-row" role="row"><h3 role="rowheader">Navigation</h3><p role="cell">My Flights, Friends, and Passport anchor the experience.</p><p role="cell">Those tabs stay. Trips sits within Past Flights; loyalty progress is accessible from My Flights.</p></div>
+</div>
+<p class="small-note">Comparison describes the supplied reference screens, not an exhaustive audit of every feature in the current Flighty app.</p>
+</section>
+<section class="feature-section" id="trips">
+<figure class="feature-visual"><img src="images/japan.png" alt="Japan trip with a route globe and summary for four flights, retaining each flight leg." width="393" height="852" loading="lazy"><figcaption>One journey. Every flight still accessible.</figcaption></figure>
+<div class="feature-copy"><div class="eyebrow">03 · Trips</div><h2 class="section-title">Remember Tokyo.<br>Keep every leg.</h2><p class="large-copy">A destination is a better memory cue than a flight number.</p><p>City thumbnails make trips recognizable. A focused globe frames the selected route, while a summary connects distance, travel days, and flight time to the journey.</p><ol class="decision-list"><li><strong>Suggest, then confirm.</strong> Review flight membership before a group becomes a saved trip.</li><li><strong>Leave gaps visible.</strong> A missing connection can be a train, car, or ferry. The prototype does not invent a flight.</li><li><strong>Make it personal.</strong> Rename a trip, add notes, or mark it Work or Personal. Split and merge actions include Undo.</li></ol><a class="text-link" href="#demo">Try it: Passport → Past Flights → Trips ↓</a></div>
+</section>
+<section class="feature-section reverse" id="mileage">
+<figure class="feature-visual"><img src="images/mileage.png" alt="ANA sample mileage account separating Premium Points, ANA Group points, booked estimates, and redeemable miles." width="393" height="852" loading="lazy"><figcaption>Distance flown is not the same as loyalty credit.</figcaption></figure>
+<div class="feature-copy"><div class="eyebrow">04 · Mileage &amp; status</div><h2 class="section-title">Know what counts<br>toward the goal.</h2><p class="large-copy">A bigger number is only useful if I know what it means.</p><p>I separated the loyalty program from the operating airline, and redeemable rewards from qualifying progress. ANA, United, and British Airways examples let visitors explore different account structures.</p><ol class="decision-list"><li><strong>See the whole requirement.</strong> The ANA example includes both total Premium Points and the ANA Group counter.</li><li><strong>Separate earned from expected.</strong> Posted credit is already in the balance. Pending and booked estimates remain visible separately.</li><li><strong>Keep the goal close.</strong> Pin a program to My Flights and edit its target or deadline without burying the next flight.</li></ol><p class="small-note">Accounts are sample or manually entered data. United and British Airways targets are illustrative personal goals; the demo does not connect to loyalty accounts or guarantee eligibility.</p></div>
+</section>
+<section class="feature-section">
+<figure class="feature-visual"><img src="images/passport.png" alt="Purple all-time Flighty Passport with a geographic route map and flight, distance, airport, and airline totals." width="393" height="852" loading="lazy"><figcaption>A familiar Passport, backed by inspectable records.</figcaption></figure>
+<div class="feature-copy"><div class="eyebrow">05 · Visual continuity</div><h2 class="section-title">Extend the experience.<br>Keep its identity.</h2><p>I brought the all-time Passport closer to the reference app: a purple cover, geographic routes, prominent totals, and deeper statistics below.</p><p>The app keeps dark surfaces, compact flight rows, and clear operational status colors. The new trip cards reuse that language. This case study uses my portfolio's monochrome layout and pixel labels, giving the project a home without changing the prototype's character.</p><p>Totals come from the demo's flight records. Missing data stays visible as partial coverage, rather than becoming a misleading zero.</p></div>
+</section>
+<section id="demo" class="demo-section">
+<div class="eyebrow">06 · Explore the prototype</div><h2 class="section-title">Take it for a spin.</h2>
+<div class="demo-intro"><p>Start with the next flight, explore a mileage goal, then open Passport and switch Past Flights to Trips. Review Japan to see why grouping needs a human decision.</p><a class="button primary" href="demo/">Open demo full screen ↗</a></div>
+<div class="demo-shell" id="demo-shell"><div class="demo-placeholder"><p class="large-copy">Your next flight is the starting point.</p><p>Load the interactive phone preview here, or open it full screen on your device.</p><button class="button primary" id="load-demo" type="button">Load interactive demo</button><p class="small-note">Loads the 3D globe and app assets only when you choose.</p></div></div>
+<p class="small-note">Best with a modern browser and WebGL. Edits stay in this browser. Sample flight lookup is available; live flight feeds, account sync, and friend sharing are not connected.</p>
+</section>
+<section class="story-section" id="reflection">
+<div><div class="eyebrow">07 · Reflection</div><h2 class="section-title">Trust before<br>more features.</h2></div>
+<div class="prose"><p class="large-copy">The hardest part was deciding what the app should not assume.</p><p>Trip grouping must be reversible. A surface transfer must not become a fake flight. Booked mileage must not look earned. Those constraints shaped the interactions as much as the visual design.</p><h3>What I checked</h3><p>Browser walkthroughs covered the core trip, mileage, and Passport flows. Automated checks covered grouping logic, statistics, and the mobile runtime. This verifies prototype behavior; it does not establish customer impact.</p><h3>What I would test next</h3><p>Ask frequent flyers to correct a suggested trip, explain how much qualifying progress they have earned, and find a past journey. Measure correction effort, comprehension errors, and retrieval time against the reference flow before claiming improvement.</p><p class="small-note">Independent design exploration, not an official Flighty product or an affiliated project. Built with AI assistance for implementation and destination imagery; scope and design choices are documented in the source.</p><a class="text-link" href="https://github.com/Toooonyliu/toooonyliu.github.io/tree/main/projects/flighty">Explore the source on GitHub ↗</a></div>
+</section>
+<section class="closing"><div class="eyebrow">Keep exploring</div><h2 class="section-title">Product thinking.<br>Something you can try.</h2><div class="actions"><a class="button primary" href="demo/">Try Flighty demo ↗</a><a class="button" href="../../#work">Back to selected work</a></div></section>
+</main>
+<footer><span>PRODUCT-MINDED, DESIGN-TRAINED, GAME-DRIVEN.</span><span>© 2026 TONY LIU</span></footer>
+<script>
+document.getElementById('load-demo').addEventListener('click',function(){const frame=document.createElement('iframe');frame.src='demo/';frame.title='Interactive Flighty redesign prototype';frame.className='demo-frame';document.getElementById('demo-shell').replaceChildren(frame);frame.focus();});
+</script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+/* App-owned styling. The surrounding phone and keyboard runtime is unchanged. */
+.flighty-app { --ink:#f7f5fc; --muted:#b1afbc; --purple:#965eff; --surface:#121316; --line:#2c2d33; position:absolute;inset:0;background:var(--surface);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.4;color-scheme:dark; }
+.flighty-app *, .bottom-sheet * {box-sizing:border-box;}
+.flighty-app button,.bottom-sheet button {font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation;}
+.flighty-app button:focus-visible,.bottom-sheet button:focus-visible {outline:2px solid #c7a5ff;outline-offset:3px;}
+.flighty-app button:disabled,.bottom-sheet button:disabled {opacity:.4;cursor:default;}
+.flighty-app h1,.flighty-app h2,.flighty-app p {margin:0;}
+.flighty-app h1 {font-size:34px;line-height:1.1;letter-spacing:-1px;font-weight:750;}
+.flighty-app h2 {font-size:20px;line-height:1.3;font-weight:650;letter-spacing:-.35px;}
+.flighty-app svg,.bottom-sheet svg {flex-shrink:0;}
+.flighty-app .flow-fixed-header {background:#180844;}
+.flighty-app .flow-screen,.flighty-scroll {background:#121316;}
+.flighty-app .flow-stack {height:100%;}
+.toolbar {height:48px;padding:0 12px;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;}
+.toolbar strong {font-size:17px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.toolbar-side {display:flex;align-items:center;justify-content:flex-start;min-height:44px;padding:0!important;color:#b68cff!important;gap:0;font-size:15px!important;}
+.toolbar-side.right {justify-content:flex-end;}
+.page-content {padding-bottom:calc(var(--mobile-safe-area-height) + 28px);min-height:100%;}
+.content-pad {padding:24px 20px 10px;}
+.content-pad>h1 {margin:8px 0 14px;}
+.content-pad>.muted {margin-bottom:18px;}
+.passport-tabs {display:flex;padding:8px 16px 13px;gap:4px;background:#180844;height:61px;}
+.passport-tabs button {flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#2b1753;color:#c0aecf;padding:8px 6px;min-height:40px;font-size:13px;border-radius:10px;}
+.passport-tabs button[aria-current=page] {background:#7540d9;color:white;font-weight:600;}
+.route-map {position:relative;background:#180844;overflow:hidden;}
+.route-map canvas {display:block;}
+.map-attribution {position:absolute;bottom:7px;right:10px;font-size:8px;letter-spacing:.2px;color:#baaacf;pointer-events:none;}
+.map-route-buttons {position:absolute;left:12px;bottom:7px;display:flex;gap:4px;}
+.map-route-buttons button {width:27px;height:27px;border-radius:50%;background:#28134e;color:#c2afe3;font-size:11px;border:1px solid #674995;}
+.map-route-buttons button.selected {background:#955cf5;color:#fff;}
+.section-heading {display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.eyebrow {font-size:10px;font-weight:600;letter-spacing:1.7px;color:#a8a3b8;margin-bottom:7px!important;}
+.circle-button {width:40px;height:40px;display:grid;place-items:center;background:#2b1946!important;border-radius:50%;color:#bb8fff!important;flex-shrink:0;}
+.muted {color:#b1afbc;}.small {font-size:13px;}
+.suggestion {margin:24px 0 28px;padding:17px;background:#1c1c22;border:1px solid #2c2b33;border-radius:16px;}
+.suggestion h2 {font-size:29px;margin:5px 0 2px;}
+.badge {font-size:10px;letter-spacing:.2px;background:#38234e;color:#c6a1ff;padding:5px 8px;border-radius:6px;}
+.suggestion .muted {font-size:13px;margin-bottom:15px;}
+.mini-route {display:flex;gap:11px;align-items:center;padding:7px 0;}
+.mini-route>svg {color:#a566ff;width:22px;height:22px;}
+.mini-route>span {display:flex;gap:7px;align-items:center;font-size:15px;font-weight:600;}
+.mini-route span svg {width:13px;color:#c4bbd7;}
+.mini-gap {display:flex;gap:11px;align-items:center;padding:8px 0;color:#b2aabf;font-size:11px;}
+.mini-gap svg {width:22px;height:20px;}
+.flighty-app .primary,.bottom-sheet .primary {display:flex;align-items:center;justify-content:center;gap:10px;background:#8245ed;color:#fff;border-radius:13px;min-height:49px;padding:12px 16px;width:100%;font-size:16px;font-weight:620;margin:14px 0 0;}
+.flighty-app .primary:active,.bottom-sheet .primary:active {background:#7036d6;}
+.flighty-app .secondary,.bottom-sheet .secondary {display:flex;justify-content:center;align-items:center;gap:9px;min-height:46px;width:100%;padding:11px 15px;border:1px solid #45404f;border-radius:12px;background:#201d28;color:#d9c5fa;margin-top:14px;font-size:14px;}
+.flighty-app .text-button,.bottom-sheet .text-button {color:#b88aff;min-height:44px;display:block;width:100%;text-align:center;padding:12px 6px;font-size:15px;}
+.flighty-app .subtle-button {color:#a5a0b0;display:block;margin:auto;min-height:40px;font-size:12px;}
+.saved-heading {display:flex;align-items:center;gap:9px;margin:8px 0 15px;}
+.count {font-size:12px;color:#b8a6d8;background:#2c203d;padding:2px 7px;border-radius:7px;}
+.segmented {padding:3px;display:flex;background:#222329;border-radius:10px;margin-bottom:15px;}
+.segmented button {width:50%;min-height:34px;font-size:13px;color:#ada8b6;}
+.segmented .active {background:#3a3744;color:white;border-radius:8px;}
+.search {display:flex;align-items:center;gap:8px;background:#25242b;color:#a8a1b7;border-radius:10px;padding:0 11px;min-height:43px;margin:14px 0;}
+.search svg {width:18px;height:18px;}
+.search input {width:100%;min-width:0;outline:0;border:0;color:#f7f5fc;background:transparent;font:inherit;font-size:13px;padding:10px 0;}
+.search input::placeholder {color:#a8a1b7;}
+.trip-row {width:100%;display:flex;gap:13px;align-items:center;text-align:left;padding:19px 0!important;border-bottom:1px solid var(--line)!important;}
+.trip-row>span:nth-child(2) {flex:1;min-width:0;}
+.trip-row strong {font-size:20px;display:block;margin-bottom:3px;}
+.trip-row small {font-size:11px;display:block;color:#a8a4b3;margin-top:3px;}
+.trip-symbol {width:42px;height:49px;background:#2c1e46;color:#bc8bff;display:grid;place-items:center;border-radius:11px;}
+.trip-row>svg {color:#9b93ab;}
+.fineprint {font-size:11px;line-height:1.65;color:#9993a5;margin:23px 0 8px!important;}
+.trip-detail {padding-top:20px;}
+.trip-detail h1 {font-size:35px;}
+.trip-dates {font-size:19px;color:#b5b1c0;margin:8px 0 4px!important;display:flex;align-items:center;gap:10px;}
+.trip-detail>.muted {font-size:14px;margin:3px 0 12px;}
+.explanation {font-size:11px;color:#96909f;margin-bottom:14px!important;}
+.timeline {border-top:1px solid #303038;margin-top:15px;}
+.flight-row {display:flex;width:100%;align-items:center;gap:11px;padding:16px 0!important;text-align:left;border-bottom:1px solid #303038!important;min-height:85px;}
+.flight-icon {color:#a36afa;position:relative;display:grid;place-items:center;width:26px;flex-shrink:0;}
+.flight-icon>svg {width:24px;height:24px;}
+.flight-row-main {display:block;flex:1;min-width:0;}
+.flight-route {display:flex;align-items:center;gap:7px;font-size:19px;letter-spacing:.2px;font-weight:650;white-space:nowrap;}
+.flight-city {display:block;font-size:11px;color:#bbb5c6;margin-top:3px;white-space:nowrap;}
+.flight-meta {display:block;color:#8f879e;font-size:10px;margin-top:4px;}
+.flight-right {display:flex;gap:5px;align-items:center;font-size:10px;color:#b5afc0;white-space:nowrap;}
+.flight-right svg {color:#a498b7;}
+.flight-row.highlighted {background:#261936;border-radius:9px;}
+.gap-row {display:flex;gap:14px;padding:17px 0;color:#b9b1c6;border-bottom:1px solid #303038;align-items:center;}
+.gap-row strong {font-size:14px;font-weight:550;display:block;}
+.gap-row small {display:block;font-size:11px;margin-top:3px;}
+.unchecked {display:block;width:21px;height:21px;border:1px solid #726b7c;border-radius:50%;}
+.trip-actions {padding-top:6px;}
+.trip-totals {display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:24px 0;border-bottom:1px solid #303038;}
+.trip-totals strong {font-size:24px;font-weight:600;letter-spacing:-.7px;display:block;}
+.trip-totals strong small {font-size:13px;color:#ada7b6;font-weight:400;}
+.trip-totals span {font-size:11px;color:#aaa3b6;display:block;margin-top:4px;}
+.note-section {margin:24px 0;padding:18px 0;border-bottom:1px solid #303038;}
+.note-section .section-heading button {color:#b889ff;min-width:44px;min-height:44px;}
+.personal-note {font-size:16px;line-height:1.65;color:#d1c9dc;margin:11px 0!important;white-space:pre-wrap;overflow-wrap:anywhere;}
+.note-placeholder {color:#a7a0b0!important;text-align:left;padding:12px 0!important;font-size:14px!important;}
+.note-placeholder span {display:block;margin-top:5px;color:#b88aff;font-size:12px;}
+.cover-section img {width:100%;max-height:200px;object-fit:cover;border-radius:14px;}
+.empty {text-align:center;padding:35px 10px;}
+.empty>svg {color:#ad78ff;margin-bottom:15px;}
+.empty p {font-size:13px;line-height:1.6;color:#b0a9bd;margin:12px 0 18px;}
+.notice {font-size:12px!important;line-height:1.65;color:#c8bddb;background:#262030;padding:13px;border-radius:10px;margin:16px 0!important;}
+.notice>svg {vertical-align:middle;margin-right:6px;}
+.error {color:#ffc0bd!important;background:#3a212c;padding:12px;border-radius:8px;font-size:13px;line-height:1.5;}
+.period-control {display:flex;gap:9px;background:#180844;padding:4px 20px 14px;}
+.period-control button {color:#bcabd4;font-size:11px;min-height:32px;padding:5px 12px;}
+.period-control .active {background:#462571;border-radius:8px;color:white;}
+.overview-totals {display:grid;grid-template-columns:1fr 1fr;gap:23px 12px;margin:26px 0 20px;}
+.overview-totals>button {text-align:left;padding:0;}
+.overview-totals span {display:block;font-size:10px;color:#afa1c2;letter-spacing:.6px;}
+.overview-totals strong {display:flex;align-items:center;gap:2px;font-size:31px;letter-spacing:-1px;font-weight:650;margin-top:7px;}
+.overview-totals small {font-size:14px;font-weight:400;color:#bdb5c8;}
+.overview-totals button strong {color:#c89fff;}
+.coverage {display:flex;align-items:center;gap:6px;font-size:11px;color:#bab0c8;padding:12px 0;border-bottom:1px solid #303038;}
+.airlines {margin-top:28px;}
+.airlines .small {margin-top:6px;margin-bottom:14px;}
+.airline-row {width:100%;display:grid;grid-template-columns:1fr 34px;text-align:left;gap:9px;padding:16px 0!important;border-bottom:1px solid #303038!important;}
+.airline-name {grid-column:1 / 3;display:flex;justify-content:space-between;font-size:14px;font-weight:600;align-items:center;}
+.airline-name>span {display:flex;align-items:center;gap:3px;font-size:10px;font-weight:400;color:#bda5db;}
+.bar-track {height:6px;background:#2d273b;align-self:center;border-radius:8px;overflow:hidden;}
+.bar-track>span {height:100%;display:block;background:#9b64ef;border-radius:8px;}
+.airline-row>strong {font-size:11px;text-align:right;color:#bcb2cb;}
+.filter-chip {display:flex;align-items:center;gap:7px;color:#d1afff!important;background:#342245!important;padding:7px 10px!important;border-radius:7px;font-size:12px!important;}
+.parent-trip {margin-left:37px;padding:7px 0!important;display:flex;gap:3px;align-items:center;color:#b588ef!important;font-size:11px!important;}
+.upcoming-card {background:#1c2021!important;border:1px solid #33433e!important;border-radius:16px;padding:18px!important;display:block;width:100%;margin:22px 0;text-align:left;}
+.upcoming-card .section-heading {font-size:10px;color:#a2b2aa;}
+.live-badge {background:#173b2e;color:#70dfa7;padding:4px 6px;border-radius:5px;}
+.airport-pair {display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+.airport-pair strong {font-size:43px;letter-spacing:-1px;}
+.airport-pair svg {color:#77d6ac;}
+.city-pair {margin-top:0;font-size:11px;color:#afbdb5;}
+.flight-schedule {border-top:1px solid #334039;margin-top:18px;padding-top:13px;display:flex;justify-content:space-between;color:#79d4a7;font-size:14px;}
+.history-cue {width:100%;display:flex;gap:12px;align-items:center;padding:17px 0!important;text-align:left;border-bottom:1px solid #34303a!important;}
+.history-cue>svg:first-child {color:#b69dcc;}
+.history-cue span {flex:1;}
+.history-cue strong {font-size:14px;display:block;font-weight:550;}
+.history-cue small {font-size:11px;display:block;color:#aca1b6;margin-top:5px;}
+.passport-entry {width:100%;display:flex;gap:13px;align-items:center;text-align:left;background:#26143f!important;padding:20px 16px!important;border-radius:14px;margin-top:26px;}
+.passport-entry>svg {color:#b883ff;}
+.passport-entry span {flex:1;}
+.passport-entry strong {display:block;font-size:16px;}
+.passport-entry small {display:block;font-size:12px;color:#bba5d7;margin-top:4px;}
+.flight-state {display:flex;gap:7px;align-items:center;color:#78e2b0;background:#143126;padding:12px;border-radius:8px;font-size:13px;margin:20px 0;}
+.flight-state.canceled {background:#3f2229;color:#efabb0;}
+.airport-detail {padding:21px 0;border-bottom:1px solid #333039;}
+.airport-detail>div {display:flex;align-items:center;gap:6px;color:#d1cbd9;font-size:12px;}
+.airport-detail svg {width:15px;}
+.airport-detail>strong {font-size:44px;letter-spacing:-1px;color:#85ddb8;display:block;margin:6px 0;}
+.airport-detail p {font-size:11px;color:#a5a2ad;}
+.detail-row {display:flex;justify-content:space-between;padding:18px 0;border-bottom:1px solid #333039;font-size:14px;}
+.detail-row span {color:#b4adbf;}
+.toast {position:absolute;z-index:40;top:calc(var(--device-safe-area-top,59px) + 52px);left:14px;right:14px;display:flex;gap:8px;align-items:center;padding:12px 14px;background:#332541;color:#eee5fb;border:1px solid #67517d;border-radius:12px;font-size:12px;box-shadow:0 5px 20px #0004;pointer-events:none;}
+/* Sheet appearance is app-specific, while the supplied sheet runtime is preserved. */
+.device-screen:has(.flighty-app) .bottom-sheet {background:#1b1922;color:#f7f2ff;color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.device-screen:has(.flighty-app) .sheet-title {font-weight:650;font-size:20px;}
+.device-screen:has(.flighty-app) .sheet-description {color:#aca2ba;}
+.device-screen:has(.flighty-app) .sheet-handle {background:#5c526a;}
+.form-content,.settings-content {font-size:14px;line-height:1.5;}
+.form-content .muted {font-size:12px;}
+.field {display:flex;flex-direction:column;gap:9px;font-size:13px;color:#c2b8d0;margin:20px 0;}
+.field input,.note-input {width:100%;border:1px solid #4d405d;border-radius:9px;background:#26212f;color:#f8f4fe;padding:13px;font:inherit;outline:none;}
+.field input:focus,.note-input:focus {border-color:#a972ff;}
+.field small {font-size:11px;color:#9c90ac;}
+.note-input {min-height:145px;resize:vertical;font-size:16px;line-height:1.55;}
+.note-counter {text-align:right;font-size:10px;color:#b4a7c4;margin:6px 0 15px;}
+.menu-row {display:flex;align-items:center;gap:11px;min-height:52px;padding:14px 0!important;width:100%;text-align:left;border-bottom:1px solid #39303f!important;font-size:14px!important;}
+.menu-row svg {width:20px;height:20px;color:#b28cd8;}
+.menu-row svg:last-child {margin-left:auto;width:15px;}
+.menu-row.danger {color:#f3a7b9;}
+.choice-row {display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;padding:12px!important;min-height:56px;border:1px solid #45384f!important;border-radius:9px;margin:8px 0;font-size:14px!important;}
+.choice-row.selected {background:#34224d!important;border-color:#9b67d5!important;}
+.choice-row small {display:block;font-size:11px;color:#baacca;margin-top:4px;}
+.toggle-row {display:flex;align-items:center;gap:14px;justify-content:space-between;width:100%;padding:13px 0!important;border-bottom:1px solid #39303f!important;text-align:left;font-size:13px!important;}
+.toggle-row small {display:block;font-size:10px;color:#a59aae;margin-top:4px;}
+.switch {width:39px;height:23px;background:#53465e;border-radius:20px;padding:3px;display:flex;align-items:center;flex-shrink:0;}
+.switch>span {width:17px;height:17px;border-radius:50%;background:white;display:block;}
+.switch.on {background:#8750db;justify-content:flex-end;}
+@media(prefers-reduced-motion:reduce){.flighty-app *, .device-screen:has(.flighty-app) .bottom-sheet {scroll-behavior:auto!important;transition:none!important;}}
+.device-screen:has(.flighty-app) .status-bar {filter:invert(1);}
+.device-screen:has(.flighty-app) .home-indicator-svg {filter:invert(1);}
+/* Original Flighty shell and scoped Passport grouping. */
+.flighty-app{--surface:#19191b;--line:#343437;--purple:#15aaff;background:#19191b;}
+.flighty-app .flow-screen,.flighty-scroll{background:#19191b;}
+.flighty-app .flow-fixed-header{background:#19191bf5;}
+.page-content{padding-bottom:calc(var(--flow-footer-height,0px) + var(--mobile-safe-area-height,34px) + 28px);}
+.native-header{display:flex;height:78px;padding:12px 18px 10px;align-items:center;justify-content:space-between;gap:8px;}
+.native-header h1{font-size:34px;letter-spacing:-1px;}
+.header-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end;}
+.header-circle{display:grid;place-items:center;width:43px;height:43px;border:1px solid #39393d!important;border-radius:50%;padding:0;}
+.toolbar .header-actions{justify-self:end;}
+.year-rail{height:54px;}
+.year-options{display:flex;gap:9px;padding:0 16px 10px;width:max-content;}
+.year-options button{padding:9px 14px;min-height:40px;font-size:15px;white-space:nowrap;color:#99999f;border:1px solid transparent;border-radius:25px;}
+.year-options button[aria-pressed=true]{border-color:#3c3c40;color:#fff;}
+.native-nav{display:flex;gap:9px;align-items:center;padding:4px 16px 20px;}
+.native-nav nav{display:flex;flex:1;min-width:0;padding:3px;border:1px solid #49494f;border-radius:42px;background:#242426ed;box-shadow:0 3px 14px #0005;backdrop-filter:blur(24px);}
+.native-nav nav button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:57px;font-size:10px;border-radius:35px;color:#eee;}
+.native-nav nav button[aria-current=page]{background:#49494e;color:#19adf5;font-weight:600;}
+.nav-search{width:62px;height:64px;border-radius:50%;border:1px solid #49494f!important;background:#242426ed!important;display:grid;place-items:center;backdrop-filter:blur(24px);}
+.passport-content{padding:8px 16px 12px;}
+.stat-card{border-radius:20px;padding:17px;margin-bottom:10px;overflow:hidden;}
+.passport-summary{background:linear-gradient(150deg,#180342,#101666 55%,#335b84);color:#fff;}
+.passport-card-title{font-size:18px;letter-spacing:.5px;}
+.passport-caption{display:flex;align-items:center;gap:4px;color:#aaa5d8;font-size:10px;margin-top:3px!important;}
+.passport-numbers{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin:23px 0 16px;}
+.passport-numbers>div,.passport-secondary>div{display:flex;flex-direction:column;}
+.passport-numbers span,.passport-secondary span{font-size:11px;color:#b2b7e4;}
+.passport-numbers strong{font-size:34px;font-weight:700;white-space:nowrap;letter-spacing:-.8px;}
+.passport-numbers strong small{font-size:22px;color:#fff;}
+.passport-numbers small{font-size:12px;color:#b0b8e4;}
+.passport-secondary{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:7px;margin-bottom:18px;}
+.passport-secondary strong{font-size:23px;white-space:nowrap;letter-spacing:-.5px;}
+.partial-time{display:block;color:#c7c8e3;font-size:10px;margin-bottom:10px;}
+.stat-link{display:flex;align-items:center;justify-content:space-between;padding:11px 13px!important;min-height:43px;width:100%;text-align:left;background:#ffffff25!important;border:1px solid #ffffff12!important;border-radius:10px;font-size:15px!important;}
+.stat-link svg{width:21px;}
+.delay-card{background:linear-gradient(130deg,#ac1019,#520408 64%,#71261b);color:white;}
+.delay-number{display:block;font-size:62px;line-height:1.05;letter-spacing:-2px;}
+.delay-card h2{font-size:20px;margin:3px 0 5px;}
+.delay-card p{font-size:14px;color:#dda19f;margin-bottom:17px;}
+.aircraft-card{position:relative;background:linear-gradient(130deg,#d6d2f4,#b5ddee);color:#063958;}
+.aircraft-card h2{font-size:20px;}
+.aircraft-name{display:block;font-size:34px;font-weight:450;letter-spacing:-1px;}
+.aircraft-card p{color:#53789c;font-size:15px;}
+.aircraft-symbol{display:block;width:100%;height:92px;color:#285b89;margin:0 0 4px;}
+.aircraft-card .stat-link{background:#568bc430!important;}
+.favorite-airline{background:#233449;color:#e7effb;margin-top:10px;}
+.favorite-airline h2{font-size:19px;}
+.card-period{font-size:12px;color:#aabdd2;margin:5px 0 16px!important;}
+.airline-leader{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.airline-leader strong{font-size:30px;}
+.favorite-airline>p:not(.card-period){font-size:14px;color:#b7c9de;margin-bottom:18px;}
+.favorite-airline .text-button{color:#94d5ff;min-height:36px;padding-bottom:0;}
+.carrier-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;flex-shrink:0;background:#224b9c;color:#fff;font-size:12px;font-weight:750;letter-spacing:-.2px;border-radius:3px;}
+.carrier-NH{background:#174589;}.carrier-BA{background:#893046;}.carrier-DL{background:#922c42;}
+.past-history{margin:30px -16px 0;}
+.past-history>.section-heading{padding:0 16px;margin-bottom:13px;}
+.past-history h2{font-size:23px;}
+.density-control{display:flex;border-radius:20px;background:#2e2e32;padding:2px;}
+.density-control button{display:grid;place-items:center;width:32px;height:30px;border-radius:50%;color:#fff;}
+.density-control button[aria-pressed=true]{background:#64646b;}
+.history-toggle{display:flex;margin:0 16px 14px;background:#29292d;border-radius:11px;padding:3px;}
+.history-toggle button{width:50%;padding:8px;min-height:38px;font-size:14px;color:#aaaab1;border-radius:8px;}
+.history-toggle button[aria-pressed=true]{background:#4a4a50;color:#fff;font-weight:600;}
+.sort-options{display:flex;gap:8px;width:max-content;padding:0 16px 10px;}
+.sort-options button{padding:6px 12px;color:#9d9da5;font-size:13px;min-height:36px;border:1px solid transparent;border-radius:24px;}
+.sort-options button[aria-pressed=true]{color:#eee;border-color:#414145;}
+.history-year{display:flex;justify-content:space-between;align-items:center;padding:22px 16px 14px;border-bottom:1px solid #38383c;}
+.history-year strong{font-size:16px;}.history-year span{font-size:12px;font-weight:650;color:#95959d;}
+.past-flight-row{display:flex;align-items:center;gap:15px;width:100%;padding:14px 16px!important;text-align:left;}
+.past-flight-copy{min-width:0;flex:1;position:relative;padding-bottom:15px;}
+.past-flight-copy:after{content:'';position:absolute;left:0;right:-16px;bottom:0;height:1px;background:#353538;}
+.past-flight-meta{display:flex;gap:6px;justify-content:space-between;color:#96969e;font-size:11px;white-space:nowrap;}
+.route-muted{color:#717178;}
+.past-flight-meta time{font-size:10px;}
+.past-flight-copy strong{display:block;font-size:16px;font-weight:600;line-height:1.35;margin-top:2px;}
+.past-flight-copy>small{display:block;font-size:11px;color:#92929c;margin-top:6px;}
+.past-flight-row.dense{padding-top:9px!important;padding-bottom:2px!important;}
+.grouped-intro{display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;color:#aaaab1;gap:10px;}
+.grouped-intro button{display:flex;align-items:center;gap:3px;color:#23b2ff;font-size:13px;min-height:40px;}
+.group-help{font-size:11px;color:#90909a;padding:2px 16px 14px;line-height:1.55;}
+.past-trip-row{display:flex;align-items:center;width:100%;padding:17px 16px!important;gap:12px;text-align:left;border-top:1px solid #343438!important;}
+.past-trip-copy{flex:1;min-width:0;}.past-trip-copy strong{font-size:20px;}.past-trip-copy small{display:block;font-size:11px;color:#a9a9b4;margin:4px 0;}
+.trip-route-label{display:block;font-size:11px;color:#b8bfd0;line-height:1.7;}
+.home-panel{padding:22px 18px 10px;background:#19191b;border-radius:26px 26px 0 0;position:relative;margin-top:-24px;}
+.home-panel .eyebrow{font-size:11px;color:#a6a6b0;}
+.home-panel .upcoming-card{margin:12px 0 25px;background:#232326!important;border-color:#3a3a3e!important;}
+.home-panel .upcoming-card .carrier-badge{width:25px;height:25px;font-size:10px;}
+.home-panel .upcoming-card .airport-pair{margin-top:12px;}
+.home-panel .upcoming-card .city-pair{margin-top:0;}
+.home-panel .flight-schedule{border-color:#414146;color:#fff;}
+.home-panel .airport-pair strong{font-size:36px;}
+.benefit-heading{margin-bottom:12px;}.benefit-heading h2{font-size:20px;}
+.benefit-heading>button{display:flex;align-items:center;color:#22b4ff;font-size:12px;min-height:40px;}
+.benefit-card{background:#242429;border:1px solid #3a3a42;border-radius:16px;padding:16px;margin-bottom:12px;color:#f7f5fc;}
+.benefit-carrier{display:flex;align-items:center;gap:9px;}
+.benefit-carrier strong{font-size:16px;}
+.sample-tag{font-size:9px;border:1px solid #5a5062;background:#3b3241;color:#d6bedf;border-radius:5px;padding:3px 6px;white-space:nowrap;}
+.mileage-link{display:block;text-align:left;padding:16px 0!important;width:100%;}
+.mileage-link strong{display:block;font-size:29px;letter-spacing:-.7px;}
+.mileage-link>span{display:flex;align-items:center;gap:4px;color:#aeb2be;font-size:12px;}
+.reward-section{padding-top:13px;border-top:1px solid #414149;}
+.reward-section .section-heading{font-size:11px;}.reward-section .section-heading strong{font-size:13px;}
+.reward-section .section-heading>span{color:#99d8ff;}
+.reward-section progress{display:block;width:100%;height:6px;border:0;border-radius:20px;overflow:hidden;margin:12px 0 8px;appearance:none;background:#44444f;}
+.reward-section progress::-webkit-progress-bar{background:#44444f;}.reward-section progress::-webkit-progress-value{background:#21aaf3;border-radius:20px;}.reward-section progress::-moz-progress-bar{background:#21aaf3;}
+.reward-section p{font-size:10px;color:#aaa9b7;margin:0;}
+.reward-disclaimer{display:block;font-size:10px;line-height:1.6;color:#b2a7b9;margin-top:12px;}
+.stat-sheet small{display:block;font-size:11px;color:#aaa9b7;margin-top:4px;}
+.stat-sheet h2{font-size:18px;margin:16px 0 4px;}
+.stat-sheet .menu-row strong{margin-left:auto;}
+.friends-filters{display:flex;align-items:center;gap:6px;}
+.friends-filters button{display:flex;align-items:center;gap:4px;font-size:14px;padding:10px 9px;min-height:42px;color:#a5a5ad;border:1px solid transparent;border-radius:24px;}
+.friends-filters button[aria-pressed=true]{color:#fff;border-color:#3c3c40;}.friends-filters button:last-child{color:#1aacff;}
+.friends-filters+.empty{padding:85px 12px;}
+/* Screenshot-led visual revision: geographic Earth behind an independent travel panel. */
+.flighty-app{background:#030406;}
+.map-panel-layout{position:absolute;inset:0;background:#030406;}
+.earth-view{position:absolute;inset:0;overflow:hidden;background:#020306;isolation:isolate;}
+.earth-canvas{display:block;width:100%;height:100%;touch-action:none;outline:none;}
+.earth-label{position:absolute;left:0;top:0;z-index:2;pointer-events:none;white-space:nowrap;font-size:12px;font-weight:600;color:#f3f6fa;text-shadow:0 1px 3px #000,0 0 3px #000;visibility:hidden;}
+.earth-label.place-label{font-size:16px;font-weight:650;color:#e2ebf0;text-shadow:0 1px 3px #18313e,0 0 4px #091a24;}
+.earth-tools{position:absolute;top:calc(var(--device-safe-area-top,54px) + 12px);right:16px;display:flex;flex-direction:column;gap:8px;z-index:3;}
+.earth-tools>button,.earth-zoom{background:#191b20d9!important;border:1px solid #5c5d614d!important;border-radius:50%;backdrop-filter:blur(18px);box-shadow:0 2px 8px #0004;}
+.earth-tools>button{width:43px;height:43px;display:grid;place-items:center;color:#ededf0;}
+.earth-zoom{display:flex;flex-direction:column;border-radius:25px;overflow:hidden;}
+.earth-zoom button{width:43px;height:33px;display:grid;place-items:center;}
+.earth-credit{position:absolute;bottom:6px;left:12px;font-size:8px;color:#b4c4d2;pointer-events:none;}
+.earth-error{position:absolute;top:75px;left:15px;right:70px;font-size:12px;color:#f1cad0;background:#33212b;padding:10px;border-radius:9px;}
+.travel-panel{position:absolute;z-index:4;top:var(--panel-top);left:8px;right:8px;bottom:0;background:#19191b;border-radius:34px 34px 0 0;overflow:hidden;transition:top 340ms cubic-bezier(.2,.8,.2,1),left 340ms,right 340ms;box-shadow:0 -7px 26px #00000016;}
+.travel-panel[data-expanded=true]{left:0;right:0;border-radius:32px 32px 0 0;}
+.travel-panel[data-dragging=true]{transition:none;user-select:none;}
+.travel-panel-heading{position:absolute;top:0;left:0;right:0;z-index:5;background:#19191b;touch-action:none;height:var(--panel-header);}
+.panel-grabber{display:flex;align-items:center;justify-content:center;width:100%;height:15px;padding:0!important;touch-action:none;}
+.panel-grabber span{display:block;width:31px;height:3px;border-radius:4px;background:#56565c;opacity:.5;}
+.travel-panel .native-header{height:73px;padding:4px 17px 12px;}
+.travel-panel .native-header h1{font-size:33px;font-weight:750;letter-spacing:-.7px;}
+.travel-panel .header-actions{gap:10px;}
+.travel-panel .header-circle{width:43px;height:43px;border-color:#343437!important;}
+.travel-panel .header-circle:last-child{background:#343a40;border-color:#58656b!important;color:#e6edf3;}
+.travel-panel .year-rail{height:55px;}
+.travel-panel .year-options{gap:6px;padding:0 15px 12px;}
+.travel-panel .year-options button{font-size:15px;padding:9px 12px;min-height:39px;}
+.travel-panel-body{position:absolute;top:var(--panel-header);left:0;right:0;bottom:0;}
+.travel-panel-body .flighty-scroll{background:#19191b;}
+.travel-panel .home-panel{margin-top:0;border-radius:0;padding:7px 18px 14px;}
+.travel-panel .passport-content{padding:7px 15px 12px;}
+.native-nav{gap:8px;padding:3px 20px 24px;}
+.native-nav nav{border-radius:40px;background:#232328c9;border:1px solid #62646c80;backdrop-filter:blur(24px) saturate(1.45);box-shadow:inset 0 1px 1px #ffffff16,0 4px 20px #0002;}
+.native-nav nav button{height:56px;gap:2px;font-size:10px;}
+.native-nav nav button svg{height:26px;width:29px;}
+.native-nav nav button[aria-current=page]{background:#5d5d6469;color:#0db0fa;}
+.nav-search{width:61px;height:62px;background:#232328c9!important;border-color:#62646c80!important;}
+.carrier-badge{display:inline-block;width:33px;height:33px;object-fit:contain;background:none!important;border-radius:0;font-size:0;}
+.benefit-carrier .carrier-badge{width:31px;height:31px;}
+.home-panel .upcoming-card .carrier-badge{width:30px;height:30px;}
+.airline-leader .carrier-badge{width:46px;height:46px;}
+.flight-icon{width:31px;}.flight-icon .carrier-badge{width:30px;height:30px;}
+.home-panel .upcoming-card{padding:15px!important;border-radius:15px;background:#232326!important;border-color:#353538!important;margin:7px 0 20px;}
+.home-panel .upcoming-card .section-heading{font-size:10px;}
+.home-panel .upcoming-card .airport-pair strong{font-size:35px;}
+.stat-card{border-radius:19px;padding:16px;margin-bottom:9px;}
+.passport-summary{background:linear-gradient(150deg,#16013f 20%,#101558 54%,#06377b 84%,#36557f);}
+.passport-card-title{font-size:18px;font-weight:450;letter-spacing:.6px;white-space:nowrap;}
+.passport-caption{font-size:10px;font-weight:600;color:#8e8ac1;}
+.passport-numbers{margin:20px 0 14px;gap:10px;grid-template-columns:1fr 2.1fr;}
+.passport-numbers strong{font-size:33px;letter-spacing:-.5px;}
+.passport-numbers strong small{font-size:24px;}
+.passport-secondary strong{font-size:23px;}.passport-secondary{margin-bottom:17px;gap:7px;}
+.passport-numbers span,.passport-secondary span{font-size:11px;font-weight:450;}
+.stat-link{min-height:41px;font-size:15px!important;padding:9px 12px!important;border-radius:9px;}
+.delay-card{background:linear-gradient(128deg,#ab1419,#550206 63%,#6e2119);}
+.delay-number{font-size:59px;font-weight:700;line-height:1.08;}
+.delay-card h2{font-size:18px;}.delay-card p{font-size:14px;margin-bottom:15px;}
+.past-history{margin:29px -15px 0;}
+.past-history h2{font-size:23px;letter-spacing:-.3px;}
+.past-flight-row{gap:18px;padding-left:18px!important;padding-right:16px!important;}
+.past-flight-copy strong{font-size:16px;font-weight:600;letter-spacing:-.2px;}
+.past-flight-meta{font-size:12px;}.past-flight-meta time{font-size:11px;}
+.past-flight-row.dense{padding-top:13px!important;padding-bottom:0!important;}
+.past-flight-copy{padding-bottom:14px;}
+.history-year{padding-top:22px;padding-bottom:13px;}
+.history-year strong{font-size:16px;}.history-year span{font-size:12px;}
+.interactive-route{height:300px;background:#020306;}.interactive-route.compact{height:245px;}
+.interactive-route .earth-tools{top:14px;right:12px;}
+.interactive-route .earth-tools>button{width:33px;height:33px;}.interactive-route .earth-zoom{display:none;}
+.interactive-route .earth-tools svg{width:19px;}
+.interactive-route .earth-label.place-label{font-size:12px;}
+.interactive-route .earth-credit{left:auto;right:8px;bottom:5px;}
+.interactive-route .map-route-buttons{z-index:5;}
+@media(prefers-reduced-motion:reduce){.travel-panel{transition:none!important;}}
+/* Counter template placeholder text rules only within the app-owned content. */
+.flighty-app .passport-card-title{color:#fff;font-size:18px;line-height:1.25;}
+.flighty-app .passport-caption{color:#a29ad0;font-size:10px;}
+.flighty-app .delay-card p{color:#da9494;font-size:14px;}
+.flighty-app .card-period{color:#aabdd2;}
+.flighty-app .group-help{color:#aaaab2;}
+.flighty-app .grouped-intro p{color:#aaaab2;font-size:12px;}
+.flighty-app .reward-section p{font-size:10px;color:#aaa9b7;}
+.flighty-app .benefit-card .reward-disclaimer{color:#b2a7b9;}
+.flighty-app .empty p{color:#aaaab3;}
+.flighty-app{font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.native-nav .tab-symbol{position:relative;display:block;height:29px;line-height:0;}
+.native-nav .tab-symbol>svg{height:29px;width:31px;}
+.native-nav .passport-symbol{transform:rotate(-8deg);}
+.native-nav .passport-symbol .passport-globe-symbol{position:absolute;width:13px;height:13px;left:7px;top:6px;color:#27272c;}
+.native-nav nav button{font-size:10.5px;}
+.earth-credit{top:calc(var(--device-safe-area-top,54px) + 11px);bottom:auto;left:14px;font-size:7px;opacity:.65;}
+.interactive-route .earth-credit{top:auto;bottom:6px;}
+.travel-panel .panel-grabber{height:9px;}
+.travel-panel .native-header{height:65px;padding-top:4px;padding-bottom:9px;}
+.travel-panel .year-rail{height:45px;}
+.travel-panel .year-options{padding-bottom:6px;gap:6px;}
+.travel-panel .year-options button{min-height:37px;padding:8px 12px;}
+.passport-numbers{margin-top:17px;margin-bottom:10px;}
+.passport-numbers strong{line-height:1.12;margin:3px 0 2px;}
+.passport-secondary strong{line-height:1.14;margin-top:4px;}
+.passport-secondary{margin-bottom:14px;}
+.passport-secondary span{font-size:10px;}
+.native-nav{padding-bottom:0;}
+.mobile-app-viewport[data-platform="ios"] .native-nav{transform:translateY(14px);}
+.mobile-app-viewport[data-keyboard-visible="true"] .native-nav{transform:none;}
+
+.aircraft-card h2{line-height:25px;margin:0;}
+.aircraft-name{line-height:40px;}
+.aircraft-card p{line-height:20px;margin:0;}
+.aircraft-illustration{display:block;width:calc(100% + 20px);height:128px;object-fit:contain;margin:-30px -10px -12px;mix-blend-mode:multiply;}
+
+.earth-canvas:focus-visible{outline:2px solid #23a8ff;outline-offset:-3px;}
+/* September 15: original add-flight, friends and grouped history flows. */
+.flight-detail-chips{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.flight-detail-chips>span{border:1px solid #3b3b40;border-radius:15px;padding:2px 8px;color:#9999a2;font-size:12px;line-height:17px;}
+.history-year strong{display:flex;align-items:center;gap:9px;}
+.country-flag{width:16px;height:11px;object-fit:cover;}
+.airline-leader strong{font-size:24px;line-height:1.25;}
+.add-flight-shell{position:absolute;inset:0;background:#030406;padding-top:calc(var(--device-safe-area-top,54px) + 8px);}
+.add-flight-shell>.flighty-scroll{top:calc(var(--device-safe-area-top,54px) + 8px);height:auto;bottom:0;border-radius:33px 33px 0 0;background:#19191b;}
+.add-flight-content{padding:21px 16px 110px;}
+.add-flight-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.add-flight-heading h1{font-size:34px;letter-spacing:-.6px;margin:0;line-height:1.15;}
+.add-flight-heading .header-circle{height:45px;width:45px;flex-shrink:0;}
+.flighty-app .add-subtitle{font-size:16px;color:#96969f;margin:2px 0 18px;line-height:1.4;}
+.flight-search-input{display:flex;align-items:center;background:#272729;border-radius:18px;min-height:47px;padding:0 14px;margin-bottom:20px;}
+.flight-search-input input{width:100%;min-width:0;font-size:18px;background:none;border:0;color:#fff;outline:0;}
+.flight-search-input button{flex-shrink:0;color:#94949e;}
+.flighty-app .lookup-label{font-size:12px;font-weight:500;color:#92929b;margin:28px 0 9px;}
+.lookup-row{display:flex;align-items:center;width:100%;min-height:68px;text-align:left;gap:15px;padding:10px 0!important;}
+.lookup-row>span{flex:1;min-width:0;}.lookup-row>svg{width:24px;height:24px;flex-shrink:0;}.lookup-row>svg:last-child:not(:first-child){border:1px solid #515158;border-radius:9px;padding:4px;width:38px;height:28px;color:#777780;}
+.lookup-row strong{font-size:18px;font-weight:550;display:block;line-height:1.3;}.lookup-row small{display:block;color:#8e8e97;font-size:14px;line-height:1.5;margin-top:2px;}
+.lookup-row .carrier-badge{width:24px;height:24px;}.airport-flag{width:26px;height:26px;object-fit:cover;border-radius:50%;}
+.flight-entry-segments{display:flex;gap:8px;margin:10px 0 22px;}
+.flight-entry-segments>button,.flight-entry-segments>input{background:#28282b;border:0;border-radius:18px;padding:12px 14px;color:#fff;min-width:0;font-size:17px;height:47px;}
+.flight-entry-segments>input,.flight-entry-segments>.date-segment{flex:1;text-align:left;width:0;}.flight-entry-segments>button:not(.date-segment){min-width:58px;}
+.flighty-app .lookup-source{font-size:11px;color:#94949d;margin:24px 0 12px;}
+.flight-search-result{display:flex;gap:15px;width:100%;padding:17px 0 20px!important;text-align:left;border-bottom:1px solid #38383c;}
+.result-duration{width:64px;flex-shrink:0;text-align:center;display:flex;flex-direction:column;padding-top:12px;}.result-duration strong{font-size:30px;font-weight:650;}.result-duration small{font-size:10px;color:#aaaab2;}
+.result-main{flex:1;min-width:0;}.result-main .section-heading{font-size:11px;color:#96969f;gap:5px;}.result-main .section-heading>span:first-child{display:flex;align-items:center;gap:6px;}.result-main .carrier-badge{width:16px;height:16px;}
+.result-main>strong{display:block;font-size:18px;font-weight:650;line-height:1.3;margin:9px 0;}.result-times{font-size:13px;color:#9c9ca5;line-height:1.7;}.result-times b{color:#f1f1f4;font-weight:600;}.added-label{color:#18b679!important;}.flight-search-result:disabled{opacity:.7;}
+.missing-flight{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#9c9ca5;margin:27px 0;}.missing-flight button{display:flex;gap:5px;color:#1ca5ff;font-weight:600;align-items:center;}.missing-flight svg{width:15px;}
+.flighty-app .empty-result,.form-message{font-size:13px;color:#b1b1bb;line-height:1.6;}.form-message{padding:12px;background:#26262d;border-radius:10px;}
+.route-fields{display:flex;align-items:center;gap:10px;margin:17px 0;}.route-fields>label{flex:1;min-width:0;font-size:13px;color:#a8a8b2;}.route-fields input{display:block;width:100%;box-sizing:border-box;border:1px solid #3d3d46;background:#28282b;border-radius:13px;padding:14px;color:#fff;font-size:18px;margin-top:6px;}
+.calendar-heading{display:flex;align-items:center;justify-content:space-between;margin:10px 0 20px;}.calendar-heading button{padding:10px;}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;}.calendar-grid>span{color:#9e9eaa;padding:6px;}.calendar-grid>button{height:38px;border-radius:50%;}.calendar-grid>button:hover,.calendar-grid>button:focus-visible{background:#148aff;}
+.friends-content{padding:3px 15px 110px;}.friends-filter-rail{margin:0 -8px 8px;}.friends-filters{width:max-content;}.friends-filters button{white-space:nowrap;font-size:15px;}
+.friends-empty{text-align:center;padding:100px 5px;color:#93939c;}.friends-empty h2{font-size:18px;margin:12px 0 6px;}.flighty-app .friends-empty p{font-size:14px;color:#909099;line-height:1.5;}
+.friend-flight{display:flex;width:100%;gap:15px;padding:14px 0 0!important;text-align:left;}.friend-flight-avatar{width:64px;flex-shrink:0;text-align:center;display:flex;align-items:center;flex-direction:column;gap:7px;padding-top:4px;}.friend-flight-avatar svg{color:#b3d6c1;background:#293c36;border-radius:50%;}.friend-flight-avatar small{font-size:10px;color:#96969f;}
+.friend-flight-copy{flex:1;min-width:0;border-bottom:1px solid #323236;padding:0 0 18px;}.friend-flight-copy .section-heading{font-size:12px;color:#95959e;gap:4px;}.friend-number{display:flex;align-items:center;gap:6px;}.friend-number .carrier-badge{width:16px;height:16px;}.friend-flight-copy>strong{display:block;font-size:17px;font-weight:650;line-height:1.4;margin:9px 0;}.friend-times{font-size:12px;color:#9797a0;display:flex;gap:5px;flex-wrap:wrap;}.friend-times b{font-weight:550;color:#eeeef1;}.friend-times>span{margin-left:auto;}
+.friend-connection{margin-left:79px;width:calc(100% - 79px);display:flex;justify-content:space-between;gap:8px;padding:12px 0!important;font-size:12px;border-bottom:1px solid #343438;}.friend-connection>span:last-child{display:flex;align-items:center;}
+.friend-profile{text-align:center;padding:22px 0;color:#d8e5df;}.friend-profile h1{margin:8px 0;}.friend-profile-link{display:flex;align-items:center;color:#1eaaff;font-size:12px;margin-bottom:6px;gap:4px;}
+.friends-intro{position:relative;padding:0 2px 8px;}.friends-intro .intro-close{position:absolute;top:0;right:0;z-index:2;}.friends-intro>img{display:block;width:calc(100% + 32px);margin:-8px -16px 8px;aspect-ratio:1.1;object-fit:cover;}.friends-intro h1{font-size:28px;line-height:1.2;margin:0 0 12px;}.bottom-sheet .friends-intro p{font-size:16px;line-height:1.5;color:#f6f6f8;margin:0 0 21px;}.friends-intro>small{font-size:11px;line-height:1.4;color:#90909c;display:block;margin:10px 0 16px;}.friends-intro .primary{border-radius:30px;background:#0787ff;font-size:18px;min-height:48px;}
+.share-app{display:flex;align-items:center;gap:16px;padding:6px 0 18px;border-bottom:1px solid #3c3c42;}.share-app svg{background:#0c0c0e;border-radius:16px;padding:10px;width:65px;height:65px;}.share-preview{display:flex;align-items:center;gap:12px;padding:12px 0;}.share-preview small{display:block;color:#9b9ba5;font-size:12px;}
+.nav-search[aria-current=page]{color:#0db0fa;}
+
+/* Reference Friends sheet fills the screen beneath the system status area. */
+.device-screen:has(.flighty-app) .bottom-sheet:has(.friends-intro){height:calc(100% - 70px);background:#19191b;border-radius:34px 34px 0 0;}
+.bottom-sheet:has(.friends-intro) .sheet-header{display:none;}
+.bottom-sheet:has(.friends-intro) .sheet-handle-zone{height:16px;flex-shrink:0;}
+.bottom-sheet:has(.friends-intro) .sheet-handle{visibility:hidden;}
+.bottom-sheet .friends-intro .primary,.bottom-sheet .friend-share .primary{background:#0787ff;}
+.bottom-sheet .friend-share p{color:#b9b9c1;line-height:1.5;}
+.carrier-badge.carrier-JL{background:#fff!important;border-radius:50%;padding:2px;}
+
+.bottom-sheet .friends-intro>img{margin-top:56px;}
+.add-flight-content .lookup-row{min-height:63px;}
+
+.bottom-sheet .friends-intro{display:flow-root;}
+/* Individual flight information follows the source's map-backed sheet. */
+.flight-sheet-heading{height:63px;padding:0 13px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #363639;}
+.flight-sheet-heading>.carrier-badge{width:32px;height:32px;}
+.flight-sheet-heading>div{flex:1;min-width:0;}.flighty-app .flight-sheet-heading p{font-size:12px;color:#96969e;margin:0 0 3px;font-weight:600;line-height:1.3;}
+.flight-sheet-heading h1{font-size:18px;line-height:1.2;font-weight:650;margin:0;letter-spacing:-.2px;}
+.travel-panel .flight-sheet-heading .header-circle{width:43px;height:43px;background:none;border-color:#343437!important;color:#fff;}
+.flight-information{padding-bottom:115px;}.arrival-banner{background:#132322;padding:12px 18px;color:#18bb79;}.arrival-banner strong{font-size:17px;}.flighty-app .arrival-banner p{color:inherit;font-size:15px;margin:2px 0 0;line-height:1.5;}.arrival-banner.late-banner{background:#290900;color:#ff4539;}
+.flight-info-body{padding:10px 18px 15px;}.flight-airport{padding:17px 0 0;}.flight-airport h2{display:flex;gap:5px;align-items:center;font-size:14px;font-weight:650;margin:0 0 9px;line-height:1.35;}
+.flight-airport-clock{display:flex;align-items:center;justify-content:space-between;gap:8px;}.flight-airport-clock>div>div{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;}.flight-airport-clock strong{font-size:32px;font-weight:650;line-height:1.2;letter-spacing:-1px;}.flight-airport-clock del{font-size:12px;color:#8c8c92;}.flighty-app .flight-airport-clock p{font-size:13px;margin:4px 0 0;font-weight:600;}.flight-information .late{color:#ff4438;}.flight-information .early{color:#13ba76;}
+.flight-airport-clock aside{text-align:right;}.flight-airport-clock aside>strong{display:flex;align-items:center;justify-content:center;gap:3px;font-size:24px;letter-spacing:0;background:#ffd000;border-radius:9px;padding:5px 8px;color:#080800;}.flight-airport-clock aside>small{display:block;font-size:12px;color:#909098;margin-top:5px;}
+.flight-duration-line{display:flex;align-items:center;gap:5px;font-size:12px;color:#73737a;margin:8px 0 -3px;}.flight-duration-line>span{flex:1;border-top:1px solid #424247;}
+.flight-personal-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 12px;}.flight-personal-fields>button{border:1px solid #404044;border-radius:17px;padding:12px;text-align:left;min-height:98px;}.flight-personal-fields strong{display:block;font-size:16px;margin-top:9px;}.flight-personal-fields span{font-size:14px;display:block;overflow-wrap:anywhere;}
+.flight-section-title{font-size:21px;margin:18px 0;}.flight-info-card{display:block;width:100%;border:1px solid #3c3c40!important;border-radius:15px;padding:16px;margin:16px 0;text-align:left;}.flight-info-card h2{font-size:21px;font-weight:650;line-height:1.2;margin:0 0 6px;letter-spacing:-.35px;}.flighty-app .flight-info-card p{font-size:14px;line-height:1.45;color:#96969f;margin:0 0 10px;}.flight-info-card>small{font-size:12px;line-height:1.5;color:#96969f;}
+.flight-info-card.compact-info{display:flex;align-items:center;gap:12px;padding:10px 16px;margin:9px 0;}.compact-info strong{font-size:15px;}.flighty-app .compact-info p{font-size:13px;margin:3px 0 0;}.compact-info>div{flex:1;}
+.forecast-card{margin-top:20px;}.forecast-totals{display:flex;justify-content:space-between;margin:24px 0 29px;gap:8px;}.forecast-totals small,.route-history-totals small,.airline-codes small{font-size:12px;color:#96969f;display:block;margin-bottom:6px;}.forecast-totals strong{font-size:18px;font-weight:500;}.forecast-row{display:grid;grid-template-columns:72px 1fr 34px;align-items:center;gap:4px;font-size:13px;margin:7px 0;}.forecast-row>span:last-child{text-align:right;}.forecast-row>div{height:16px;background:#2b2b2e;border-radius:4px;overflow:hidden;}.forecast-row>div>span{display:block;height:100%;border-radius:4px;}
+.flighty-app .flight-provenance,.flight-info-card .flight-provenance{display:block;font-size:10px;color:#8f8f98;line-height:1.5;margin:14px 0 0;}
+.plane-info{padding-bottom:0;overflow:hidden;background:#061020;}.plane-info>img{display:block;width:calc(100% + 32px);height:150px;object-fit:cover;margin:0 -16px;}.plane-info p,.plane-info>small{color:#9eabc4!important;}.plane-history-link{display:flex;align-items:center;gap:10px;border-top:1px solid #41434b!important;margin:14px -16px 0;width:calc(100% + 32px);padding:15px!important;font-size:14px;}.plane-history-link>span{flex:1;}
+.timetable{padding:16px 0 0;}.timetable>h2,.timetable>p,.timetable>.flight-provenance{margin-left:16px!important;margin-right:16px!important;}.timetable-group{border-bottom:1px solid #333337;padding:18px 15px 8px;}.timetable-group:last-of-type{border:0;}.timetable-group>p{font-size:12px!important;}.timetable-row{display:grid;grid-template-columns:1.4fr 1fr .9fr;align-items:center;gap:8px;font-size:15px;padding:8px 0;}.timetable-row small{display:block;font-size:12px;color:#8b8b95;margin-bottom:3px;}.timetable>.flight-provenance{padding-bottom:12px;}
+.airline-info-heading{display:flex;align-items:center;gap:14px;}.airline-info-heading .carrier-badge{width:32px;height:32px;}.airline-info-heading p{margin:0!important;}.airline-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0;}.airline-actions>button,.airline-actions>a{display:block;border-radius:7px;background:#2c2c2f!important;padding:9px;text-align:center;font-size:13px;color:#f5f5f8;text-decoration:none;}.airline-codes{display:grid;grid-template-columns:repeat(3,1fr);font-size:16px;}
+.route-history-totals{display:flex;justify-content:space-between;gap:8px;margin:14px 0;}.route-history-totals strong{font-size:15px;font-weight:500;}.route-history-flight{display:flex;align-items:center;gap:14px;width:100%;padding:8px 0!important;text-align:left;}.route-history-flight+.route-history-flight{border-top:1px solid #3b3b40;}.route-history-flight>.carrier-badge{width:26px;height:26px;}.route-history-flight>span{flex:1;min-width:0;}.route-history-flight>span>span{display:flex;justify-content:space-between;gap:8px;line-height:1.4;}.route-history-flight strong{font-size:17px;font-weight:600;}.route-history-flight small{font-size:11px;color:#96969f;margin-top:7px;}.route-history-flight small:last-child{text-align:right;}
+.updates>div{position:relative;padding-left:20px;margin-top:15px;}.updates strong{display:block;font-size:15px;line-height:1.4;font-weight:500;}.updates>div>small{display:block;font-size:12px;color:#96969f;}.update-dot{position:absolute;left:0;top:6px;width:12px;height:12px;border:1px solid #ddd;border-radius:50%;}
+.flight-note{min-height:140px;}.flight-note h2{border-bottom:1px solid #333337;padding-bottom:12px;}.flighty-app .flight-note p{white-space:pre-wrap;overflow-wrap:anywhere;padding-top:3px;}.report-flight{display:flex;align-items:center;justify-content:center;width:100%;gap:8px;margin:50px 0 60px;font-size:17px;color:#8a8a94!important;}
+.flight-detail-actions{position:absolute;left:27px;right:27px;bottom:calc(var(--mobile-safe-area-height,20px) + 8px);z-index:9;display:flex;align-items:center;justify-content:space-between;pointer-events:none;}.flight-detail-actions>div{display:flex;background:#25252acc;border:1px solid #494950;border-radius:30px;backdrop-filter:blur(20px);pointer-events:auto;}.flight-detail-actions>div>button{width:49px;height:47px;display:grid;place-items:center;}.flight-detail-actions>.flight-share{display:flex;align-items:center;gap:7px;background:#00a8ef;border:1px solid #23d7ff;border-radius:30px;padding:10px 18px;height:48px;color:#b9efff;font-size:18px;font-weight:600;pointer-events:auto;}
+
+.plane-info>img{height:auto;aspect-ratio:3;object-fit:contain;}
+/* Flight content scrolls in MobileScroll; prevent browser focus scrolling the
+   clipped phone surface (and its off-screen keyboard) during route changes. */
+.device-screen:has(.flight-information){overflow:clip;}
+
+.flighty-app .plane-info>p{margin-bottom:0;}.plane-info>small{display:block;line-height:1.3;}
+/* Frequent flyer tools retain the native charcoal cards and Passport purple. */
+.loyalty-hub h2{font-size:20px;margin:10px 0 18px}.loyalty-hub>.section-heading .text-button{display:flex;align-items:center;gap:3px;color:#20aeff;padding:12px 0;font-size:13px}
+.loyalty-card{display:block;width:100%;text-align:left;background:#242426!important;border:1px solid #3c3c42!important;border-radius:20px;padding:17px!important;margin:6px 0 10px;color:#f4f4f6}.loyalty-card .benefit-carrier{font-size:16px;gap:10px}.loyalty-card .carrier-badge{width:29px;height:29px}.loyalty-meta{font-size:12px;color:#b0abb9;margin:12px 0 18px}.loyalty-goal{display:flex;justify-content:space-between;gap:8px;font-size:15px;font-weight:600}.loyalty-goal>span{color:#aba7b3;font-size:12px;font-weight:400}.loyalty-number{margin:10px 0}.loyalty-number strong{font-size:31px;letter-spacing:-1px}.loyalty-number span{font-size:13px;color:#b8b5c0}.loyalty-card progress{width:100%;height:6px;border:0;border-radius:5px;overflow:hidden;background:#434049}.loyalty-card progress::-webkit-progress-bar{background:#434049}.loyalty-card progress::-webkit-progress-value{background:#a78bed}.flighty-app .loyalty-remaining,.bottom-sheet .loyalty-remaining{color:#d7c6f7;font-size:14px;margin:8px 0 14px}.secondary-counter{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin:10px 0 14px;color:#ccc7d6}.secondary-counter strong{font-weight:550}.credit-projection{display:flex;justify-content:space-between;gap:10px;padding-top:13px;border-top:1px solid #444149;font-size:12px;color:#bdb9c4}.credit-projection b{display:block;color:#f5f2fb;font-size:17px;margin-top:4px;font-weight:600}.flighty-app .projection-copy,.bottom-sheet .projection-copy{font-size:12px;color:#c0bbc8;margin:12px 0 0;line-height:1.5}.loyalty-card.compact .loyalty-meta{margin:10px 0 13px}.redeemable-balance{display:flex;justify-content:space-between;border-top:1px solid #444149;padding-top:14px;margin-top:15px;font-size:14px}.loyalty-card .fineprint{font-size:12px!important;line-height:1.5!important;color:#aaa5b3!important;margin-bottom:0}.loyalty-card-actions{display:flex;justify-content:space-between;margin:0 0 24px}.loyalty-card-actions button{min-height:40px;display:flex;align-items:center;gap:6px;font-size:13px;color:#c4a2ff}.loyalty-empty{display:flex;gap:12px;align-items:center;border:1px solid #424047!important;border-radius:16px;padding:20px!important;width:100%;text-align:left}.loyalty-empty small{display:block;color:#aaa6b2;margin-top:5px}.loyalty-form{padding-bottom:24px}.field select{display:block;width:100%;background:#28262e;color:#f4f0fb;border:1px solid #4b4654;border-radius:11px;padding:13px;margin-top:8px;font:inherit;min-height:46px}.date-pair{display:flex;gap:10px}.date-pair>label{flex:1;min-width:0}.date-pair input{min-width:0;width:100%;font-size:13px}.choice-segments{display:flex;gap:4px;background:#29262f;border-radius:11px;padding:4px;margin:12px 0}.choice-segments button{flex:1;padding:9px 10px;border-radius:8px;font-size:13px;min-height:40px}.choice-segments button[aria-pressed=true]{background:#544564;color:#fff}.credit-flight .carrier-badge{width:26px;height:26px}.credit-flight>span{flex:1}.credit-flight small{display:block;font-size:12px;color:#aca5b5;margin-top:5px}.trip-credit-section{margin:24px 0;padding-top:10px;border-top:1px solid #39343f}.trip-credit-section h2{font-size:20px}.trip-credit-section .muted{font-size:13px}.trip-program{border:1px solid #4b405b;border-radius:12px;padding:12px;margin:12px 0}.trip-program p{font-size:13px;color:#c8bbd6;margin:6px 0}.trip-credit-section .menu-row>span{flex:1}.trip-credit-section .menu-row small{display:block;font-size:12px;color:#b9adc8;margin-top:4px}
+.trip-thumbnail{display:grid;place-items:center;flex-shrink:0;width:56px;height:56px;border-radius:14px;overflow:hidden;background:#30273e;color:#d8c7f2;border:1px solid #55475f}.trip-thumbnail img{width:100%;height:100%;object-fit:cover;display:block}.past-trip-row .trip-thumbnail{align-self:flex-start;margin-top:2px}.past-trip-copy{min-width:0}.past-trip-copy .section-heading{gap:8px}.past-trip-copy strong{font-size:17px}.past-trip-copy small{font-size:12px;line-height:1.5}.trip-category{font-size:11px;color:#cbb5e8}.trip-note-preview{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:240px}.trip-filter-row{display:flex;align-items:center;gap:8px;margin:0 16px}.trip-filter-row .choice-segments{flex:1}.trip-filter-row>button{width:42px;height:42px;display:grid;place-items:center;background:#302b37;border-radius:10px}.trip-search{margin:2px 16px!important}.trip-search input{font-size:15px!important}.trip-undo{display:flex;align-items:center;gap:8px;margin:8px 16px 15px!important;font-size:13px;color:#c4a2ff!important;padding:8px!important}.trip-undo svg{width:18px}.trip-title-row{justify-content:flex-start;gap:12px}.trip-title-row h1{flex:1;font-size:29px}.trip-title-row .trip-thumbnail{width:48px;height:48px}.trip-detail.reviewing{padding-bottom:210px}.trip-action-dock{position:absolute;bottom:0;left:0;right:0;background:#1b181ff2;backdrop-filter:blur(20px);padding:12px 20px;border-top:1px solid #443a50;z-index:12;display:grid;grid-template-columns:1fr 1fr;gap:4px}.trip-action-dock .primary{grid-column:1/-1;margin:0;min-height:46px}.trip-action-dock .text-button,.trip-action-dock .subtle-button{margin:0;min-height:40px;font-size:13px}.trip-labels{display:flex;gap:8px;margin:20px 0}.trip-labels button{border:1px solid #564963;border-radius:20px;padding:10px 16px;color:#cdb7ea;min-height:42px}.trip-labels button[aria-pressed=true]{background:#543b73;border-color:#ab82dc;color:#fff}.surface-link{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:12px!important;border:1px solid #4d435b!important;border-radius:12px;color:#d1bbed!important;width:100%;font-size:14px;margin:12px 0}.trip-detail .explanation{font-size:14px;line-height:1.6}.toast{pointer-events:auto}.toast button{margin-left:auto;color:#e4cbff;white-space:nowrap;text-decoration:underline;min-height:30px}.loyalty-form .field{margin-bottom:16px}
+
+.loyalty-hub>.section-heading>h2{white-space:nowrap}.loyalty-hub>.section-heading>.text-button{width:auto;flex-shrink:0;margin-left:auto}
+
+.trip-action-dock::after{content:"";position:absolute;left:0;right:0;top:100%;height:var(--trip-dock-inset);background:#1b181f;pointer-events:none}
+/* Keep native focus scrolling inside the trip's MobileScroll, never the phone viewport. */
+.device-screen:has(.flighty-app){overflow:clip;}
+
+.earth-canvas:focus-visible{outline:2px solid #b28aff;outline-offset:-3px}

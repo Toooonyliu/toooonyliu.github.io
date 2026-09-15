@@ -1,0 +1,7 @@
+import {chromium,expect} from '@playwright/test';
+import {mkdir} from 'node:fs/promises';
+await mkdir('qa/passport-refresh/before',{recursive:true});
+const b=await chromium.launch({args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1400,height:1200}}),c=()=>p.getByTestId('flow-current');
+const shot=async n=>{await p.mouse.move(0,0);await p.waitForTimeout(700);await p.locator('.device-screen').screenshot({path:`qa/passport-refresh/before/${n}.png`});};
+await p.goto('http://127.0.0.1:4174');await c().getByRole('button',{name:'View all',exact:true}).click();await shot('01-accounts');await p.getByRole('button',{name:'Done',exact:true}).click();
+await p.getByRole('navigation').getByRole('button',{name:'Passport',exact:true}).click();await p.getByRole('button',{name:'Expand panel',exact:true}).click();await p.getByRole('region',{name:'Passport year'}).getByRole('button',{name:'All-Time',exact:true}).click();await c().getByRole('button',{name:'All Flight Stats',exact:true}).click();await shot('02-passport');await p.getByRole('button',{name:'Done',exact:true}).click();await c().getByRole('group',{name:'Past flights display'}).getByRole('button',{name:'Trips',exact:true}).click();await c().getByRole('button',{name:'Open trip: Chicago',exact:true}).click();await expect(c().locator('.earth-view')).toHaveAttribute('data-ready','true');await shot('03-trip');await b.close();

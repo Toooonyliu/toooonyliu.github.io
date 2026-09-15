@@ -1,0 +1,15 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+
+.env.local
+
+# Local audit artifacts, source screenshots and machine-specific files
+qa/
+references/
+.DS_Store
+.env*
+!.env.example
+.codex/
+.agents/

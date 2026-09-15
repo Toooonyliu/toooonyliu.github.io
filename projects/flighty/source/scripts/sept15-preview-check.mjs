@@ -1,0 +1,15 @@
+import {chromium,expect} from '@playwright/test';
+const browser=await chromium.launch({headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const page=await browser.newPage({viewport:{width:1400,height:1200},deviceScaleFactor:1});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:4174/?preview-friend=bobo');
+await expect(page.getByRole('heading',{name:'Flighty Friends',exact:true})).toBeVisible();
+await page.mouse.move(0,0);await page.waitForTimeout(900);
+await page.locator('.device-screen').screenshot({path:'qa/sept15/friends-intro.png'});
+await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('button',{name:'Add sample friend Bobo'}).click();
+await page.getByTestId('flow-current').getByRole('button',{name:'Bobo’s profile'}).click();
+await expect(page.getByTestId('flow-current').getByRole('heading',{name:'Bobo',exact:true})).toBeVisible();await expect(page.locator('.friends-intro')).toHaveCount(0);
+await page.goto('http://127.0.0.1:4174/');await page.getByRole('button',{name:'Search flights',exact:true}).click();await page.getByRole('button',{name:'Find by Route',exact:true}).click();
+await page.getByLabel('Departure airport',{exact:true}).fill('LAX');await page.getByLabel('Arrival airport',{exact:true}).fill('CAN');await page.getByRole('button',{name:'Choose date'}).click();await page.getByRole('button',{name:/Today Tue/}).click();await expect(page.locator('.empty-result')).toContainText('No sample flights');
+await page.goto('http://127.0.0.1:4174/qa/sept15/comparison.html');await page.locator('#intro').screenshot({path:'qa/sept15/compare-intro.png'});
+console.log('Preview link, friend detail and unmatched route passed. Page errors:',errors);await browser.close();

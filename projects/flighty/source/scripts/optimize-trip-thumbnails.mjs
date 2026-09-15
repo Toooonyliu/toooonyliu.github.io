@@ -1,0 +1,5 @@
+import {chromium} from '@playwright/test';
+import {writeFile,mkdir,rename,stat} from 'node:fs/promises';
+const b=await chromium.launch(),p=await b.newPage();await p.goto('http://127.0.0.1:4174');await mkdir('qa/destination-originals',{recursive:true});let before=0,after=0;
+for(const name of ['tokyo','chicago','london','hongkong','newyork','losangeles']){const data=await p.evaluate(async name=>{const im=new Image();im.src=`/assets/destinations/${name}.png`;await im.decode();const c=document.createElement('canvas');c.width=384;c.height=384;c.getContext('2d').drawImage(im,0,0,384,384);return c.toDataURL('image/webp',.85).split(',')[1];},name);const from=`public/assets/destinations/${name}.png`,to=`public/assets/destinations/${name}.webp`;const buf=Buffer.from(data,'base64');before+=(await stat(from)).size;after+=buf.length;await writeFile(to,buf);await rename(from,`qa/destination-originals/${name}.png`);}
+console.log({before,after,reduction:((1-after/before)*100).toFixed(1)+'%'});await b.close();

@@ -37,3 +37,7 @@ All copy lives in `js/i18n.js`, one key per string, `en` and `zh` side by side. 
 ## Deploying
 
 Pushed to `main` on `toooonyliu.github.io` — GitHub Pages serves it automatically from the repo root.
+
+## Flighty concept (September 2026)
+
+The homepage now links to `projects/flighty/`: a portfolio-style case study with an on-demand demo preview. The full interactive demo and its source are included in the repository. See [the project README](projects/flighty/README.md) for source and rebuild instructions. This addition uses the current static HTML portfolio; the older structure and language-toggle notes above describe an earlier iteration.
