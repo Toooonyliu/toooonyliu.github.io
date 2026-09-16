@@ -10,7 +10,7 @@ For this workspace, an official Node.js runtime was downloaded to `/tmp/node-v24
 
 ## Walkthrough
 
-1. Start on **My Flights**. Open the upcoming PIT–ORD flight. Below the next flight, **Mileage & status** shows a pinned loyalty goal. **View all** opens accounts and per-flight credit; add/edit accounts, choose Reach / Retain / Save miles, and enter balances from your airline account.
+1. Start on **My Flights**. Open the upcoming PIT–ORD flight. Below the next flight, **Mileage & status** shows a “Where next?” planner and three compact loyalty account rows. **View all** opens accounts and per-flight credit; add/edit accounts, choose Reach / Retain / Save miles, and enter balances from your airline account.
 2. Use the persistent **My Flights / Friends / Passport** bottom navigation. Search opens the number/date/result Add Flight flow. Friends includes onboarding, a simulated share sheet and Bobo’s sample itinerary; no invitations are sent.
 3. Open **Passport**. Its year selector filters the Passport totals, delay and aircraft cards, most-flown-airline card, and Past Flights. Airline count and distance drill-downs use the exact contributing records.
 4. Scroll to **Past Flights**. The new **Flights / Trips** control changes only the list view. Flights retains sorting and density controls. Trips displays compact saved journeys and reviewable suggestions. Switching views never creates a saved trip.
@@ -98,3 +98,14 @@ A hosted static web app is the preferred review format: share one HTTPS URL, wit
 - The six city thumbnails total 226 KB as WebP, down from 14.5 MB PNG. Original images remain in local QA storage only.
 
 Before production: import the full flight history; integrate authenticated airline balances/earning rules and flight data; add secure cloud synchronization and recovery. Current online search is a clearly labeled sample catalog/manual-entry demo. WebGL image resolution limits very close zoom; full VoiceOver/TalkBack and older mobile GPU testing remain future validation.
+
+
+## Mileage planner and journey recap — September 15, 2026
+
+From **My Flights → Mileage & status → Tokyo**, choose travel dates and cabin, then compare. **Lowest cost** starts with United; **My goal** with the ANA goal puts ANA first because both Premium Points requirements improve. Open an option to see usable sample benefits, one credited program, redeemable earnings, current → proposed → after progress, remaining counters and potential next-tier benefits. Change cabin, goal or nonstop filter to explore the tradeoff. Comparing never saves a booking or changes balances.
+
+Supported scenario library: PIT or SFO to HND (Tokyo), LHR (London), and ORD (Chicago; Economy only). Prices are fictional USD cash fares for one adult, with listed bags and taxes included. Dates affect qualification periods and membership validity, but do not drive live inventory or price changes. Cabin-specific credit values are fixtures, not airline fare-class formulas. Each direction uses a single scenario credit package; real segment-level earning rules are deferred. Detailed per-segment schedules, live fares, booking, award availability and an exhaustive benefits catalog are outside this prototype.
+
+**Passport → All-Time → Trips → Chicago → Trip summary → Explore statistics** now starts with Your journey. Each chronological leg opens its original flight. The New York trip spans 2025–2026 and excludes its canceled leg; Japan keeps its HND–KIX surface gap. Times distinguish sample, entered, reported and screenshot-recorded gate events; unavailable times are not inferred. All-time/year frequency charts remain.
+
+Validation: `node --test tests/*.test.mjs` (42 cases), `npm run build`, and `node scripts/planner-journey-qa.mjs` with an installed Playwright browser. The browser script accepts `DEMO_URL` for static-preview or deployed checks. See `design-qa.md` for visual evidence and remaining production limits.

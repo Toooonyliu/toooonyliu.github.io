@@ -4,6 +4,7 @@ import { BottomSheet, Carousel, FlowStack, KeyboardInput, KeyboardTextarea, Mobi
 import AddFlight from './AddFlight';
 import FriendsView from './FriendsView';
 import FlightInformation from './FlightInformation';
+import MileagePlanner from './MileagePlanner';
 import LoyaltyHub,{TripCredits} from './LoyaltyPanel';
 import TripThumbnail from './TripThumbnail';
 import PassportDetails,{PassportDetailHeader,PassportHero,TripSummaryCard} from './PassportDetails';
@@ -18,7 +19,7 @@ type AppState={records:Flight[];year:string;setYear:(v:string)=>void;grouped:boo
 const Context=createContext<AppState>(null!);
 const useApp=()=>useContext(Context);
 function initial(){try{const raw=localStorage.getItem(STORE);if(raw){const v=JSON.parse(raw);if(v.version===1){validateTrips(v.trips,personalFlights(v));return v as State;}}}catch{}return seed();}
-type Page='passport-detail'|'trip-passport'|'trips'|'overview'|'home'|'review'|'trip'|'flight'|'matching'|'history'|'create'|'friends'|'search'|'friend';
+type Page='planner'|'passport-detail'|'trip-passport'|'trips'|'overview'|'home'|'review'|'trip'|'flight'|'matching'|'history'|'create'|'friends'|'search'|'friend';
 function screen(page:Page,id='',filter='All airlines',year='All time'):FlowScreen{
  if(page==='passport-detail'||page==='trip-passport')return {id:`${page}-${id}`,headerHeight:page==='trip-passport'?62:114,header:()=> <PassportDetailHeader tripId={page==='trip-passport'?id:''}/>,render:()=> <PassportDetails tripId={page==='trip-passport'?id:''}/>};
  const top=['home','friends','overview','trips'].includes(page);
@@ -40,7 +41,7 @@ function Toggle({label,detail,value,onChange}:{label:string;detail:string;value:
 function Header({page,id}:{page:Page;id:string}){
  const flow=useFlow(),app=useApp();const top=['home','friends','trips','overview'].includes(page);
  const passport=page==='trips'||page==='overview';const [sharing,setSharing]=useState(false);
- const title=page==='home'?'My Flights':page==='friends'?'Friends':passport?'Passport':page==='review'?'Review trip':page==='trip'?(app.state.trips.find(t=>t.id===id)?.title??'Your trip'):page==='flight'?'Flight details':page==='search'?'Add Flight':page==='friend'?'Bobo':page==='matching'?'Matching flights':page==='history'?'Before you fly':'Create trip';
+ const title=page==='planner'?'Trip planner':page==='home'?'My Flights':page==='friends'?'Friends':passport?'Passport':page==='review'?'Review trip':page==='trip'?(app.state.trips.find(t=>t.id===id)?.title??'Your trip'):page==='flight'?'Flight details':page==='search'?'Add Flight':page==='friend'?'Bobo':page==='matching'?'Matching flights':page==='history'?'Before you fly':'Create trip';
  const summary=totals(filterFlights(app.year,'All airlines',app.state.empty?[]:app.records));
  const download=()=>{const text=`Flighty demo · ${app.year}\n${summary.count} flights · ${summary.km.toLocaleString()} km\nFictional sample travel history`;const url=URL.createObjectURL(new Blob([text],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download='my-passport.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  return <><div className={top?'native-header':'toolbar'}>{!top&&<button aria-label="Go back" onClick={()=>flow.pop()} className="toolbar-side"><CaretLeft size={25}/><span>Back</span></button>}{top?<h1>{title}</h1>:<strong>{title}</strong>}<div className="header-actions">{top&&<button className="header-circle" aria-label="Share passport summary" onClick={()=>setSharing(true)}><Export size={23}/></button>}<button className={top?'header-circle':'toolbar-side right'} aria-label="Demo controls" onClick={app.settings}>{top?<UserCircle size={29}/>:<DotsThree size={28}/>}</button></div></div>
@@ -48,7 +49,7 @@ function Header({page,id}:{page:Page;id:string}){
  <BottomSheet open={sharing} onOpenChange={setSharing} title="Your Passport summary" description="A summary of fictional demo flights." snap={.45}><p>{app.year} · {summary.count} flights · {summary.km.toLocaleString()} km</p><button className="primary" onClick={download}><DownloadSimple/>Download summary</button><button className="text-button" onClick={()=>setSharing(false)}>Done</button></BottomSheet></>;
 }
 function MainNav({page}:{page:Page}){const flow=useFlow();return <div className="native-nav"><nav aria-label="Main navigation">{([{page:'home',label:'My Flights',Icon:AirplaneTilt},{page:'friends',label:'Friends',Icon:Users},{page:'overview',label:'Passport',Icon:BookBookmark}] as const).map(({page:target,label,Icon})=><button key={target} aria-current={page===target||(target==='overview'&&page==='trips')?'page':undefined} onClick={()=>{if(page!==target)flow.replace(screen(target));}}><span className={`tab-symbol ${target==='overview'?'passport-symbol':''}`}><Icon size={29} weight="fill"/>{target==='overview'&&<GlobeSimple className="passport-globe-symbol" size={14} weight="bold"/>}</span><span>{label}</span></button>)}</nav><button className="nav-search" aria-current={page==='search'?'page':undefined} aria-label="Search flights" onClick={()=>{if(page!=='search')flow.push(screen('search'));}}><MagnifyingGlass size={28}/></button></div>;}
-function Screen({page,id,filter,year}:{page:Page;id:string;filter:string;year:string}){switch(page){case 'passport-detail':case 'trip-passport':return <PassportDetails tripId={id}/>;case 'trips':case 'overview':return <MapPanel page={page}><Passport/></MapPanel>;case 'home':return <MapPanel page={page}><Home/></MapPanel>;case 'friends':return <MapPanel page={page}><FriendsView/></MapPanel>;case 'friend':return <FriendsView detail/>;case 'search':return <AddFlight/>;case 'review':return <TripView id={id} review/>;case 'trip':return <TripView id={id}/>;case 'flight':return <FlightInformation id={id}/>;case 'matching':return <Matching filter={filter} year={year}/>;case 'history':return <History/>;case 'create':return <CreateTrip/>;}}
+function Screen({page,id,filter,year}:{page:Page;id:string;filter:string;year:string}){switch(page){case 'planner':return <MileagePlanner initialDestination={id}/>;case 'passport-detail':case 'trip-passport':return <PassportDetails tripId={id}/>;case 'trips':case 'overview':return <MapPanel page={page}><Passport/></MapPanel>;case 'home':return <MapPanel page={page}><Home/></MapPanel>;case 'friends':return <MapPanel page={page}><FriendsView/></MapPanel>;case 'friend':return <FriendsView detail/>;case 'search':return <AddFlight/>;case 'review':return <TripView id={id} review/>;case 'trip':return <TripView id={id}/>;case 'flight':return <FlightInformation id={id}/>;case 'matching':return <Matching filter={filter} year={year}/>;case 'history':return <History/>;case 'create':return <CreateTrip/>;}}
 function PageBody({children,className=''}:{children:ReactNode;className?:string}){return <MobileScroll className={`flighty-scroll ${className}`}><main className="page-content">{children}</main></MobileScroll>;}
 
 function Empty({title,detail,action,onAction}:{title:string;detail:string;action?:string;onAction?:()=>void}){return <section className="empty"><GlobeHemisphereWest size={42} weight="light"/><h2>{title}</h2><p>{detail}</p>{action&&<button className="primary" onClick={onAction}>{action}</button>}</section>;}
@@ -118,7 +119,6 @@ function MapPanel({page,children,heading,flight}:{page:Page;children:ReactNode;h
  const expandedTop=device.geometry.safeArea.top+8,restTop=Math.round(height*.425),peekTop=height-215;
  const [position,setPosition]=useState(restTop),[dragging,setDragging]=useState(false);
  const drag=useRef<{startY:number;startTop:number;scale:number;moved:boolean}|null>(null);
- const suppressClick=useRef(false);
  useEffect(()=>setPosition(restTop),[restTop]);
  const passport=page==='overview'||page==='trips';
  const routes=flight?[flight]:app.state.empty?[]:passport?filterFlights(app.year,'All airlines',app.records):page==='home'?app.records.filter(f=>f.status==='planned'):app.state.friends?.includes('bobo')?friendFlights:[];
@@ -128,11 +128,11 @@ function MapPanel({page,children,heading,flight}:{page:Page;children:ReactNode;h
   drag.current={startY:event.clientY,startTop:position,scale:event.currentTarget.getBoundingClientRect().width/event.currentTarget.offsetWidth,moved:false};setDragging(true);
  };
  const move=(event:ReactPointerEvent<HTMLElement>)=>{if(!drag.current)return;event.stopPropagation();const delta=(event.clientY-drag.current.startY)/drag.current.scale;if(Math.abs(delta)>5)drag.current.moved=true;setPosition(Math.max(expandedTop,Math.min(peekTop,drag.current.startTop+delta)));};
- const finish=(event:ReactPointerEvent<HTMLElement>)=>{if(!drag.current)return;event.stopPropagation();const moved=drag.current.moved;suppressClick.current=moved;drag.current=null;setDragging(false);if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);if(moved)setPosition([expandedTop,restTop,peekTop].reduce((a,b)=>Math.abs(a-position)<Math.abs(b-position)?a:b));};
- const toggle=()=>{if(suppressClick.current){suppressClick.current=false;return;}keyboard.hide();setPosition(position<restTop-20?restTop:expandedTop);};
+ const finish=(event:ReactPointerEvent<HTMLElement>)=>{if(!drag.current)return;event.stopPropagation();const moved=drag.current.moved;drag.current=null;setDragging(false);if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);if(moved)setPosition([expandedTop,restTop,peekTop].reduce((a,b)=>Math.abs(a-position)<Math.abs(b-position)?a:b));else if(event.type==='pointerup'&&event.currentTarget.classList.contains('panel-grabber'))setPosition(position<restTop-20?restTop:expandedTop);};
+ const toggle=()=>{keyboard.hide();setPosition(position<restTop-20?restTop:expandedTop);};
  return <div className="map-panel-layout" inert={flow.current.id.split('-')[0]!==page} aria-hidden={flow.current.id.split('-')[0]!==page}><EarthView flights={routes}/><section className="travel-panel" data-expanded={position===expandedTop} data-dragging={dragging} style={{'--panel-top':`${position}px`,'--panel-header':flight?'78px':passport?'119px':'74px'} as CSSProperties}>
  <div className="travel-panel-heading" onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} onDoubleClick={event=>{if(!(event.target as HTMLElement).closest('button'))toggle();}}>
- <button className="panel-grabber" onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} aria-label={position<restTop-20?'Collapse panel':'Expand panel'} onClick={toggle}><span/></button>{heading??<Header page={page} id=""/>}
+ <button className="panel-grabber" onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} aria-label={position<restTop-20?'Collapse panel':'Expand panel'} onClick={event=>{if(event.detail===0)toggle();}}><span/></button>{heading??<Header page={page} id=""/>}
  </div><div className="travel-panel-body" onWheelCapture={event=>{if(event.deltaY>0&&position>expandedTop)setPosition(expandedTop);}}>{children}</div>
  </section></div>;
 }

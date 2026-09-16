@@ -1,39 +1,50 @@
-# Passport and trip refresh — September 15, 2026
+# Mileage planner and Trip Passport QA
 
-final result: passed
+Date: September 15, 2026
 
-## Evidence and comparison
+## Visual truth and comparison
 
-- Source visual truth: `qa/passport-refresh/reference/01.png`–`09.png`, supplied in the current user request. All 9 originals are 1206×2622.
-- Implementation: `qa/passport-refresh/after/01-accounts.png`–`14-japan-passport.png`; final capture updates `05-passport`, `06-flights`, `07-distance`, `08-time`, `09-airlines`, `10-countries`, `11-chicago`, `13-japan`.
-- Viewport: browser 1400×1200, iPhone screen 393×852 at scale 1. Reference normalized to 393×852; comparison PNGs 786×852 with reference left/current right.
-- Combined full-view evidence: `qa/passport-refresh/compare-cover.png`, `compare-flights.png`, `compare-distance.png`, `compare-airlines.png`, `compare-countries.png`, each opened and inspected. The detail views start at the relevant section; countries reference also shows the preceding route tail, which is intentionally not used to judge section offset.
-- Readable 1:1 screen comparisons make the typography, controls, flight rows and bars legible without extra crop images. Trip maps separately inspected in `after/11-chicago.png` and `after/13-japan.png`.
+Source visual truth: existing approved demo captures at `../research/flighty/demo-feedback-review/01-home.png`, `02-accounts.png`, `03-trip-passport.png`, supplemented by the user's approved functional changes in the same review. This is a revision of the existing charcoal/purple app, not a pixel-identical reproduction of the former account card or annual chart.
 
-## Findings and fixes
+Rendered evidence: `qa/planner-journey/01-home.png` through `12-home-expanded.png`. Browser viewport 1400 × 1200, deviceScaleFactor 1. iPhone captures are 393 × 852 pixels/CSS px at scale 1; Pixel captures are 427 × 952. Baseline iPhone captures are also 393 × 852; no density resizing is required.
 
-- P1 baseline: fixed-radius trip globe hid short routes. Added route/frustum fitting and retained full transpacific span. Chicago camera distance 1.16 vs previous 3.6.
-- P1 baseline: all-time stats opened a small prose sheet. Replaced with purple geographic Passport cover, fixed period header and working statistics sections.
-- P2 iteration 1: close-zoom airport markers were oversized. Markers now scale to approximately 3 screen pixels of radius.
-- P2 iteration 1: fun-summary and average-distance text inherited low-contrast paragraph styles. Applied scoped light text; verified in final trip/distance captures.
-- P2 iteration 1: excessive chart control margin and absent section sharing. Tightened chart controls; added working summary downloads styled as the reference Share pills.
-- P2 functional: old migration could duplicate an edited sample account ID. Preserve stable IDs and program matches; no edited balance replacement.
-- P2 hosting: local flight adapter probing on public origins. Public demo now uses sample/manual flow without requests to visitor localhost.
+Combined comparison inputs opened and reviewed: `qa/planner-journey/compare-home.png` and `compare-journey.png`. The home comparison explicitly uses the old resting panel and the new expanded panel to expose the full revised account section; panel proportions are intentionally different states, not a claimed visual mismatch. The trip comparison uses the same Chicago statistics state, replacing the annual chart with the approved chronology.
+
+Focused evidence: `03-search.png`, `04-results.png`, `05-benefits.png`, `06-projection.png`, `07-empty.png`, `09-cross-year.png` and `11-pixel-planner.png` were inspected at full phone resolution to check dense labels, counters, safe areas and error/empty states.
+
+## Findings and iteration history
+
+- Resolved P2: the initial search form put its primary action too close to the lower safe area. Reduced introduction, notice and field spacing. Post-fix `03-search.png` shows the full Compare flights action above the home indicator.
+- Resolved P2: repeated price explanation and oversized result spacing hid alternative options. Removed duplicate first-option explanation and compacted credit rows/filters; `04-results.png` and `11-pixel-planner.png` show comparable options with readable price, route, stops and credit information.
+- Resolved P2: the existing panel handle's pointer tap did not expand it reliably, even though keyboard activation worked. Pointer-up now handles taps explicitly; click handles keyboard activation. The final browser run verifies tap expand/collapse and keyboard expansion. `12-home-expanded.png` shows all three account rows below the destination entry.
+- No remaining actionable P0/P1/P2 findings in the reviewed flows.
 
 ## Required fidelity surfaces
 
-- Typography: system mobile font retained; cover uses regular-weight passport title, strong numeric hierarchy, muted units and readable labels. Counts and strings deliberately follow loaded records.
-- Spacing: purple fixed header/period rail, wide map and flags, two-column passport metrics, full-width dark divided sections. No app-owned fixed controls are hidden by viewport overflow.
-- Colors: deep purple cover/header, purple chart bars, charcoal surfaces, blue Show More, light body text. Original green flight status styling retained elsewhere.
-- Images: Natural Earth geographic map with coordinate-driven routes; real airline and country assets. City WebP thumbnails are existing artwork optimized without changing subjects. No generated geography. Passport app icon uses the established airplane library icon; original screenshot's branded app tile and decorative serial strip are not copied.
-- Content: 15 completed flights / 72,674 km / 10 airports / 6 airlines / 5 countries and territories. 94h 53m is labeled partial, time coverage 14/15. Reported 2023 total remains 23,511 km. Region totals do not invent world-country denominators; Moon comparison uses verified average distance. Missing air/taxi breakdown is not fabricated.
+- Typography: existing system family, native phone chrome and clear title/body/metadata hierarchy retained. Search inputs, prices, local clocks and goal counters wrap without truncating essential data.
+- Spacing/layout: original navigation and next-flight priority retained. Planner is a separate full screen, with existing phone-scoped sheets; the account overview is compact and full detail remains one tap away. iPhone/Pixel lower chrome stays usable.
+- Colors/tokens: charcoal surfaces, purple goal/Passport accents and blue existing navigation actions retained. Sample labels, counter names and selection text supplement color.
+- Image/assets: original airline logos, real NASA globe and existing trip thumbnails retained. No generated geography or replacement logo approximations added.
+- Copy/content: fictional prices and scenario credit labeled; qualification counters separate from spendable miles; current perks distinct from future activation. Manual/expired/unknown status does not guarantee benefits. Timeline says departure/arrival or recorded gate time, not invented takeoff/landing events.
 
-## Verification
+## Functional verification
 
-- 32 data/domain tests passed, including accounting, source data, grouping, route camera and new Passport math.
-- Reference/travel/Earth regression: 10 passed initially; remaining 2 passed after updating the account count expectation to three and waiting for the calibrated phone layout before dispatching touch input. Touch drag/pinch, iPhone and Pixel gestures, reference Add Flight/Friends, grouping, notes and year filters verified.
-- New Passport flow script passed: three accounts, pinning, all-time cover, year selection, chart modes, rankings, Chicago summary, Japan review/save and trip Passport. No page errors.
-- Final visual script passed; all 28 protected runtime files verified; TypeScript/Vite build and 4 Sites Worker tests passed.
-- Follow-up P3: physical-device/assistive-technology validation and higher-resolution Earth tiles for very close zoom. Dataset size, geographic projection, decorative serial treatment and omitted unknown statistics are intentional differences, not source substitution.
+- `npm run build`: passed; all 28 protected runtime files match their lock. Existing large-bundle warning remains.
+- `node --test tests/*.test.mjs`: 42 passed. Includes rankings, both ANA counters, selected program, cabin, goal deadlines, unsupported queries, unknown/expired tiers, cross-year dates, time zones, missing data, canceled flights and surface transfers.
+- `scripts/planner-journey-qa.mjs`: passed with zero page errors. Covers homepage rows/account detail, form, cost vs goal ordering, program switching, Business lounge scenario, nonstop empty state, invalid return date, unchanged persisted balances, trip leg drill-down, cross-year recap and preservation of all-time charts. iPhone and Pixel previews captured.
+- Public export browser smoke check passed with zero page errors and zero HTTP failures; compact-account details, panel tap/keyboard activation, Tokyo goal ranking and both counters were verified. Public export scopes assets to the GitHub Pages subdirectory. The separate Sites deployment is not updated by this revision.
 
-User-facing review: `qa/passport-refresh/report.md`.
+## Remaining validation limits
+
+Fares, inventory, earning packages and modeled benefits are curated examples. No live booking or loyalty integration. Dates do not drive live fares; exact fare-class/segment rules and full status eligibility need a production data service. Frequent-flyer usability testing, complete VoiceOver/TalkBack testing and physical-device GPU checks remain future work.
+
+## Implementation checklist
+
+- [x] Compact accounts plus preserved detailed cards
+- [x] Destination/date/cabin comparison with transparent priorities
+- [x] Benefits now versus future goal progress
+- [x] Trip chronology and original-flight drill-down
+- [x] Protected runtime, calculations, phone browser interactions and visual comparison
+- [x] PRD scope addendum records exploratory planner scope
+
+final result: passed

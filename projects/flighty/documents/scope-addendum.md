@@ -24,6 +24,16 @@ The later prototype explores multiple accounts, reach/retain/save goals, indepen
 
 Acceptance boundaries: geographic distance is separate from loyalty credit; posted credit is not added twice; unknown is not zero; program rules, personal targets, source and update date are identifiable. United and British Airways example targets are illustrative personal goals, not elite-status thresholds or award prices.
 
+## September 15 follow-up: choosing a flight and recalling a journey
+
+The approved demo now includes a compact mileage account overview and a destination/date/cabin planner. It compares a curated set of fictional cash fares by cost, progress toward a selected goal, or modeled benefits. Expanded options distinguish usable fare/sample-tier benefits, redeemable earnings, required qualification counters and potential benefits after airline activation. The account model adds optional explicit tier and validity dates. Exploring does not alter balances, confirmed flights or booked projections.
+
+This remains a separate experiment beyond v1.0. PIT/SFO → Tokyo, London and Chicago scenarios are not live search; dates constrain goal/tier eligibility, not inventory or prices. Earnings are illustrative packages rather than fare-class calculations. No booking, award inventory, automatic account sync or universal benefits catalog is implemented.
+
+Trip Passport replaces its per-year frequency graph with first departure, final arrival and chronological legs in airport-local dates/time zones. All-time/year graphs remain. Cross-year trips, canceled records, missing timestamps and unrecorded surface transfers are handled explicitly.
+
+Additional validation questions: can travelers explain why the cheapest option differs from the strongest goal option; identify benefits usable now versus after qualification; and understand that projected credit has not been earned?
+
 ## Evidence and validation
 
 The original PRD used 12 purposively selected qualitative accounts: nine Reddit, one Flighty App Store and two AwardWallet Google Play. This is desk research, not an interview sample. The website adds context from four selected historical App Store reviews; the trip-grouping review overlaps the original set and is not a new independent participant.

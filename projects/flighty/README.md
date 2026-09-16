@@ -17,8 +17,8 @@ The page distinguishes Trips as the core concept from the more speculative loyal
 - `index.html`, `case-study.css`, `case-study.js`: static case study, no build step. Native system font; locally bundled imagery and Phosphor icons.
 - `images/`: prototype captures, city images and attributed Flighty artwork. See `images/ASSETS.md`.
 - `documents/`: original PRD v1.0 and dated scope addendum.
-- `demo/`: existing static app served by GitHub Pages; unchanged in this case-study revision.
-- `source/`: original prototype source snapshot (9da7c721601f49abf04950ae0185b4da6752e514). The separate Sites deployment is unchanged.
+- `demo/`: static app served by GitHub Pages; includes the September 15 mileage planner and trip chronology revision.
+- `source/`: synchronized prototype source, including the mileage planner and trip chronology revision. The separate Sites deployment is unchanged.
 - `portfolio.css`: retained legacy style file from the earlier page; no longer loaded by this case study.
 
 Hero tabs change phone screenshots and benefit cards. Comparison tabs switch traveler jobs. The trip chart switches distance/time and provides a data table. The loyalty chart switches three sample accounts and earned-only versus booked-estimate progress. Values mirror `source/src/domain.ts` and `source/src/loyalty.ts`; update the explanatory fixtures together if those source examples change.
@@ -45,3 +45,9 @@ Commit source and demo together when changing the app. The export scopes asset r
 ## Data and verification
 
 The prototype uses sample/manual loyalty records and local browser persistence. It has no production loyalty connection. Research context is desk research; business outcomes remain hypotheses. See `design-qa.md` for browser verification and remaining limits.
+
+## Latest demo iteration
+
+Mileage adds a destination/date/cabin planner, compact account rows, sample cost/goal/benefit comparison and one-program credit projections. Trip Passport adds first/final event times and chronological legs, with cross-year and unknown-time handling. The original PRD remains unchanged; the dated scope addendum identifies this planner as an exploratory extension.
+
+No live pricing, bookings or loyalty sync: curated fares and credit packages demonstrate the interaction. The portfolio homepage and case-study layout are unchanged by this app revision. See `source/design-qa.md` for app validation.

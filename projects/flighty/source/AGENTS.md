@@ -128,3 +128,13 @@ When any text-entry control loses focus, dismiss the simulated keyboard. If the 
 - Add United and BA sample mileage accounts alongside ANA. Targets are illustrative personal goals; preserve edited accounts and stable IDs. Public hosts must not probe visitors’ localhost flight adapters.
 - Trip Earth cameras fit all non-canceled route geometry at the viewport aspect ratio, with readable map markers. Trip summary and detail statistics must derive from original flight IDs.
 - Supplied September 15 all-time Passport references (local `qa/passport-refresh/reference`) define purple cover/header, flat geographic map, charcoal stats sections, purple charts and blue Show More. Loaded data remains 15 completed records; do not imitate the screenshot’s 75-flight totals without the source records. Missing flight duration is partial, never exact. Keep geographic distance separate from loyalty.
+
+
+## Approved mileage planner and trip chronology revision
+
+- Keep My Flights' next flight first. Mileage & status now offers a destination entry and three compact account rows; View all retains full account and flight-credit editing.
+- Add a what-if cash-fare planner with origin, destination, dates, cabin, nonstop filter and cost/goal/benefit priorities. Curated PIT/SFO → HND/LHR/ORD offers are illustrative scenarios, never live prices, availability or airline earning rules. Unsupported routes/cabins have explicit empty states.
+- Show credit to one selected program, redeemable earnings separately from qualification counters, all required counters and period boundaries. Do not alter balances, booked estimates or flight records while comparing. Compare normalized progress within the selected goal, never raw points across currencies.
+- Current tier and validity are optional explicit account fields; never infer a tier from points. Only seeded sample benefits are modeled. Manual/unknown/expired membership does not promise perks. Next-tier benefits require airline confirmation and activation.
+- Trip Passport replaces its frequency chart with first departure, final arrival and chronological flight events in airport-local dates/time zones. Keep all-time/year charts. Preserve cross-year dates, canceled-flight exclusions, unknown times, surface gaps and original-flight drill-down. Do not relabel gate times as takeoff/landing.
+- This planner expands the original PRD's manual loyalty pilot; record it as an exploratory scope addition, with live search/booking and full benefit-rule integration deferred.
