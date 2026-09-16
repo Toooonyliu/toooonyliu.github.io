@@ -138,3 +138,11 @@ When any text-entry control loses focus, dismiss the simulated keyboard. If the 
 - Current tier and validity are optional explicit account fields; never infer a tier from points. Only seeded sample benefits are modeled. Manual/unknown/expired membership does not promise perks. Next-tier benefits require airline confirmation and activation.
 - Trip Passport replaces its frequency chart with first departure, final arrival and chronological flight events in airport-local dates/time zones. Keep all-time/year charts. Preserve cross-year dates, canceled-flight exclusions, unknown times, surface gaps and original-flight drill-down. Do not relabel gate times as takeoff/landing.
 - This planner expands the original PRD's manual loyalty pilot; record it as an exploratory scope addition, with live search/booking and full benefit-rule integration deferred.
+
+## Approved calculated earnings revision (September 16)
+
+- Passport starts on All-Time and tapping its main navigation tab resets the period to All-Time. Preserve a chosen year on drill-down/back.
+- Replace fixed planner earning packages with published base earning formulas for explicit fare-class/ticket assumptions. Keep fares illustrative, distinguish sector mileage from credited miles, disclose approximate distance/FX/tax assumptions and excluded tier/card bonuses. Never label an unbooked calculation as posted or guaranteed earnings.
+- Show eligible saved-program earnings on every option, including BA Avios on JAL when the selected ANA goal is ineligible. Ranking still uses only the selected goal.
+- Purple denotes entered current credit and yellow denotes this proposed trip. Label both with quantities; show all required status counters. Do not mutate accounts.
+- Link to official airline booking sites. United revenue-based credits require a United-issued ticket, so that choice links to United even on an ANA-operated itinerary.

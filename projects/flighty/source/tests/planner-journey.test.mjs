@@ -12,13 +12,13 @@ test('rankings expose cost vs goal tradeoffs without comparing raw program curre
  const accounts=sampleAccounts(),offers=offersFor(q),before=JSON.stringify(accounts);
  assert.equal(rankOffers(offers,q,'price',accounts[0],accounts)[0].carrier,'United');assert.equal(rankOffers(offers,q,'goal',accounts[0],accounts)[0].carrier,'ANA');
  const nh=offers.find(o=>o.carrier==='ANA'),ua=offers.find(o=>o.carrier==='United');const p=projectionFor(accounts[0],nh,q),partner=projectionFor(accounts[0],ua,q);
- assert.equal(p.after,51600);assert.equal(p.secondAfter,31600);assert.equal(p.met,true);assert.equal(partner.remaining,0);assert.equal(partner.secondRemaining,3000);assert.equal(partner.met,false);assert.equal(projectionFor(accounts[2],ua,q),null);assert.equal(JSON.stringify(accounts),before);
+ assert.equal(p.after,51370);assert.equal(p.secondAfter,30796);assert.equal(p.met,true);assert.equal(partner.remaining,0);assert.equal(partner.secondRemaining,3000);assert.equal(partner.met,false);assert.equal(projectionFor(accounts[2],ua,q),null);assert.equal(JSON.stringify(accounts),before);
 });
 test('cabin, trip type, credit program and period independently change estimates',()=>{
  const accounts=sampleAccounts(),economy=offersFor(q)[0],business=offersFor({...q,cabin:'Business'})[0];assert.ok(business.price>economy.price);assert.ok(business.credits[0].points>economy.credits[0].points);
- const one=projectionFor(accounts[0],economy,{...q,roundTrip:false});assert.equal(one.earned,4800);
- const cross=projectionFor(accounts[0],economy,{...q,depart:'2026-12-30',returnDate:'2027-01-08'});assert.equal(cross.eligible,1);assert.equal(cross.earned,4800);assert.equal(cross.miles,8400);
- const outside=projectionFor(accounts[0],economy,{...q,depart:'2027-10-07',returnDate:'2027-10-17'});assert.equal(outside.eligible,0);assert.equal(outside.improvement,0);assert.equal(projectionFor(accounts[1],economy,q).earned,1300);
+ const one=projectionFor(accounts[0],economy,{...q,roundTrip:false});assert.equal(one.earned,4685);
+ const cross=projectionFor(accounts[0],economy,{...q,depart:'2026-12-30',returnDate:'2027-01-08'});assert.equal(cross.eligible,1);assert.equal(cross.earned,4685);assert.equal(cross.miles,9370);
+ const outside=projectionFor(accounts[0],economy,{...q,depart:'2027-10-07',returnDate:'2027-10-17'});assert.equal(outside.eligible,0);assert.equal(outside.improvement,0);assert.equal(projectionFor(accounts[1],economy,q).earned,960);
 });
 test('benefits require explicit modeled status valid for the complete journey',()=>{
  const accounts=sampleAccounts(),o=offersFor(q)[0];assert.equal(benefitsFor(o,q,accounts).tierModeled,true);assert.equal(benefitsFor(o,q,[{...accounts[0],currentTier:undefined}]).tierModeled,false);assert.equal(benefitsFor(o,q,[{...accounts[0],source:'manual'}]).tierModeled,false);assert.equal(benefitsFor(o,{...q,returnDate:'2027-05-01'},accounts).tierModeled,false);assert.ok(benefitsFor(offersFor({...q,cabin:'Business'})[0],q,[]).perks.some(p=>p.label==='Lounge access'));

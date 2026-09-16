@@ -48,3 +48,14 @@ Fares, inventory, earning packages and modeled benefits are curated examples. No
 - [x] PRD scope addendum records exploratory planner scope
 
 final result: passed
+
+## September 16 calculated-earnings follow-up
+
+- Replaced fixed earning packages with published base earning formulas and disclosed sample inputs. Sources and coverage are in `public/assets/EARNING_RULES.md`.
+- Added purple/current + yellow/proposed bars with numeric labels, visible targets, separate ANA Group requirements, concrete JAL→BA earnings and official booking handoffs.
+- `13-jal-calculation.png`, `14-yellow-progress.png` and refreshed `06-projection.png` were visually inspected at native iPhone resolution. No clipped labels or obscured booking controls were found. Existing charcoal/purple identity remains, with yellow used solely for proposed progress.
+- Extended browser regression passed with zero page errors, including JAL formula/source expansion, yellow color and official URL, initial All-Time and reset after selecting 2023 and navigating away/back. Existing Trip and Pixel flows passed.
+- Unit arithmetic found and fixed a floating-point floor bug (5,130 × 70% must be 3,591, not 3,590); calculations now multiply integer percentages before dividing.
+- Limitation: these are base earnings under visible assumptions, not complete personalized posted totals. Fares remain fictional; bonuses, final booking class and fare components require airline confirmation.
+
+Final September 16 checks: production build and 28-file runtime integrity passed; 47 unit tests passed; exported GitHub Pages browser smoke passed with zero page errors and zero HTTP failures.

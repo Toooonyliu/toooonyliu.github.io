@@ -28,7 +28,7 @@ Acceptance boundaries: geographic distance is separate from loyalty credit; post
 
 The approved demo now includes a compact mileage account overview and a destination/date/cabin planner. It compares a curated set of fictional cash fares by cost, progress toward a selected goal, or modeled benefits. Expanded options distinguish usable fare/sample-tier benefits, redeemable earnings, required qualification counters and potential benefits after airline activation. The account model adds optional explicit tier and validity dates. Exploring does not alter balances, confirmed flights or booked projections.
 
-This remains a separate experiment beyond v1.0. PIT/SFO → Tokyo, London and Chicago scenarios are not live search; dates constrain goal/tier eligibility, not inventory or prices. Earnings are illustrative packages rather than fare-class calculations. No booking, award inventory, automatic account sync or universal benefits catalog is implemented.
+This remains a separate experiment beyond v1.0. PIT/SFO → Tokyo, London and Chicago scenarios are not live search; dates constrain goal/tier eligibility, not inventory or prices. The initial September 15 version used illustrative earning packages; the September 16 revision below supersedes those packages. No booking, award inventory, automatic account sync or universal benefits catalog is implemented.
 
 Trip Passport replaces its per-year frequency graph with first departure, final arrival and chronological legs in airport-local dates/time zones. All-time/year graphs remain. Cross-year trips, canceled records, missing timestamps and unrecorded surface transfers are handled explicitly.
 
@@ -43,3 +43,11 @@ Validate Trips through retrieval success/time and group correction effort. Valid
 ## Before production
 
 Recheck the current competitive feature set; conduct direct research with multi-airline frequent flyers; validate data availability, privacy, support cost and eligibility edge cases. Keep operational flight tracking prominent. Use a revised PRD version if the loyalty pilot earns a larger scope.
+
+## September 16: calculated base earnings and booking handoff
+
+The planner now calculates base miles/Avios and qualification counters from published rules under explicit sample booking-class, ticket issuer, tax and exchange-rate assumptions. Per-segment formulas and source links are visible in the option details. Tier/card bonuses remain excluded; approximate sector mileage is identified. See [calculation coverage and sources](../demo/assets/EARNING_RULES.md).
+
+Purple progress represents the entered balance and yellow represents the proposed trip. JAL options expose eligible BA Avios credit when ANA is the selected comparison goal, without suggesting ANA progress. Official airline links let travelers search and book independently; no fare or availability is reserved. Passport navigation now opens All-Time.
+
+Production still requires ticket-level booking classes, validated sector miles, fare components, membership bonuses, return-leg allocations and current rules. This remains an exploratory planner, not a guaranteed credit or booking service.
