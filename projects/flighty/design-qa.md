@@ -56,3 +56,17 @@ Source and primary implementation captures are 1440 × 1000 CSS/pixel dimensions
 - The hero and feature screenshots are explanatory previews. Full app interaction is in the on-demand demo.
 
 final result: passed
+
+## Approved September 16, 2026 revision
+
+This revision supersedes the older loyalty-widget figures and unchanged-demo statement above.
+
+- Mileage now foregrounds frequent routes, a locally remembered last search, compact account rows, attained-tier badges, and current/conditional/next-tier benefits backed by linked official policies. Membership benefits remain separate from scenario fare inclusions and projected credit.
+- Trips show first departure and final arrival on the overview, with expandable flight legs. Full route labels include the origin and preserve surface gaps; cross-year journeys display both years.
+- Portfolio copy, hero screenshots, feature descriptions and PRD scope addendum match the demo. The original PRD PDF is unchanged.
+- The Tokyo Economy return chart mirrors the planner: ANA +9,370 PP and +8,796 ANA Group PP; United +812 PQP and +4 PQF; BA on JAL +9,932 Avios. Purple is current credit and yellow is proposed growth. Crossing a target never changes the current-tier badge.
+- App validation: 53 passing unit tests, successful production build and 28 protected-runtime checks. iPhone/Pixel browser flows passed without page errors, including policy disclosures, remembered search, credit calculations, booking links, All-time Passport and trip chronology.
+- Portfolio validation: desktop 1440px and mobile 393px, hero switching, three interactive account scenarios, growth toggle and embedded demo passed. No page errors, HTTP failures or horizontal mobile overflow.
+- Screenshots were visually reviewed and regenerated from the revised demo. Export removes stale generated assets before copying the new build.
+
+Remaining product limitations: fares and balances are illustrative/manual; policy coverage is bounded to supported tiers and operating airlines. Usability and commercial outcomes remain hypotheses to validate with frequent flyers. Native Safari/VoiceOver testing remains a follow-up.

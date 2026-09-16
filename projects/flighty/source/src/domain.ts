@@ -62,7 +62,20 @@ export const ordered=(ids:string[],source=flights)=>[...new Set(ids)].map(id=>so
 export function tripDate(t:Pick<Trip,'flightIds'>,source=flights){const fs=ordered(t.flightIds,source);return fs[0]?.departure??'';}
 export function date(f:Flight,year=false){return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',...(year?{year:'numeric' as const}:{}),timeZone:airports[f.from].zone}).format(new Date(f.departure));}
 export function time(iso:string,airport:string){return new Intl.DateTimeFormat('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:airports[airport].zone}).format(new Date(iso));}
-export function range(t:Pick<Trip,'flightIds'>,source=flights){const fs=ordered(t.flightIds,source);if(!fs.length)return '';return `${date(fs[0])} – ${date(fs.at(-1)!,true)}`;}
+export function range(t:Pick<Trip,'flightIds'>,source=flights){
+ const fs=ordered(t.flightIds,source).filter(f=>f.status!=='canceled');if(!fs.length)return '';
+ const first=fs[0],last=fs.at(-1)!;
+ const startYear=new Intl.DateTimeFormat('en',{year:'numeric',timeZone:airports[first.from].zone}).format(new Date(first.departure));
+ const endIso=last.arrival||last.departure,endZone=airports[last.arrival?last.to:last.from].zone;
+ const endYear=new Intl.DateTimeFormat('en',{year:'numeric',timeZone:endZone}).format(new Date(endIso));
+ const end=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:endZone}).format(new Date(endIso));
+ return `${date(first,startYear!==endYear)} – ${end}${last.arrival?'':' · final arrival unavailable'}`;
+}
+export function tripRoute(fs:Flight[]){
+ const legs=[...fs].filter(f=>f.status==='flown').sort((a,b)=>a.departure.localeCompare(b.departure));if(!legs.length)return 'Route unavailable';
+ if(legs.length===2&&legs[0].from===legs[1].to&&legs[0].to===legs[1].from)return `${legs[0].from} ↔ ${legs[0].to}`;
+ return legs.map((f,i)=>i===0?`${f.from} → ${f.to}`:legs[i-1].to===f.from?` → ${f.to}`:` · ${f.from} → ${f.to}`).join('');
+}
 export function filterFlights(year:string,carrier='All airlines',source=flights){return source.filter(f=>f.status==='flown'&&(carrier==='All airlines'||f.carrier===carrier)&&(year==='All time'||new Intl.DateTimeFormat('en',{year:'numeric',timeZone:airports[f.from].zone}).format(new Date(f.departure))===year));}
 export function totals(fs:Flight[]){const flown=fs.filter(f=>f.status==='flown');const refs=flown.filter(f=>reference2023.some(r=>r.id===f.id));const completeReference=reference2023.every(r=>refs.some(f=>f.id===r.id));return {count:flown.length,km:flown.reduce((n,f)=>n+f.km,0)+(completeReference?reference2023Summary.km-refs.reduce((n,f)=>n+f.km,0):0),estimated:flown.some(f=>f.distanceEstimated&&!(completeReference&&reference2023.some(r=>r.id===f.id))),reported:completeReference,minutes:flown.reduce((n,f)=>n+(f.minutes??0),0),missing:flown.filter(f=>f.minutes===null).length,airports:new Set(flown.flatMap(f=>[f.from,f.to])).size,carriers:new Set(flown.map(f=>f.carrier)).size};}
 export type HistorySort='Date'|'From'|'To'|'Airline'|'Aircraft';

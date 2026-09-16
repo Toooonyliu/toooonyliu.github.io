@@ -51,3 +51,15 @@ The planner now calculates base miles/Avios and qualification counters from publ
 Purple progress represents the entered balance and yellow represents the proposed trip. JAL options expose eligible BA Avios credit when ANA is the selected comparison goal, without suggesting ANA progress. Official airline links let travelers search and book independently; no fare or availability is reserved. Passport navigation now opens All-Time.
 
 Production still requires ticket-level booking classes, validated sector miles, fare components, membership bonuses, return-leg allocations and current rules. This remains an exploratory planner, not a guaranteed credit or booking service.
+
+## September 16: membership value and journey hierarchy
+
+Approved by Tony after the UX/product review. Mileage now introduces frequent-route shortcuts and a locally remembered last search. Compact rows show attained-tier badges, current-benefit previews and remaining goals. Full cards separate current membership benefits, conditions, next-tier previews and explicit account editing. Badges reflect the entered tier and validity, never a projected threshold crossing.
+
+A bounded official-policy catalog covers ANA Bronze/Platinum, United Premier Silver/Gold and BA Bronze/Silver, including the BA-on-JAL partner scenario. Recognized manual entries and demo accounts follow the same eligibility checks. Operating airline, membership dates, benefit timing and paid lounge conditions matter. Fare inclusions remain scenario assumptions; this is not a universal live benefit engine. See [benefit policies and sources](../demo/assets/BENEFIT_POLICIES.md).
+
+Benefit sorting now prioritizes itinerary coverage by current-tier benefits, then price; it does not equate a count of perks to a cash value. Purple current progress and yellow proposed growth remain separate. Official booking links hand off to the airline without reserving anything.
+
+Trips promotes first departure, final arrival and expandable flight legs to the overview, before optional Passport statistics. List routes include the origin and cross-year dates show both years. Original records, surface gaps, review controls and editing remain available.
+
+The next research step is a moderated pilot with 8–10 multi-airline frequent flyers: compare decision time and benefit/credit comprehension for Mileage, and retrieval time, final-arrival comprehension and grouping correction effort for Trips. Monitor upcoming-flight access as a guardrail. Longer-term repeat use and retention require a suitable baseline or controlled rollout; no commercial impact has yet been measured.

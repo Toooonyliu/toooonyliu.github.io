@@ -27,8 +27,8 @@ function wireTabs(list, onChange) {
 wireTabs(document.querySelector('.feature-tabs'), tab => {
   const trips = tab.id === 'tab-trips';
   document.getElementById('hero-caption').textContent = trips
-    ? 'Reviewed journeys, city thumbnails, and a Passport for every trip.'
-    : 'Optional program context, with earned credit and estimates clearly separated.';
+    ? 'A focused route, clear journey times, and a Passport for every trip.'
+    : 'Current-tier benefits and a clear view of what your next flight could add.';
   const link = document.getElementById('hero-learn');
   link.href = trips ? '#trips' : '#mileage';
   link.firstChild.textContent = trips ? 'Explore Trips ' : 'Explore Mileage & status ';
@@ -126,9 +126,9 @@ document.getElementById('show-trip-data').addEventListener('click', event => {
 
 // Values mirror source/src/loyalty.ts. These are examples, not synced balances.
 const accounts = {
-  ana: {name: 'ANA Mileage Club', goal: 'Reach Platinum', earned: 42000, target: 50000, unit: 'Premium Points', estimate: 850, second: {name: 'ANA Group points', earned: 22000, target: 25000}, balance: '18,500 miles', balanceLabel: 'Redeemable balance', date: 'Dec 31, 2026', context: 'Flying-only example: both ANA counters must be met. Posted credit is already in the entered balance.'},
-  united: {name: 'United MileagePlus', goal: 'My annual flying target', earned: 4200, target: 6000, unit: 'PQP', estimate: 0, second: {name: 'PQF', earned: 16, target: 20}, balance: '64,250 miles', balanceLabel: 'Redeemable balance', date: 'Dec 31, 2026', context: 'An illustrative personal goal, not a published elite-status threshold. No booked estimates have been entered.'},
-  ba: {name: 'British Airways Club', goal: 'A future London getaway', earned: 48000, target: 60000, unit: 'Avios', estimate: 0, second: null, balance: '2,100 tier points', balanceLabel: 'Separate status counter', date: 'Mar 31, 2027', context: 'An illustrative savings goal, not an award quote. Tier points are separate from Avios. No booked estimates have been entered.'}
+  ana: {name:'ANA Mileage Club',tier:'Bronze',benefit:'Premium Economy check-in · ANA Group international flights',policy:'https://www.ana.co.jp/en/jp/amc/premium/overview/service-comparison/',carrier:'ANA',goal:'Reach Platinum',earned:42000,target:50000,unit:'Premium Points',estimate:9370,second:{name:'ANA Group points',earned:22000,target:25000,growth:8796},balance:'18,500 miles',balanceLabel:'Current redeemable balance',date:'Dec 31, 2026',context:'Both counters must be met. Calculated base credit, with tier/card bonuses excluded. ANA confirms and activates any new status.'},
+  united: {name:'United MileagePlus',tier:'Premier Silver',benefit:'Economy Plus at check-in · when available on eligible United Economy tickets',policy:'https://marriottbonvoy.unitedmileageplus.com/faqs',carrier:'United',goal:'My annual flying target',earned:4200,target:6000,unit:'PQP',estimate:812,second:{name:'PQF',earned:16,target:20,growth:4},balance:'64,250 miles',balanceLabel:'Current redeemable balance',date:'Dec 31, 2026',context:'Personal target, not an elite threshold. Assumes a United-issued ticket and $812 eligible return fare, excluding $280 sample taxes.'},
+  ba: {name:'British Airways Club',tier:'Bronze',benefit:'Priority check-in on eligible oneworld flights · no Ruby lounge entitlement',policy:'https://www.britishairways.com/content/information/partners-and-alliances/oneworld/frequent-flyer-benefits',carrier:'Japan Airlines',goal:'A future London getaway',earned:48000,target:60000,unit:'Avios',estimate:9932,second:null,balance:'2,100 tier points',balanceLabel:'Current separate status counter',date:'Mar 31, 2027',context:'JAL H-class scenario, credited to BA. A miles savings goal is separate from status and does not guarantee an award seat. Tier bonuses excluded.'}
 };
 let selectedAccount = 'ana';
 let includeEstimates = true;
@@ -137,22 +137,24 @@ function renderAccount() {
   const account = accounts[selectedAccount];
   const estimate = includeEstimates ? account.estimate : 0;
   const remaining = Math.max(0, account.target - account.earned - estimate);
-  setText('account-name', account.name); setText('account-goal', account.goal);
+  setText('account-tier',account.tier);document.querySelector('.portfolio-tier').classList.toggle('silver',selectedAccount==='united');setText('account-benefit',account.benefit);document.getElementById('account-policy').href=account.policy;setText('account-scenario',`PIT → Tokyo · ${account.carrier} · Economy return`);setText('account-name', account.name); setText('account-goal', account.goal);
   setText('earned-value', number(account.earned)); setText('account-denominator', `/ ${number(account.target)} ${account.unit}`);
-  document.getElementById('earned-segment').style.width = `${Math.min(100, account.earned / account.target * 100)}%`;
-  document.getElementById('estimate-segment').style.width = `${Math.min(100 - account.earned / account.target * 100, estimate / account.target * 100)}%`;
-  document.getElementById('primary-progress').setAttribute('aria-label', `${number(account.earned)} earned, ${number(estimate)} booked estimate ${includeEstimates ? 'included' : 'included (estimates excluded)'}, ${number(remaining)} remaining out of ${number(account.target)} ${account.unit}`);
-  const suffix = estimate ? ` after the ${number(estimate)}-point booked estimate.` : (account.estimate ? ' based on earned credit only.' : '. No booked estimate entered.');
-  setText('goal-outcome', `${number(remaining)} ${account.unit} remaining${suffix}`);
+  document.getElementById('earned-segment').style.width = `${account.earned / Math.max(account.target,account.earned+estimate) * 100}%`;
+  document.getElementById('estimate-segment').style.width = `${estimate / Math.max(account.target,account.earned+estimate) * 100}%`;
+  document.getElementById('primary-progress').setAttribute('aria-label', `${number(account.earned)} current + ${number(estimate)} from this trip; target ${number(account.target)} ${account.unit}`);
+  setText('goal-outcome', `${number(remaining)} ${account.unit} remaining${estimate?` after this trip adds ${number(estimate)} ${account.unit}.`:' with current credit only.'}`);
   document.getElementById('secondary-counter').hidden = !account.second;
   if (account.second) {
     const second = account.second;
-    setText('second-name', second.name); setText('second-value', `${number(second.earned)} / ${number(second.target)}`);
-    const progress = document.getElementById('second-progress'); progress.max = second.target; progress.value = second.earned; progress.setAttribute('aria-label', `${second.name}: ${number(second.earned)} of ${number(second.target)}`);
-    setText('second-note', `${number(second.target - second.earned)} ${second.name} still needed.`);
+    const growth=includeEstimates?second.growth:0,after=second.earned+growth,scale=Math.max(second.target,after);
+    setText('second-name', second.name); setText('second-value', `${number(second.earned)}${growth?' → '+number(after):''} / ${number(second.target)}`);
+    document.getElementById('second-progress').setAttribute('aria-label',`${number(second.earned)} current + ${number(growth)} projected ${second.name}; target ${number(second.target)}`);
+    document.getElementById('second-current').style.width=`${second.earned/scale*100}%`;
+    document.getElementById('second-growth').style.width=`${growth/scale*100}%`;
+    setText('second-note', `${number(Math.max(0,second.target-after))} ${second.name} still needed.`);
   }
   setText('balance-label', account.balanceLabel); setText('balance-value', account.balance);
-  setText('account-context', account.context); setText('account-date', `Sample · Updated Sep 15, 2026 · Goal ends ${account.date}`);
+  setText('account-context', account.context); setText('account-date', `Sample account · Policy review Sep 16, 2026 · Goal ends ${account.date}`);
   document.getElementById('estimate-toggle').setAttribute('aria-checked', String(includeEstimates));
   document.querySelectorAll('[data-account]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.account === selectedAccount)));
 }

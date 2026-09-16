@@ -1,4 +1,5 @@
 import {airports,routeDistance} from './domain.ts';
+import {itineraryBenefits,membershipValid} from './benefitPolicy.ts';
 import type {LoyaltyAccount} from './loyalty.ts';
 
 export const cabins = ['Economy', 'Premium economy', 'Business'] as const;
@@ -98,17 +99,8 @@ export function projectionFor(a:LoyaltyAccount|undefined,offer:Offer,q:PlannerQu
  const afterRatio=Math.min(...requirements.map(c=>Math.min(1,c.after/c.target)));
  return {current,earned,after,second,secondAfter,remaining:Math.max(0,a.target-after),secondRemaining:Math.max(0,a.secondTarget-secondAfter),miles:credit.miles*days.length,eligible,legs:days.length,improvement:afterRatio-beforeRatio,met:requirements.every(c=>c.after>=c.target),alreadyMet:requirements.every(c=>c.current>=c.target)};
 }
-export function tierValid(a:LoyaltyAccount|undefined,q:PlannerQuery){return !!a?.currentTier&&a.currentTier!=='Member'&&!!a.tierSince&&!!a.tierUntil&&a.tierSince<=q.depart&&a.tierUntil>=(q.roundTrip?q.returnDate:q.depart);}
-export function benefitsFor(offer:Offer,q:PlannerQuery,accounts:LoyaltyAccount[]){
- // Status-based scenario benefits only for explicitly seeded tiers, on matching carriers.
- const own=accounts.find(a=>a.program===(offer.carrier==='ANA'?'ana':offer.carrier==='United'?'united':offer.carrier==='British Airways'?'ba':''));
- const modeled=own?.source==='sample'&&tierValid(own,q)&&['Bronze','Premier Silver'].includes(own.currentTier??'');
- const perks=[{label:`${offer.bags} checked ${offer.bags===1?'bag':'bags'}`,reason:'Included in this sample fare'}];
- if(offer.priority)perks.push({label:'Priority check-in',reason:'Included in this sample Business fare'});
- else if(modeled)perks.push({label:'Priority check-in',reason:`Sample ${own!.currentTier} benefit on ${offer.carrier}`});
- if(offer.lounge)perks.push({label:'Lounge access',reason:'Included in this sample Business fare'});
- return {perks,tierModeled:modeled,tier:own?.currentTier,score:perks.length,unknown:!!own&&own.currentTier!=='Member'&&!modeled};
-}
+export function tierValid(a:LoyaltyAccount|undefined,q:PlannerQuery){return membershipValid(a,q.depart,q.roundTrip?q.returnDate:q.depart);}
+export const benefitsFor=itineraryBenefits;
 export function rankOffers(offers:Offer[],q:PlannerQuery,priority:Priority,goal:LoyaltyAccount|undefined,accounts:LoyaltyAccount[]){
  return [...offers].sort((a,b)=>{
   if(priority==='goal'){const diff=(projectionFor(goal,b,q)?.improvement??-1)-(projectionFor(goal,a,q)?.improvement??-1);if(diff)return diff;}

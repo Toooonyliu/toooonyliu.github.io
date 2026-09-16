@@ -146,3 +146,15 @@ When any text-entry control loses focus, dismiss the simulated keyboard. If the 
 - Show eligible saved-program earnings on every option, including BA Avios on JAL when the selected ANA goal is ineligible. Ranking still uses only the selected goal.
 - Purple denotes entered current credit and yellow denotes this proposed trip. Label both with quantities; show all required status counters. Do not mutate accounts.
 - Link to official airline booking sites. United revenue-based credits require a United-issued ticket, so that choice links to United even on an ANA-operated itinerary.
+
+## Approved policy and journey hierarchy revision (September 16)
+
+- Tony approved `research/flighty/sept16-ux-review/review.md`: implement and publish the Mileage/Trips revisions and corresponding portfolio narrative to the existing GitHub Pages project.
+- Mileage entry uses Frequent routes for the example travel history; Last searched appears only after a completed local search. It is a convenience preference, separate from flight and account records.
+- Compact account rows show attained tier badges, a benefit preview, balance and remaining goal/deadline. Full cards prioritize current membership benefits; editing is an explicit action, not a whole-card tap.
+- `benefitPolicy.ts` supersedes the earlier sample-only benefit fixture. Recognized manual and sample tiers use the same dated official policies, contingent on entered validity and operating carrier. Supported policy coverage is intentionally bounded; no universal eligibility claim.
+- Distinguish included benefits, conditions/extra steps and paid or points-funded lounge entry. ANA Bronze is not free lounge access or Star Alliance Gold; BA Bronze on JAL uses Ruby benefits, not BA-only seat timing. Crediting a program does not transfer status.
+- Tier badges never derive from numerical progress. Preserve purple current credit and yellow proposed credit. Personal savings/flying goals do not qualify a traveler automatically.
+- Benefit sorting prioritizes route coverage by a recognized current tier, then cost, with an explanation; do not rank using a raw count of perks as monetary value.
+- Trip overview promotes first departure, final arrival and expandable flight legs before the Passport summary. Keep the focused globe, original-flight access, editing, surface gaps, missing data and Undo. Trip dates show both years for cross-year journeys; route labels include the origin.
+- Refresh portfolio captures/copy and the dated PRD addendum. The original PRD stays unchanged. Usability/retention outcomes remain proposed validation, not measured success.

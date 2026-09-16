@@ -59,3 +59,12 @@ final result: passed
 - Limitation: these are base earnings under visible assumptions, not complete personalized posted totals. Fares remain fictional; bonuses, final booking class and fare components require airline confirmation.
 
 Final September 16 checks: production build and 28-file runtime integrity passed; 47 unit tests passed; exported GitHub Pages browser smoke passed with zero page errors and zero HTTP failures.
+
+## September 16: approved membership and trip overview revision
+
+- `node --test tests/*.test.mjs`: 53 checks pass, including membership validity, recognized manual tiers, ANA paid lounge conditions, BA Ruby on JAL, United cabin-specific seating, coverage ranking and complete cross-year routes.
+- `npm run build`: passes; all 28 protected runtime files unchanged. Existing WebGL bundle-size advisory remains.
+- `scripts/benefits-journey-qa.mjs`: iPhone and Pixel flows pass with zero page errors. Checked current badges/benefits, next-tier disclosure, price/goal comparison, purple/yellow projections, booking links, invalid dates, empty results, local last search, Passport All-Time reset, trip overview chronology, original-flight drill-down and all-time chart preservation.
+- Screens inspected in `qa/benefits-journey`: compact mileage rows, United account, ANA benefits, trip overview and expanded timeline. Long deadline labels use human-readable dates; last-search action has a distinct accessible name.
+- Policy coverage and constraints: `public/assets/BENEFIT_POLICIES.md`. Fare inclusions remain explicit scenario assumptions. No live account verification, booking inventory or universal benefit catalog is claimed.
+- This verification is not a full accessibility conformance audit or a user study. Pilot and retention measurements remain proposed.

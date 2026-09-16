@@ -10,3 +10,5 @@ This is an independent, noncommercial Flighty design case study by Tony Liu, not
 - **Airline logos:** reused from the prototype’s local assets. See [prototype asset sources](../source/public/assets/SOURCES.md).
 - **Interface icons:** [Phosphor Icons](https://phosphoricons.com/), regular and fill weights, exported from the installed `@phosphor-icons/react` package. [MIT license](PHOSPHOR-LICENSE.txt). No custom icon approximations.
 - **Typeface:** native system sans-serif, following the source website’s system font stack. No third-party font request is required.
+
+September 16, 2026: `mileage.png` and `japan.png` refreshed from the approved local prototype. Captures show the current-tier badges / frequent routes and the trip overview's journey boundaries. Only fictional demo records are shown.

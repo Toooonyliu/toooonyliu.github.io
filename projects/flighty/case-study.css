@@ -3258,3 +3258,7 @@ h1 .hero-flightline{
     font-size:9px
   }
 }
+
+/* Match the demo's attained membership and current/projected visual hierarchy. */
+.portfolio-tier{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #96714e;border-radius:15px;background:linear-gradient(135deg,#725238,#2c2239);color:#f5d7b7;margin:10px 0}.portfolio-tier.silver{background:linear-gradient(135deg,#6a7789,#292637);border-color:#a3b1c5;color:#f0f3ff}.portfolio-tier img{filter:brightness(0) invert(1)}.portfolio-tier strong{display:block;font-size:17px}.portfolio-tier small{display:block;font-size:12px;color:#d3c4da}.portfolio-benefit{font-size:15px;line-height:1.6;color:#ded4eb;margin:8px 0}.portfolio-policy{display:inline-flex;align-items:center;min-height:44px;font-size:13px;color:#d5b3ff}.portfolio-scenario{font-size:14px;color:#cabada;border-top:1px solid #ffffff26;padding-top:20px;margin-top:14px}#estimate-segment,.estimate-key,#second-growth{background:#ffd34e!important}#second-current{background:#a66bf2}#second-progress>div{height:100%;transition:width .3s}#second-progress{margin-top:10px}.secondary-counter #second-value{font-size:14px}.loyalty-widget .account-date{line-height:1.7}
+@media(prefers-reduced-motion:reduce){#second-progress>div{transition:none}}
