@@ -56,3 +56,9 @@ No live pricing, bookings or loyalty sync: curated fares and published base-cred
 ## September 16 membership and journey update
 
 Attained-tier badges and current benefits now lead the account cards. A bounded policy catalog includes timing, operator and lounge conditions; manual tiers use the same checks as examples. Frequent routes and a locally remembered last search lead into the planner. Purple/yellow progress is mirrored in the case-study Tokyo scenario chart. Journey start/end and expandable flight legs are now on the trip overview, with complete list routes and cross-year dates. Policy links and validation plans are explicit; there are no measured commercial outcomes.
+
+### AI Process presentation page
+
+`process.html` adds a separate four-phase reflection, linked through Project / AI Process navigation. Phase tabs support keyboard arrows, Home/End, previous/next controls and direct links (`#define`, etc.). All phases are available without JavaScript and in print.
+
+The PRD pivot is central and explicitly based on Tony’s retrospective account. Conversation excerpts preserve original wording; the later assistant reflection is labeled as such. `documents/ai-process-evidence.md` records attribution and limits. No professor quotation, missing historical AI response, or completed user study is invented.
