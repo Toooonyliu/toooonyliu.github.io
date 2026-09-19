@@ -37,7 +37,7 @@ export function validateDate(date,currentYear=new Date().getUTCFullYear()) {
   return date;
 }
 const lunarCache=new Map();
-export async function fetchLunar(date,{fetcher=fetch,timeout=10000}={}) {
+async function fetchLunarOnce(date,{fetcher=fetch,timeout=10000}={}) {
   validateDate(date);
   if(lunarCache.has(date)) return lunarCache.get(date);
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),timeout);
@@ -51,4 +51,13 @@ export async function fetchLunar(date,{fetcher=fetch,timeout=10000}={}) {
     return result;
   } catch(error) {throw new Error(error.message==='format'?'format':'network');}
   finally {clearTimeout(timer);}
+}
+
+const inFlight=new Map();
+export async function fetchLunar(date,options={}){
+  if(lunarCache.has(date))return lunarCache.get(date);
+  if(inFlight.has(date))return inFlight.get(date);
+  const pending=fetchLunarOnce(date,options).finally(()=>inFlight.delete(date));
+  inFlight.set(date,pending);
+  return pending;
 }

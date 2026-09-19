@@ -49,3 +49,13 @@ test('API response parsed and cached; failed requests are not cached',async()=>{
   assert.equal((await fetchLunar('2026-09-20',{fetcher:async()=>({ok:true,json:async()=>({LunarDate:'八月初十'})})})).day,10);
   await assert.rejects(fetchLunar('2026-09-21',{fetcher:async()=>({ok:true,json:async()=>({LunarDate:'bad'})})}),/format/);
 });
+test('live calendar and reading share an in-flight date request',async()=>{
+  let calls=0,release;
+  const fetcher=()=>{calls++;return new Promise(resolve=>{release=resolve;});};
+  const calendar=fetchLunar('2026-09-22',{fetcher});
+  const reading=fetchLunar('2026-09-22',{fetcher});
+  assert.equal(calls,1);
+  release({ok:true,json:async()=>({LunarDate:'八月十三'})});
+  const [a,b]=await Promise.all([calendar,reading]);
+  assert.deepEqual(a,b);assert.equal(a.day,13);
+});
