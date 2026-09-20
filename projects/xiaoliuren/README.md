@@ -73,3 +73,7 @@ The displayed name is 速问 in Chinese and Ask in English. The header, favicon 
 Timing associations follow the chosen Ni-style secondary summaries: 大安 approximately one week, 速喜 soon, 小吉 approximately two weeks; 留连, 赤口 and 空亡 have no fixed date. Source: https://www.shenjige.cn/details/I8TyiKp2X.html and https://6ren.chaosxy.com/. These are traditional symbolic associations, not verified deadlines or a fully checked transcript of Ni’s original lecture.
 
 The independent visual study references https://lukewangdesign.com/ — a WebGL lotus rendered as interactive ASCII characters. Our study reuses our original SVG silhouette with a simulated depth field, lighting, rotation, touch color and a three-stage thumb demonstration. It is explicitly a 2.5D study, not a fully rigged 3D hand, and does not copy the lotus model or implementation. The production palm remains unchanged pending review.
+
+## Hand-drawn A/B previews
+
+Two independent previews compare a minimal structural palm (`previews/palm-structure.html`) with a flowing, mudra-inspired contour (`previews/palm-flow.html`). Both retain an animated counting thumb and use the requested screen orientation, with the thumb on the left. They demonstrate a fixed example and do not replace the production palm. See `previews/hand-directions.md` for layout/type recommendations and testing limits.
