@@ -1,7 +1,8 @@
 import {palmMarkup,activateNode} from './palm.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
-import {copy,meanings} from './content.js';
-import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js';
+import {copy,meanings} from './content.js?v=ask3';
+import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask3';
+import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask3';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const preference=(key,fallback)=>{try{return localStorage.getItem(key)||fallback;}catch{return fallback;}};
@@ -10,10 +11,15 @@ let lang=preference('palm-language','zh');if(!copy[lang])lang='zh';
 let zone=preference('palm-zone',Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Shanghai');
 try{timeAt(new Date(),zone);}catch{zone='Asia/Shanghai';}
 let question='',category='daily',timeMode='now',recorded='',settingsOpen=false,result=null,busy=false,routeVersion=0,animationVersion=0,skipAnimation=false,exampleIndex=0;
-const readings=new Map();
+const storage={getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)};
+const journalState=readJournal(storage);let journal=journalState.entries,storageFailed=journalState.error;
+const readings=new Map(journal.map(r=>[questionKey(r.question),r]));
+const jc=()=>journalCopy[lang];
+const outcomeKeys=['pending','matched','partial','missed','unclear'];
+let speechWatchdog=null;
 let lunarPreview={date:'',state:'idle'},previewVersion=0,recognition=null,speechVersion=0,listening=false;
 const u=()=>ui[lang];
-const t=()=>({...copy[lang],nav:[u().home,u().method,u().meanings,u().about],footer:u().disclaimer}), li=()=>lang==='zh'?0:1;
+const t=()=>({...copy[lang],nav:[u().home,u().method,u().meanings,u().about,jc().history],footer:u().disclaimer}), li=()=>lang==='zh'?0:1;
 const positionName=i=>lang==='zh'?NAMES[i]:`${NAMES[i]} · ${meanings[i].pinyin}`;
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const route=()=>location.hash.slice(1)||'/';
@@ -30,12 +36,13 @@ function clockData(){
 }
 function updateChrome(){
   document.documentElement.lang=lang==='zh'?'zh-CN':'en';
-  const routes=['/','/method','/meanings','/rules'];
+  const routes=['/','/method','/meanings','/rules','/history'];
   $('#navigation').innerHTML=routes.map((r,i)=>`<a href="#${r}" ${route()===r?'aria-current="page"':''}>${t().nav[i]}</a>`).join('');
   $('#language').innerHTML=lang==='zh'?'中 <span>/ EN</span>':'EN <span>/ 中</span>';
   $('#language').setAttribute('aria-label',lang==='zh'?'Switch to English':'切换至中文');
   $('#footer-note').textContent=route()==='/'?'':t().footer;
-  document.title=`${t().nav[Math.max(0,routes.indexOf(route()))]} · 掌间 Palm of Time`;
+  document.title=`${t().nav[Math.max(0,routes.indexOf(route()))]} · ${jc().brand}`;
+  $('.brand-name').textContent=jc().brand;$('.brand').setAttribute('aria-label',jc().brand);
 }
 function processMarkup(data=null){
   return `<div class="process-bar" aria-label="${lang==='zh'?'计算步骤':'Calculation steps'}">${t().steps.map((title,i)=>`<div class="process-step" data-step="${i}"><span class="step-num">0${i+1}</span><div><div class="step-title">${title}</div><div class="step-desc" data-step-description="${i}">${data?esc(positionName(data.stages[i].end)):t().stepDesc[i]}</div></div></div>`).join('')}</div>`;
@@ -55,15 +62,15 @@ function timeMarkup(){
   ${result?'':`<div id="time-controls" class="time-controls" ${settingsOpen?'':'hidden'}><label>${t().zone}<select id="timezone">${zones.map(z=>`<option value="${esc(z)}" ${z===zone?'selected':''}>${esc(z.replaceAll('_',' '))}</option>`).join('')}</select></label><label>${t().timeMode}<select id="time-mode"><option value="now" ${timeMode==='now'?'selected':''}>${t().now}</option><option value="recorded" ${timeMode==='recorded'?'selected':''}>${t().recorded}</option></select></label><label id="recorded-label" ${timeMode==='now'?'hidden':''}>${t().recordedLabel}<input id="recorded-time" type="datetime-local" min="2023-01-01T00:00" max="${new Date().getUTCFullYear()+2}-12-31T23:59" value="${esc(recorded)}"></label></div>`}</section>`;
 }
 function verseMarkup(index){return `<div class="classical-block"><span class="section-kicker">${u().original}</span><blockquote lang="zh-CN">${verses[index].zh.join('<br>')}</blockquote>${lang==='en'?`<div class="verse-translation"><span class="section-kicker">${u().translation}</span><p>${verses[index].en.join('<br>')}</p></div>`:''}</div>`;}
-function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span class="sr-only">${u().voice}</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
+function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><p class="voice-help">${jc().voiceHelp}</p><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
 function resultMarkup(r){
   const m=meanings[r.timePalace],topic=r.category;
-  const advice=(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
-  return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${m.name}</h1><div><span>${m.pinyin}</span><span>${palettes[r.timePalace].en}</span></div></div>${verseMarkup(r.timePalace)}<div class="modern-block"><span class="section-kicker">${u().modern} <span class="topic-note">/ ${u().topics[topic]}</span></span><p>${advice}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay} ↻</button><button class="text-button" id="new-question" type="button">${u().again} ↗</button></div><div class="status" id="question-status" role="status"></div></div>`;
+  const advice=r.reflection?.[li()]||(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
+  return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${m.name}</h1><div><span>${m.pinyin}</span><span>${palettes[r.timePalace].en}</span></div></div>${verseMarkup(r.timePalace)}<div class="timing-block"><span class="section-kicker">${jc().timing}</span><strong>${timing[r.timePalace][li()]}</strong><p>${jc().timingNote}</p></div><div class="modern-block"><span class="section-kicker">${u().modern} <span class="topic-note">/ ${u().topics[topic]}</span></span><p>${esc(advice)}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay} ↻</button><button class="text-button" id="new-question" type="button">${u().again} ↗</button></div><a class="history-result-link" href="#/history">${jc().recordLink} ↗</a><div class="status" id="question-status" role="status">${storageFailed?jc().storageError:""}</div></div>`;
 }
 function home(){
   document.body.dataset.view='home';applyTheme(result?.timePalace??null);
-  $('#main').innerHTML=`<div class="home-screen"><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-caption"><span>${u().left}</span><span>小六壬 / XIAO LIU REN</span></div>${colorKey()}</section>${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section></div>`;
+  $('#main').innerHTML=`<div class="home-screen">${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-caption"><span>${u().left}</span><span>${lang==='zh'?'小六壬':'XIAO LIU REN'}</span></div>${colorKey()}</section></div>`;
   $('#palm-state').textContent=result?t().complete:u().left;activateNode(result?result.timePalace:null,true);
   $('#skip-animation').onclick=()=>{skipAnimation=true;};
   $('#retry-calendar').onclick=()=>{let clock;try{clock=clockData();}catch{return;}ensureLunar(clock.date,true);};
@@ -107,23 +114,32 @@ async function ensureLunar(date,force=false){
   refreshTime();
 }
 function stopSpeech(){
-  speechVersion++;const old=recognition;recognition=null;listening=false;
+  speechVersion++;clearTimeout(speechWatchdog);const old=recognition;recognition=null;listening=false;
   if(old){try{old.abort();}catch{}}
   const message=$('#voice-status');if(message)message.textContent='';
-  const button=$('#voice-input');if(button){button.classList.remove('listening');button.setAttribute('aria-pressed','false');button.setAttribute('aria-label',u().voice);}
+  resetVoiceButton();
+}
+function resetVoiceButton(){
+  const button=$('#voice-input');if(button){button.classList.remove('listening');button.setAttribute('aria-pressed','false');button.setAttribute('aria-label',u().voice);$('#voice-button-label').textContent=u().voice;}
 }
 function toggleSpeech(){
-  const label=$('#voice-status');if(listening){recognition?.stop();return;}
+  const label=$('#voice-status');
+  if(recognition){try{recognition.stop();}catch{stopSpeech();}return;}
   const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!Speech){label.textContent=u().voiceUnsupported;return;}
-  const version=++speechVersion,base=$('#question').value.trim();
-  recognition=new Speech();const current=recognition;
+  if(!Speech){label.textContent=u().voiceUnsupported;$('#question').focus();return;}
+  if(window.isSecureContext===false&&location.hostname!=='localhost'){label.textContent=jc().voiceTimeout;return;}
+  const version=++speechVersion,base=$('#question').value.trim();let current,received=false;
+  const finish=()=>{clearTimeout(speechWatchdog);listening=false;recognition=null;resetVoiceButton();};
+  try{current=new Speech();recognition=current;}catch{label.textContent=u().voiceUnsupported;return;}
   current.lang=lang==='zh'?'zh-CN':'en-US';current.continuous=false;current.interimResults=true;current.maxAlternatives=1;
-  current.onstart=()=>{if(version!==speechVersion)return;listening=true;$('#voice-input').classList.add('listening');$('#voice-input').setAttribute('aria-pressed','true');$('#voice-input').setAttribute('aria-label',u().stop);label.textContent=`${u().listening} ${u().voiceNote}`;};
-  current.onresult=event=>{if(version!==speechVersion||!$('#question'))return;const transcript=Array.from(event.results).map(r=>r[0].transcript).join(lang==='zh'?'':' ');question=[base,transcript].filter(Boolean).join(' ').slice(0,300);$('#question').value=question;};
-  current.onerror=event=>{if(version!==speechVersion)return;label.dataset.error='true';label.textContent=['not-allowed','service-not-allowed','audio-capture'].includes(event.error)?u().voiceDenied:event.error==='no-speech'?u().voiceEmpty:u().voiceError;};
-  current.onend=()=>{if(version!==speechVersion)return;listening=false;recognition=null;const b=$('#voice-input');if(b){b.classList.remove('listening');b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',u().voice);}if(!label.dataset.error)label.textContent='';};
-  delete label.dataset.error;
+  label.textContent=jc().voiceStarting;delete label.dataset.error;
+  $('#voice-input').setAttribute('aria-pressed','true');$('#voice-button-label').textContent=jc().voiceFinish;
+  current.onstart=()=>{if(version!==speechVersion)return;clearTimeout(speechWatchdog);listening=true;$('#voice-input').classList.add('listening');$('#voice-input').setAttribute('aria-label',u().stop);label.textContent=`${u().listening} ${u().voiceNote}`;};
+  current.onresult=event=>{if(version!==speechVersion||!$('#question'))return;const transcript=Array.from(event.results).map(r=>r[0].transcript).join(lang==='zh'?'':' ');received=!!transcript.trim();question=[base,transcript].filter(Boolean).join(' ').slice(0,300);$('#question').value=question;};
+  current.onerror=event=>{if(version!==speechVersion)return;clearTimeout(speechWatchdog);label.dataset.error='true';label.textContent=['not-allowed','service-not-allowed','audio-capture'].includes(event.error)?u().voiceDenied:event.error==='no-speech'?u().voiceEmpty:event.error==='network'?jc().voiceNetwork:event.error==='language-not-supported'?jc().voiceLanguage:u().voiceError;finish();};
+  current.onend=()=>{if(version!==speechVersion)return;finish();if(!label.dataset.error)label.textContent=received?jc().voiceReview:jc().voiceNoResult;};
+  // Set feedback before start(), and start synchronously inside the user's tap (needed on mobile).
+  speechWatchdog=setTimeout(()=>{if(version!==speechVersion||listening)return;stopSpeech();label.textContent=jc().voiceTimeout;},9000);
   try{current.start();}catch{stopSpeech();label.textContent=u().voiceError;}
 }
 function status(message,error=false){const el=$('#question-status');if(el){el.textContent=message;el.classList.toggle('error',error);}}
@@ -165,7 +181,7 @@ async function beginReading(){
   stopSpeech();
   question=$('#question').value.trim();
   if(!question){status(t().empty,true);$('#question').focus();return;}
-  const key=question.toLocaleLowerCase().replace(/\s+/g,'');
+  const key=questionKey(question);
   if(readings.has(key)){result=readings.get(key);home();status(t().repeat);return;}
   let clock;try{clock=clockData();}catch(error){status(t()[error.message]||t().timeError,true);return;}
   const version=routeVersion;
@@ -175,10 +191,12 @@ async function beginReading(){
     if(version!==routeVersion)return;
     const hourIndex=shichen(clock.hour),calculation=calculate(lunar.month,lunar.day,hourIndex);
     category=inferTopic(question);
-    const candidate={...clock,lunar,hourIndex,...calculation,question,category};
+    const reflection=extraAdvice[category]?.[calculation.timePalace]||meanings[calculation.timePalace].advice[category]||meanings[calculation.timePalace].advice.daily;
+    const candidate=recordReading({...clock,lunar,hourIndex,...calculation,question,category,reflection:[...reflection]});
     paintLunar(lunar,clock);status('');
     $('#submit-reading').textContent=t().calculating;
-    if(await animate(calculation)){result=candidate;readings.set(key,candidate);home();}
+    if(window.innerWidth<=760)$('.palm-region')?.scrollIntoView?.({behavior:reduced()?'instant':'smooth',block:'center'});
+    if(await animate(calculation)){result=candidate;readings.set(key,candidate);journal.unshift(candidate);storageFailed=journalState.error||!writeJournal(storage,journal);home();if(window.innerWidth<=760)$('.question-region')?.scrollIntoView?.({behavior:'instant',block:'start'});}
   }catch(error){if(version===routeVersion){status(t()[error.message]||t().network,true);$('#submit-reading').innerHTML=`${u().begin}<span>↗</span>`;}}
   finally{if(version===routeVersion)lockForm(false);}
 }
@@ -200,18 +218,25 @@ function meaningsPage(){
 }
 function rulesPage(){
   const links=[['https://6ren.chaosxy.com/results/',u().methodSource],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
-  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section><section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
 }
+function historyPage(){
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${jc().history}</div><h1>${jc().historyTitle}</h1><p>${jc().historyIntro}</p>${storageFailed?`<p role="status">${journalState.error?jc().corrupt:jc().storageError}</p>`:''}</section><section class="history-list">${journal.length?journal.map((r,i)=>`<article class="history-card" data-record="${i}" style="--sign-color:${palettes[r.timePalace].color}"><div class="history-summary"><div><p class="history-date">${esc(r.date)} · ${esc(r.clock)} · ${esc(r.timeZone)}</p><h2>${esc(r.question)}</h2><p class="history-sign">${NAMES[r.timePalace]} <span>${lang==='en'?palettes[r.timePalace].en:''}</span></p></div><button class="secondary" type="button" data-open="${i}">${jc().open} ↗</button></div><details><summary>${jc().outcome} · ${jc().outcomes[Math.max(0,outcomeKeys.indexOf(r.review?.outcome))]}</summary><form data-review="${i}"><label>${jc().outcome}<select name="outcome">${outcomeKeys.map((k,n)=>`<option value="${k}" ${r.review?.outcome===k?'selected':''}>${jc().outcomes[n]}</option>`).join('')}</select></label><label>${jc().actualDate}<input name="actualDate" type="date" value="${esc(r.review?.actualDate||'')}"></label><label class="note-label">${jc().note}<textarea name="note" maxlength="2000" placeholder="${jc().notePlaceholder}">${esc(r.review?.note||'')}</textarea></label><div class="review-actions"><button class="secondary" type="submit">${jc().save}</button><button class="text-button" type="button" data-delete="${i}">${jc().delete}</button><span class="review-status" role="status"></span></div></form></details></article>`).join(''):`<p>${jc().empty}</p><a class="secondary" href="#/">${jc().back} ↗</a>`}</section>`;
+  document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>{result=journal[Number(button.dataset.open)];question=result.question;location.hash='/';});
+  document.querySelectorAll('[data-review]').forEach(form=>form.onsubmit=event=>{event.preventDefault();const r=journal[Number(form.dataset.review)];r.review={outcome:form.elements.outcome.value,actualDate:form.elements.actualDate.value,note:form.elements.note.value.trim()};storageFailed=journalState.error||!writeJournal(storage,journal);form.querySelector('.review-status').textContent=storageFailed?jc().storageError:jc().saved;form.closest('details').querySelector('summary').textContent=`${jc().outcome} · ${jc().outcomes[outcomeKeys.indexOf(r.review.outcome)]}`;});
+  document.querySelectorAll('[data-delete]').forEach(button=>button.onclick=()=>{if(!window.confirm(jc().confirmDelete))return;const r=journal[Number(button.dataset.delete)],next=journal.filter(entry=>entry.id!==r.id);if(journalState.error||!writeJournal(storage,next)){button.closest('form').querySelector('.review-status').textContent=jc().storageError;return;}journal=next;readings.delete(questionKey(r.question));if(result?.id===r.id){result=null;question='';}historyPage();});
+}
+function timingSection(){return `<section class="timing-section"><h2>${jc().timingTitle}</h2><p>${jc().timingIntro}</p><div class="timing-grid">${timing.map((row,i)=>`<article><h3>${NAMES[i]}</h3><strong>${row[li()]}</strong><p>${row[li()+2]}</p></article>`).join('')}</div><p class="small-note">${jc().timingNote} <a href="https://www.shenjige.cn/details/I8TyiKp2X.html" target="_blank" rel="noopener">${lang==='zh'?'查阅整理原文':'Read the secondary summary'} ↗</a></p></section>`;}
 function render(){
   stopSpeech();routeVersion++;animationVersion++;busy=false;$('#language').disabled=false;document.body.dataset.view=route()==='/'?'home':'page';applyTheme();updateChrome();
-  if(route()==='/method')method();else if(route()==='/meanings')meaningsPage();else if(route()==='/rules')rulesPage();else home();
+  if(route()==='/method')method();else if(route()==='/meanings')meaningsPage();else if(route()==='/rules')rulesPage();else if(route()==='/history')historyPage();else home();
 }
 $('#language').onclick=()=>{lang=lang==='zh'?'en':'zh';savePreference('palm-language',lang);render();};
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
 render();
 const clockTimer=setInterval(()=>{if(!busy)refreshTime();},1000);
 window.addEventListener('pagehide',()=>{clearInterval(clockTimer);stopSpeech();});
-// Only preferences persist; questions and readings remain in this page's memory.
+// Preferences and history persist only in this browser. Voice audio is handled by its speech service.
 if(document.modelContext?.registerTool){
   const lifecycle=new AbortController();
   const tool={name:'show_xiaoliuren_example',title:'Explore a Xiao Liu Ren example',description:'Navigate to the method page and show one of its two worked examples. Does not create a personal reading.',inputSchema:{type:'object',properties:{example:{type:'integer',enum:[1,2]}},required:['example'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async input=>{if(!input||![1,2].includes(input.example))throw new Error('Example must be 1 or 2.');exampleIndex=input.example-1;if(route()!=='/method'){location.hash='/method';await new Promise(resolve=>window.addEventListener('hashchange',resolve,{once:true}));}else render();const e=exampleData(),c=calculate(e.month,e.day,e.hourIndex);activateNode(c.timePalace,true);showCallout(2,e.hourIndex,e.hourIndex,c.timePalace);return {example:input.example,month:e.month,day:e.day,hourIndex:e.hourIndex,result:NAMES[c.timePalace]};}};

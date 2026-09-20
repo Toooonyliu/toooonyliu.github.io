@@ -4,11 +4,11 @@ Tony Liu's personal portfolio — hand-built HTML/CSS/JS, no framework or build 
 
 Built for CMU 15-113 (Effective Coding with AI), Project 1.
 
-## HW3 — Palm of Time
+## HW3 — Ask (速问)
 
 [Live app](https://toooonyliu.github.io/projects/xiaoliuren/) · [Source and project README](projects/xiaoliuren/) · [AI prompt log](projects/xiaoliuren/prompt_log.md)
 
-Palm of Time is a bilingual interactive introduction to Xiao Liu Ren with an animated palm and six symbolic results. The app uses JavaScript's built-in `fetch` to send an HTTPS GET request to Hong Kong Observatory's public Gregorian–lunar calendar API, with a `date` parameter formatted as `YYYY-MM-DD`. The API returns JSON containing Chinese string fields such as `LunarYear` and `LunarDate`; the app parses the lunar month and day and combines them with the traditional two-hour period to calculate the result locally. No API key or authentication is required, and questions are not sent to the calendar API. Successful calendar lookups are cached, and failed requests display a retry option.
+Ask is a bilingual interactive introduction to Xiao Liu Ren with an animated palm and six symbolic results. The app uses JavaScript's built-in `fetch` to send an HTTPS GET request to Hong Kong Observatory's public Gregorian–Chinese lunisolar calendar API, with a `date` parameter formatted as `YYYY-MM-DD`. The API returns JSON containing Chinese string fields such as `LunarYear` and `LunarDate`; the app parses the lunar month and day and combines them with the traditional two-hour period to calculate the result locally. No API key or authentication is required, and questions are not sent to the calendar API. Successful calendar lookups are cached, and failed requests display a retry option.
 
 To run HW3, install Python 3, run `python3 -m http.server 4173 --directory projects/xiaoliuren` from the repository root, and open `http://localhost:4173/`. No JavaScript packages or build step are needed. See the project README for calculation conventions, source attribution, and optional tests.
 
