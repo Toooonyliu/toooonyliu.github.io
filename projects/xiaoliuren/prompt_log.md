@@ -22,3 +22,8 @@ For this revision, Codex implemented browser speech recognition with typed-input
 The history is browser-local with editable outcomes and notes. Timing is labeled as a traditional secondary-source association. The speech changes improve feedback and start/error lifecycle handling, but real-device recognition has not been verified. The independent preview adapts our existing palm silhouette into character shading and simulated depth; the reference’s model/code is not reused.
 
 9. Return to a hand-drawn style. Create two independent HTML previews: a minimal structural outline and a graceful, mudra-inspired form. Keep thumb counting animation, place the thumb at screen-left and 大安 at lower left, enlarge the palm on the desktop’s left side, reconsider typography, and reduce persistent helper copy. Leave the live design unchanged until review.
+
+
+## Approved HTML integration and traditional palette
+
+User approved v7 and requested a quieter production homepage, a slimmer middle finger, slower counting with day/hour restarting taps, researched Chinese traditional colors, optional GPT interpretation choices, offset top labels, a single-line hand favicon and English names/meanings matching the reference. Codex integrated the flowing SVG study, retained calendar/history/voice, researched museum color sources and the 1896 verse transcription, and wrote original English translations. GPT architecture was researched with official OpenAI Docs; no AI API/key was configured. Independent asset/research agents returned palette, English content and favicon assets for review.

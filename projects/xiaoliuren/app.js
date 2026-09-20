@@ -1,8 +1,9 @@
-import {palmMarkup,activateNode} from './palm.js';
+import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask8';
+import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
-import {copy,meanings} from './content.js?v=ask3';
-import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask3';
-import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask3';
+import {copy,meanings} from './content.js?v=ask8';
+import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask8';
+import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask8';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const preference=(key,fallback)=>{try{return localStorage.getItem(key)||fallback;}catch{return fallback;}};
@@ -26,19 +27,14 @@ const route=()=>location.hash.slice(1)||'/';
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const exampleData=()=>exampleIndex===0?{month:3,day:3,hourIndex:5}:{month:4,day:5,hourIndex:11};
 function clockData(){
-  if(timeMode==='recorded'){
-    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(recorded))throw new Error('timeError');
-    const [date,clock]=recorded.split('T'),hour=Number(clock.slice(0,2)),minute=Number(clock.slice(3));
-    validateDate(date);if(hour>23||minute>59)throw new Error('timeError');
-    return {date,clock,hour,timeZone:zone};
-  }
-  return timeAt(new Date(),zone);
+ const instant=timeMode==='recorded'?resolveWallTime(recorded,zone):new Date();
+ return {...timeAt(instant,zone),instant:instant.toISOString()};
 }
 function updateChrome(){
   document.documentElement.lang=lang==='zh'?'zh-CN':'en';
   const routes=['/','/method','/meanings','/rules','/history'];
   $('#navigation').innerHTML=routes.map((r,i)=>`<a href="#${r}" ${route()===r?'aria-current="page"':''}>${t().nav[i]}</a>`).join('');
-  $('#language').innerHTML=lang==='zh'?'中 <span>/ EN</span>':'EN <span>/ 中</span>';
+  $('#language').textContent=lang==='zh'?'EN':'中文';
   $('#language').setAttribute('aria-label',lang==='zh'?'Switch to English':'切换至中文');
   $('#footer-note').textContent=route()==='/'?'':t().footer;
   document.title=`${t().nav[Math.max(0,routes.indexOf(route()))]} · ${jc().brand}`;
@@ -49,56 +45,77 @@ function processMarkup(data=null){
 }
 function handPanel(){return `<div class="hand-panel">${palmMarkup(NAMES)}<div class="count-callout" id="count-callout" hidden><span class="count-label" id="count-label"></span><strong id="count-position"></strong><span class="count-detail" id="count-detail"></span></div><button type="button" class="skip-animation text-button" id="skip-animation" hidden>${t().skip}</button></div>`;}
 function applyTheme(index=null){
-  document.body.dataset.sign=index===null?'':String(index);
-  document.body.classList.toggle('result-mode',index!==null);
-  const bg=index===null?'#f6f6f2':palettes[index].color;
-  document.documentElement.style.backgroundColor=bg;
-  document.querySelector('meta[name="theme-color"]').content=bg;
+ document.body.dataset.sign=index===null?'':String(index);
+ document.body.classList.toggle('result-mode',index!==null);
+ const p=index===null?null:palettes[index],bg=p?.color||'#faf8ef',ink=p?.ink||'#343a33';
+ const darkText=ink==='#292D28'||index===null;
+ const tokens={'--bg':bg,'--ink':ink,'--muted':index===null?'#656d62':ink,'--line':darkText?'#292d283d':'#fffaf047','--accent':ink};
+ Object.entries(tokens).forEach(([k,v])=>document.body.style.setProperty(k,v));
+ document.documentElement.style.backgroundColor=bg;
+ document.querySelector('meta[name="theme-color"]').content=bg;
+ document.querySelectorAll('[data-color]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.color)===index)));
 }
-function colorKey(){return `<div class="color-key" role="list" aria-label="${u().legend}">${palettes.map((p,i)=>`<span role="listitem" class="color-key-item ${result?.timePalace===i?'is-result':''}" ${result?.timePalace===i?'aria-current="true"':''}><i style="--swatch:${p.color}" aria-hidden="true"></i><span>${p.name}</span></span>`).join('')}</div>`;}
-function timeMarkup(){
-  const zones=[...new Set([zone,'America/New_York','America/Los_Angeles','Europe/London','Asia/Shanghai','Asia/Hong_Kong','Asia/Taipei','Asia/Tokyo','Australia/Sydney','UTC'])];
-  return `<section class="time-region" aria-label="${u().moment}"><div class="time-heading"><span>${result?u().frozen:u().moment}</span>${result?`<span>${esc(result.timeZone.split('/').pop().replaceAll('_',' '))}</span>`:`<button class="text-button" id="time-settings" type="button" aria-expanded="${settingsOpen}" aria-controls="time-controls">${zone.split('/').pop().replaceAll('_',' ')} ↗</button>`}</div><div class="calendar-line"><span>${u().gregorian}</span><div><time id="gregorian-date"></time><span id="gregorian-clock" class="clock-value"></span></div></div><div class="calendar-line lunar-line"><span>${u().lunar}</span><div><strong id="lunar-date">${u().load}</strong><span id="lunar-translation"></span><button class="text-button" id="retry-calendar" type="button" hidden>${u().retry} ↻</button></div></div>
-  ${result?'':`<div id="time-controls" class="time-controls" ${settingsOpen?'':'hidden'}><label>${t().zone}<select id="timezone">${zones.map(z=>`<option value="${esc(z)}" ${z===zone?'selected':''}>${esc(z.replaceAll('_',' '))}</option>`).join('')}</select></label><label>${t().timeMode}<select id="time-mode"><option value="now" ${timeMode==='now'?'selected':''}>${t().now}</option><option value="recorded" ${timeMode==='recorded'?'selected':''}>${t().recorded}</option></select></label><label id="recorded-label" ${timeMode==='now'?'hidden':''}>${t().recordedLabel}<input id="recorded-time" type="datetime-local" min="2023-01-01T00:00" max="${new Date().getUTCFullYear()+2}-12-31T23:59" value="${esc(recorded)}"></label></div>`}</section>`;
+function colorKey(){return `<div class="color-key" role="group" aria-label="${u().legend}">${palettes.map((p,i)=>`<button type="button" data-color="${i}" aria-pressed="${result?.timePalace===i}" title="${p.colorName[li()]} · ${p.emotion[li()]}"><i style="--swatch:${p.color}" aria-hidden="true"></i><span>${p.name}</span></button>`).join('')}</div>`;}
+function timeMarkup(){return `<section class="time-region" aria-label="${u().moment}"><button id="time-settings" class="time-trigger" type="button" aria-haspopup="dialog" aria-label="${lang==='zh'?'修改日期、时间和时区':'Edit date, time and time zone'}"><span class="clock-row"><time id="gregorian-date"></time><strong id="gregorian-clock"></strong><small>${lang==='zh'?'修改':'Edit'}</small></span><span id="time-zone"></span></button><div class="calendar-line lunar-line"><span>${u().lunar}</span><div><strong id="lunar-date">${u().load}</strong><span id="lunar-translation"></span><button class="text-button" id="retry-calendar" type="button" hidden>${u().retry}</button></div></div></section>`;}
+function timeEditorMarkup(){return `<dialog id="time-dialog"><form id="time-form"><h2>${lang==='zh'?'选择起念的时间':'Choose a moment'}</h2><label for="datetime-input">${lang==='zh'?'日期与时间':'Date and time'}</label><input id="datetime-input" type="datetime-local" required step="60" min="2023-01-01T00:00" max="${new Date().getUTCFullYear()+2}-12-31T23:59"><label for="timezone-input">${t().zone}</label><select id="timezone-input"></select><p id="time-error" role="alert"></p><p class="time-note">${lang==='zh'?'夏令时结束的重复时刻，取较早的一次。':'A repeated time at the end of daylight saving uses the earlier occurrence.'}</p><div class="time-actions"><button type="button" id="time-now">${lang==='zh'?'回到此刻':'Use current time'}</button><button type="button" id="time-cancel">${lang==='zh'?'取消':'Cancel'}</button><button type="submit" id="time-save">${lang==='zh'?'应用':'Apply'}</button></div></form></dialog>`;}
+function bindTimeEditor(){
+ let draftZone=zone;
+ const error=e=>{$('#time-error').textContent=e.message==='dst'?(lang==='zh'?'所选时区在这一刻发生夏令时跳时，请选择其他时间。':'This time does not exist because the clock moves forward. Choose another time.'):(lang==='zh'?'请输入有效的日期与时间。':'Enter a valid date and time.');};
+ const apply=()=>{savePreference('palm-zone',zone);stopSpeech();result=null;$('#time-dialog').close();home();};
+ $('#time-settings').onclick=()=>{
+  if(busy)return;
+  const c=result||clockData();draftZone=c.timeZone;
+  const all=[...new Set([draftZone,'America/New_York','America/Los_Angeles','Asia/Shanghai','Asia/Hong_Kong','Asia/Taipei','Asia/Tokyo','Europe/London','UTC',...(Intl.supportedValuesOf?.('timeZone')||[])])];
+  $('#timezone-input').innerHTML=all.map(z=>`<option value="${esc(z)}">${esc(z.replaceAll('_',' '))}</option>`).join('');
+  $('#timezone-input').value=draftZone;$('#datetime-input').value=c.date+'T'+c.clock;$('#time-error').textContent='';$('#time-dialog').showModal();
+ };
+ $('#timezone-input').onchange=()=>{try{const instant=resolveWallTime($('#datetime-input').value,draftZone);draftZone=$('#timezone-input').value;$('#datetime-input').value=localStamp(instant,draftZone);$('#time-error').textContent='';}catch(e){$('#timezone-input').value=draftZone;error(e);}};
+ $('#time-form').onsubmit=e=>{e.preventDefault();try{resolveWallTime($('#datetime-input').value,draftZone);}catch(err){error(err);return;}zone=draftZone;recorded=$('#datetime-input').value;timeMode='recorded';apply();};
+ $('#time-now').onclick=()=>{zone=draftZone;timeMode='now';apply();};
+ $('#time-cancel').onclick=()=>$('#time-dialog').close();
 }
-function verseMarkup(index){return `<div class="classical-block"><span class="section-kicker">${u().original}</span><blockquote lang="zh-CN">${verses[index].zh.join('<br>')}</blockquote>${lang==='en'?`<div class="verse-translation"><span class="section-kicker">${u().translation}</span><p>${verses[index].en.join('<br>')}</p></div>`:''}</div>`;}
-function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><p class="voice-help">${jc().voiceHelp}</p><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
+function verseMarkup(index,compact=false){
+ const v=verses[index];
+ const lines=(start,end)=>`<blockquote lang="zh-CN">${v.zh.slice(start,end).join('<br>')}</blockquote>${lang==='en'?`<p class="verse-translation">${v.en.slice(start,end).map(esc).join('<br>')}</p>`:''}`;
+ if(!compact)return `<div class="classical-block">${lines(0,4)}${v.noteZh?`<p class="verse-note">${lang==='zh'?v.noteZh:v.noteEn}</p>`:''}</div>`;
+ return `<div class="classical-block compact-verse">${lines(0,2)}<details><summary>${lang==='zh'?'完整歌诀':'Read the complete verse'}</summary>${lines(2,4)}${v.noteZh?`<p class="verse-note">${lang==='zh'?v.noteZh:v.noteEn}</p>`:''}</details></div>`;
+}
+function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
 function resultMarkup(r){
-  const m=meanings[r.timePalace],topic=r.category;
-  const advice=r.reflection?.[li()]||(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
-  return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${m.name}</h1><div><span>${m.pinyin}</span><span>${palettes[r.timePalace].en}</span></div></div>${verseMarkup(r.timePalace)}<div class="timing-block"><span class="section-kicker">${jc().timing}</span><strong>${timing[r.timePalace][li()]}</strong><p>${jc().timingNote}</p></div><div class="modern-block"><span class="section-kicker">${u().modern} <span class="topic-note">/ ${u().topics[topic]}</span></span><p>${esc(advice)}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay} ↻</button><button class="text-button" id="new-question" type="button">${u().again} ↗</button></div><a class="history-result-link" href="#/history">${jc().recordLink} ↗</a><div class="status" id="question-status" role="status">${storageFailed?jc().storageError:""}</div></div>`;
+ const m=meanings[r.timePalace],topic=r.category;
+ const advice=r.reflection?.[li()]||(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
+ return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${lang==='zh'?m.name:m.romanized}</h1>${lang==='en'?`<p class="sign-subtitle">${m.name} · ${m.en}</p>`:''}</div>${lang==='en'?`<p class="sign-summary">${m.summary}</p>`:''}${verseMarkup(r.timePalace,true)}<div class="modern-block"><span class="section-kicker">${u().modern}</span><p>${esc(advice)}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay}</button><button class="text-button" id="new-question" type="button">${u().again}</button></div><div class="status" id="question-status" role="status">${storageFailed?jc().storageError:''}</div></div>`;
 }
 function home(){
-  document.body.dataset.view='home';applyTheme(result?.timePalace??null);
-  $('#main').innerHTML=`<div class="home-screen">${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-caption"><span>${u().left}</span><span>${lang==='zh'?'小六壬':'XIAO LIU REN'}</span></div>${colorKey()}</section></div>`;
-  $('#palm-state').textContent=result?t().complete:u().left;activateNode(result?result.timePalace:null,true);
-  $('#skip-animation').onclick=()=>{skipAnimation=true;};
-  $('#retry-calendar').onclick=()=>{let clock;try{clock=clockData();}catch{return;}ensureLunar(clock.date,true);};
-  if(result){
-    $('#new-question').onclick=()=>{result=null;question='';render();$('#question').focus();};
-    $('#replay').onclick=()=>replayResult();
-  }else{
-    $('#question').oninput=e=>{question=e.target.value;};
-    $('#voice-input').onclick=toggleSpeech;
-    $('#time-settings').onclick=()=>{settingsOpen=!settingsOpen;$('#time-controls').hidden=!settingsOpen;$('#time-settings').setAttribute('aria-expanded',String(settingsOpen));};
-    $('#timezone').onchange=e=>{zone=e.target.value;savePreference('palm-zone',zone);stopSpeech();home();};
-    $('#time-mode').onchange=e=>{timeMode=e.target.value;$('#recorded-label').hidden=timeMode==='now';refreshTime();};
-    $('#recorded-time').oninput=e=>{recorded=e.target.value;refreshTime();};
-    $('#reading-form').onsubmit=e=>{e.preventDefault();beginReading();};
-  }
-  refreshTime();
+ document.body.dataset.view='home';applyTheme(result?.timePalace??null);
+ const showLabels=preference('ask-preview-labels','on')!=='off';
+ $('#main').innerHTML=`<div class="home-screen"><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-controls"><label class="label-control"><input id="toggle-labels" type="checkbox" ${showLabels?'checked':''}>${lang==='zh'?'标注卦象':'Label the six signs'}</label>${colorKey()}</div></section><div class="home-workspace">${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section></div></div>${timeEditorMarkup()}`;
+ $('.palm-frame').classList.toggle('names-off',!showLabels);
+ $('#palm-state').textContent=result?t().complete:u().left;activateNode(result?result.timePalace:null,true);
+ $('#toggle-labels').onchange=e=>{$('.palm-frame').classList.toggle('names-off',!e.target.checked);savePreference('ask-preview-labels',e.target.checked?'on':'off');};
+ const preview=i=>{if(busy)return;applyTheme(i);activateNode(i,reduced(),{duration:460});$('#palm-state').textContent=(lang==='zh'?'宫位预览：':'Position preview: ')+positionName(i);};
+ document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>preview(Number(b.dataset.color)));
+ document.querySelectorAll('[data-node]').forEach(b=>{b.onclick=()=>preview(Number(b.dataset.node));b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();preview(Number(b.dataset.node));}};});
+ $('#skip-animation').onclick=()=>{skipAnimation=true;};
+ $('#retry-calendar').onclick=()=>{let clock;try{clock=clockData();}catch{return;}ensureLunar(clock.date,true);};
+ bindTimeEditor();
+ if(result){$('#new-question').onclick=()=>{result=null;question='';home();$('#question').focus();};$('#replay').onclick=()=>replayResult();}
+ else{$('#question').oninput=e=>{question=e.target.value;};$('#voice-input').onclick=toggleSpeech;$('#reading-form').onsubmit=e=>{e.preventDefault();beginReading();};}
+ refreshTime();
 }
 function paintLunar(lunar,clock){
   if(!$('#lunar-date'))return;
   const branch=BRANCHES[shichen(clock.hour)-1];
   $('#lunar-date').textContent=`${lunar.text} · ${branch}时`;
-  $('#lunar-translation').textContent=lang==='en'?`${lunar.isLeap?'Leap ':''}month ${lunar.month}, day ${lunar.day} · ${['Zǐ','Chǒu','Yín','Mǎo','Chén','Sì','Wǔ','Wèi','Shēn','Yǒu','Xū','Hài'][shichen(clock.hour)-1]} hour`:lunar.year;
+  $('#lunar-translation').textContent=lang==='en'?`${lunar.isLeap?'Leap ':''}month ${lunar.month}, day ${lunar.day} · ${['Zǐ','Chǒu','Yín','Mǎo','Chén','Sì','Wǔ','Wèi','Shēn','Yǒu','Xū','Hài'][shichen(clock.hour)-1]} hour`:'';
   $('#retry-calendar').hidden=true;
 }
 function refreshTime(){
   if(route()!=='/'||!$('#gregorian-date'))return;
   let clock;try{clock=result||clockData();}catch{$('#lunar-date').textContent='—';return;}
-  $('#gregorian-date').textContent=clock.date.replaceAll('-',' / ');
+  $('#gregorian-date').textContent=clock.date.replaceAll('-','.');
+  const instant=clock.instant?new Date(clock.instant):resolveWallTime(clock.date+'T'+clock.clock,clock.timeZone);
+  $('#time-zone').textContent=clock.timeZone+' · '+offsetLabel(instant,clock.timeZone);
   $('#gregorian-clock').textContent=clock.clock;
   if(result){paintLunar(result.lunar,result);return;}
   if(lunarPreview.date===clock.date&&lunarPreview.state==='ready'){paintLunar(lunarPreview.lunar,clock);return;}
@@ -144,8 +161,8 @@ function toggleSpeech(){
 }
 function status(message,error=false){const el=$('#question-status');if(el){el.textContent=message;el.classList.toggle('error',error);}}
 function lockForm(lock){
-  busy=lock;
-  document.querySelectorAll('#reading-form button,#reading-form input,#reading-form select,#reading-form textarea,#replay,#new-question,#time-controls input,#time-controls select,#time-settings').forEach(el=>el.disabled=lock);
+  busy=lock;document.body.classList.toggle('counting',lock);
+  document.querySelectorAll('#reading-form button,#reading-form input,#reading-form select,#reading-form textarea,#replay,#new-question,#time-settings,[data-color]').forEach(el=>el.disabled=lock);
   $('#language').disabled=lock;
 }
 function showCallout(stage,count,total,index){
@@ -157,24 +174,22 @@ function showCallout(stage,count,total,index){
   const desc=$(`[data-step-description="${stage}"]`);if(desc)desc.textContent=`${count}/${total} → ${positionName(index)}`;
 }
 async function animate(data){
-  const version=++animationVersion;skipAnimation=reduced();
-  $('#skip-animation').hidden=skipAnimation;
-  for(let stage=0;stage<3;stage++){
-    const {start,count}=data.stages[stage];
-    for(let j=0;j<count;j++){
-      if(version!==animationVersion)return false;
-      const n=(start+j)%6;
-      if(!skipAnimation||j===count-1){activateNode(n,skipAnimation);showCallout(stage,j+1,count,n);}
-      if(!skipAnimation)await sleep(175);
-    }
-    if(!skipAnimation)await sleep(550);
+ const version=++animationVersion;skipAnimation=reduced();
+ $('#skip-animation').hidden=skipAnimation;
+ const total=data.stages.reduce((n,s)=>n+s.count,0),stepDelay=Math.max(170,Math.min(560,7800/total));
+ for(let stage=0;stage<3;stage++){
+  const {start,count}=data.stages[stage];
+  for(let j=0;j<count;j++){
+   if(version!==animationVersion)return false;
+   const n=(start+j)%6,retap=stage>0&&j===0,wait=retap?Math.max(460,stepDelay):stepDelay;
+   if(!skipAnimation||j===count-1){activateNode(n,skipAnimation,{duration:Math.min(430,wait*.82),retap});showCallout(stage,j+1,count,n);}
+   if(!skipAnimation)await sleep(wait);
   }
-  if(version!==animationVersion)return false;
-  $('#skip-animation').hidden=true;
-  $('#palm-state').textContent=t().complete;
-  $('#count-label').textContent=u().result;
-  $('#count-detail').textContent='';
-  return true;
+  if(!skipAnimation)await sleep(240);
+ }
+ if(version!==animationVersion)return false;
+ $('#skip-animation').hidden=true;$('#count-callout').hidden=true;
+ $('#palm-state').textContent=t().complete;return true;
 }
 async function beginReading(){
   if(busy)return;
@@ -214,12 +229,13 @@ function method(){
   $('#play-example').onclick=async()=>{if(busy)return;const version=routeVersion;busy=true;$('#language').disabled=true;document.querySelectorAll('.method-controls button').forEach(b=>b.disabled=true);await animate(calc);if(version===routeVersion){busy=false;$('#language').disabled=false;document.querySelectorAll('.method-controls button').forEach(b=>b.disabled=false);}};
 }
 function meaningsPage(){
-  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${t().meaningsEye}</div><h1>${t().meaningsTitle}</h1><p>${t().meaningsIntro}</p></section><section class="meaning-grid">${meanings.map((m,i)=>`<article class="meaning-card" style="--sign-color:${palettes[i].color}"><div class="meaning-top"><span class="sign-swatch"></span><span>0${i+1}</span></div><div class="meaning-name"><h2>${m.name}</h2><span>${m.pinyin}<br>${palettes[i].en}</span></div>${verseMarkup(i)}<div class="meaning-advice"><span class="section-kicker">${u().modern}</span><p>${m.advice.daily[li()]}</p></div></article>`).join('')}</section><p class="verse-context">${u().verseNote}</p><div class="page-end"><a class="secondary" href="#/">${t().return} ↗</a></div>`;
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${t().meaningsEye}</div><h1>${t().meaningsTitle}</h1><p>${t().meaningsIntro}</p></section><section class="meaning-grid">${meanings.map((m,i)=>`<article class="meaning-card" style="--sign-color:${palettes[i].color}"><div class="meaning-top"><span class="sign-swatch"></span><span>0${i+1}</span></div><div class="meaning-name"><h2>${lang==='zh'?m.name:m.romanized}</h2><span>${lang==='en'?m.name+' · ':''}${m.en}</span></div>${lang==='en'?`<p class="sign-summary">${m.summary}</p>`:''}${verseMarkup(i)}<div class="meaning-advice"><span class="section-kicker">${u().modern}</span><p>${m.advice.daily[li()]}</p></div></article>`).join('')}</section><p class="verse-context">${u().verseNote}</p><div class="page-end"><a class="secondary" href="#/">${t().return} ↗</a></div>`;
 }
 function rulesPage(){
-  const links=[['https://6ren.chaosxy.com/results/',u().methodSource],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
-  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
+  const links=[[lang==='zh'?'https://6ren.chaosxy.com/results/':'https://6ren.chaosxy.com/en/results/',u().methodSource],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}${paletteSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
 }
+function paletteSection(){return `<section class="palette-section"><h2>${lang==='zh'?'六色，六种心境':'Six colors, six states of mind'}</h2><p>${u().colorNote}</p><div class="palette-grid">${palettes.map(p=>`<article style="--swatch:${p.color}"><i aria-hidden="true"></i><h3>${p.name} · ${p.colorName[li()]}</h3><strong>${p.emotion[li()]}</strong><p>${p.note[li()]}</p><a href="${p.sources[0]}" target="_blank" rel="noopener">${lang==='zh'?'色彩来源':'Color source'} ↗</a></article>`).join('')}</div></section>`;}
 function historyPage(){
   $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${jc().history}</div><h1>${jc().historyTitle}</h1><p>${jc().historyIntro}</p>${storageFailed?`<p role="status">${journalState.error?jc().corrupt:jc().storageError}</p>`:''}</section><section class="history-list">${journal.length?journal.map((r,i)=>`<article class="history-card" data-record="${i}" style="--sign-color:${palettes[r.timePalace].color}"><div class="history-summary"><div><p class="history-date">${esc(r.date)} · ${esc(r.clock)} · ${esc(r.timeZone)}</p><h2>${esc(r.question)}</h2><p class="history-sign">${NAMES[r.timePalace]} <span>${lang==='en'?palettes[r.timePalace].en:''}</span></p></div><button class="secondary" type="button" data-open="${i}">${jc().open} ↗</button></div><details><summary>${jc().outcome} · ${jc().outcomes[Math.max(0,outcomeKeys.indexOf(r.review?.outcome))]}</summary><form data-review="${i}"><label>${jc().outcome}<select name="outcome">${outcomeKeys.map((k,n)=>`<option value="${k}" ${r.review?.outcome===k?'selected':''}>${jc().outcomes[n]}</option>`).join('')}</select></label><label>${jc().actualDate}<input name="actualDate" type="date" value="${esc(r.review?.actualDate||'')}"></label><label class="note-label">${jc().note}<textarea name="note" maxlength="2000" placeholder="${jc().notePlaceholder}">${esc(r.review?.note||'')}</textarea></label><div class="review-actions"><button class="secondary" type="submit">${jc().save}</button><button class="text-button" type="button" data-delete="${i}">${jc().delete}</button><span class="review-status" role="status"></span></div></form></details></article>`).join(''):`<p>${jc().empty}</p><a class="secondary" href="#/">${jc().back} ↗</a>`}</section>`;
   document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>{result=journal[Number(button.dataset.open)];question=result.question;location.hash='/';});
@@ -228,7 +244,7 @@ function historyPage(){
 }
 function timingSection(){return `<section class="timing-section"><h2>${jc().timingTitle}</h2><p>${jc().timingIntro}</p><div class="timing-grid">${timing.map((row,i)=>`<article><h3>${NAMES[i]}</h3><strong>${row[li()]}</strong><p>${row[li()+2]}</p></article>`).join('')}</div><p class="small-note">${jc().timingNote} <a href="https://www.shenjige.cn/details/I8TyiKp2X.html" target="_blank" rel="noopener">${lang==='zh'?'查阅整理原文':'Read the secondary summary'} ↗</a></p></section>`;}
 function render(){
-  stopSpeech();routeVersion++;animationVersion++;busy=false;$('#language').disabled=false;document.body.dataset.view=route()==='/'?'home':'page';applyTheme();updateChrome();
+  stopSpeech();cancelPalmMotion();routeVersion++;animationVersion++;busy=false;document.body.classList.remove('counting');$('#language').disabled=false;document.body.dataset.view=route()==='/'?'home':'page';applyTheme();updateChrome();
   if(route()==='/method')method();else if(route()==='/meanings')meaningsPage();else if(route()==='/rules')rulesPage();else if(route()==='/history')historyPage();else home();
 }
 $('#language').onclick=()=>{lang=lang==='zh'?'en':'zh';savePreference('palm-language',lang);render();};
