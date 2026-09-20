@@ -367,6 +367,9 @@
     font-size: 0.6rem;
     margin-top: 18px;
   }
+  .work-title a { color: inherit; text-decoration: none; }
+  .work-actions { display: flex; flex-wrap: wrap; gap: 18px; }
+  .work-actions a { color: inherit; text-underline-offset: 4px; }
 
   /* ---- contact ---- */
   .contact-section { border-bottom: none; }
@@ -532,13 +535,13 @@
       <p class="work-blurb">A frequent-flyer concept connecting trip memories, route summaries, and clearer mileage goals. Explore the working demo.</p>
       <div class="work-arrow">VIEW CASE STUDY &rarr;</div>
     </a>
-    <a class="work-card" href="projects/xiaoliuren/">
+    <article class="work-card">
       <div class="work-card-top"><span class="work-num">08</span><span class="work-cat">Interaction &middot; Creative Coding</span></div>
       <div class="work-icon" aria-hidden="true">掌</div>
-      <h3 class="work-title">Palm of Time &mdash; tradition, made interactive</h3>
+      <h3 class="work-title"><a href="projects/xiaoliuren/">Palm of Time &mdash; tradition, made interactive</a></h3>
       <p class="work-blurb">A bilingual exploration of Xiao Liu Ren: follow an animated palm through a real lunar-calendar calculation, discover six meanings, and learn the method step by step.</p>
-      <div class="work-arrow">EXPLORE PROJECT &rarr;</div>
-    </a>
+      <div class="work-arrow work-actions"><a href="projects/xiaoliuren/">EXPLORE PROJECT &rarr;</a><a href="https://github.com/Toooonyliu/toooonyliu.github.io/tree/main/projects/xiaoliuren" target="_blank" rel="noopener">VIEW CODE &nearr;</a></div>
+    </article>
   </div>
 </section>
 
