@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <title>Ask — a hand in one line</title>
-  <rect width="64" height="64" rx="14" fill="#f7f4e9"/>
-  <path d="M25 57 C25 51 19 48 16 42 C13 36 11 30 9 25 C7 21 10 18 13 20 C16 22 18 27 21 31 C24 35 26 34 24 29 L19 15 C17 11 19 8 22 9 C25 10 28 19 32 27 C34 31 36 30 35 26 L30 8 C29 4 32 2 35 5 C38 9 41 20 43 28 C44 32 47 31 47 27 L46 15 C46 11 49 9 51 12 C53 15 52 26 53 32 C53 35 55 35 56 32 L58 26 C59 22 62 24 61 28 L58 41 C56 48 49 50 47 57" fill="none" stroke="#293b36" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" class="ask-mark">
+  <title>Ask — the open palm</title>
+  <style>.ask-mark{color:var(--ask-mark-ink,#293b36)}@media(prefers-color-scheme:dark){.ask-mark{color:var(--ask-mark-ink,#faf5e8)}}</style>
+  <path d="M27 60 C27 53 24 48 21 44 C18 40 14 35 10 30 C8 28 9 25 12 25 C15 25 18 30 20 32 C23 36 26 36 26 32 C26 27 24 19 24 15 C23 11 24 8 26 9 C29 10 29 16 29 20 L30 29 C30 33 33 33 33 29 L33 9 C33 5 35 3 37 5 C39 7 38 13 38 17 L38 29 C38 32 40 32 41 29 L43 16 C43 12 46 10 47 14 C48 18 46 26 46 31 C46 35 48 35 49 32 L52 25 C53 22 56 22 56 25 L54 38 C53 44 49 48 47 52 C45 55 44 58 45 60" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

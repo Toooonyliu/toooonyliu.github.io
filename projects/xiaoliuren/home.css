@@ -1,7 +1,7 @@
 /* Ask: the approved flowing palm and a quiet, two-column working surface. */
 :root{--bg:#faf8ef;--ink:#343a33;--muted:#656d62;--line:#343a3333;--accent:#343a33}
 .site-header{max-width:1800px;min-height:100px;padding:20px 4.5%;gap:25px;flex-wrap:nowrap}
-.site-header .brand{gap:12px}.brand-mark{width:34px;height:34px;filter:none!important}
+.site-header .brand{gap:12px}.brand-mark{display:block;width:34px;height:40px;flex-shrink:0;background:currentColor;-webkit-mask:url('./mark.svg?v=ask9') center/contain no-repeat;mask:url('./mark.svg?v=ask9') center/contain no-repeat;filter:none!important}
 .brand-name{font-size:30px;letter-spacing:.12em}.site-header nav{width:auto;order:0;gap:25px;margin-left:auto}
 .site-header nav a,.language{font-size:14px}.language{min-width:44px;min-height:44px}
 body[data-view=home] #main{max-width:1800px;margin:auto}
@@ -44,8 +44,11 @@ html[lang=en] .result-heading h1{font-family:Georgia,serif;font-size:clamp(46px,
 .sign-subtitle{font-size:16px;margin:11px 0 0}.sign-summary{font-size:16px;line-height:1.85;margin-bottom:24px}
 .classical-block{margin:20px 0 25px}.classical-block blockquote{font:400 21px/1.95 var(--serif);margin:0}
 .classical-block .verse-translation{font:16px/1.8 Georgia,serif;margin:13px 0 0;color:var(--muted)}
-.compact-verse details{margin-top:12px}.compact-verse summary{font-size:14px;color:var(--muted);cursor:pointer;min-height:34px}
-.compact-verse details[open] summary{margin-bottom:10px}.verse-note{font-size:13px;color:var(--muted);margin-top:18px;line-height:1.8}
+.compact-verse details{margin-top:12px}.compact-verse summary{font-size:14px;color:var(--muted);cursor:pointer;min-height:44px;padding-block:8px;line-height:1.8}
+.compact-verse details[open] summary{margin-bottom:10px}.compact-verse:has(details[open])>.verse-preview{display:none}
+.verse-full{padding:4px 0 8px}.classical-preamble{font:17px/1.95 var(--serif);margin:0 0 18px;overflow-wrap:anywhere}
+.verse-label{display:block;font:14px/1.8 var(--sans);color:var(--muted);margin:16px 0 8px}.verse-note,.verse-source{font-size:14px;color:var(--muted);margin-top:18px;line-height:1.8}.verse-source a{text-underline-offset:4px}
+.classical-block .verse-full>.verse-translation:first-child{margin-top:0}
 .modern-block{margin:24px 0 0;padding:0;border:0}.modern-block .section-kicker{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 0 7px}
 .modern-block p{font-size:17px;line-height:1.85;margin:0}.result-actions{display:flex;gap:28px;margin-top:28px}.result-actions button{font-size:14px;min-height:44px}
 .count-callout{right:3%;bottom:16%;border:0;padding:0;text-align:right;min-width:0;max-width:150px;pointer-events:none}

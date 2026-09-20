@@ -56,7 +56,7 @@ Official calendar dataset: https://data.gov.hk/en-data/dataset/hk-hko-rss-gregor
 - `previews/palm-study.html`: standalone character-shaded 2.5D palm study. It is not imported by the production app and requires no server or packages; open this HTML directly.
 - `prompt_log.md`: AI tool usage and key prompts.
 
-For GitHub Pages, copy the contents of `` into `projects/xiaoliuren/` in the portfolio repository and link the project card to `projects/xiaoliuren/`. All assets use relative URLs; secondary views use hash routes, so direct links and refreshes work without a server rewrite. Sites hosting metadata is kept separately in `.openai/hosting.json`.
+This directory is deployed at https://toooonyliu.github.io/projects/xiaoliuren/ through the portfolio’s GitHub Pages site. All assets use relative URLs and secondary views use hash routes, so direct links and refreshes work without a server rewrite. The Sites working copy and hosting metadata are maintained separately.
 
 ## Validation
 
@@ -85,7 +85,7 @@ The home now follows the selected HTML study: a large, softly fanned hand on the
 
 The six colors are inspired by documented traditional materials: 石绿/malachite, 靛青/indigo, 朱砂/cinnabar, 胭脂/rouge, 藤黄/gamboge, 松烟/pine-soot ink. These screen values and emotional associations are design interpretations, not traditional six-sign or Ni-specific assignments. The yellow theme uses dark text and strokes; all foreground pairs meet 4.5:1 contrast. Museum references and per-color explanations are available in About.
 
-English uses Da An, Liu Lian, Su Xi, Chi Kou, Xiao Ji and Kong Wang, with the reference page’s teaching glosses and independently written short summaries. Chinese verses and original English translations now consistently use the reference’s transcription of the 1896 多文堂《中外提福》 edition. Historical wording differences are described in About. Full verses are expandable on the result and visible on the Six signs page; timing context lives in About to simplify the home.
+English uses Da An, Liu Lian, Su Xi, Chi Kou, Xiao Ji and Kong Wang, with the reference page’s teaching glosses and independently written short summaries. The original v8 verses followed the reference’s transcription of the 1896 多文堂《中外提福》 edition; v9 now also preserves the longer common-version reading requested by the user, separately labeled from the 1896 text. Historical wording differences are described in About. Full texts are expandable on both the result and the Six signs page; timing context lives in About to simplify the home.
 
 ### Question-specific interpretation choices
 
@@ -98,3 +98,11 @@ Official references: https://developers.openai.com/api/docs/guides/structured-ou
 New files: `home.css` (approved layout and responsive refinements), `time.js` (date-specific offset and civil-time validation). Existing history, voice, method examples and deterministic calculation remain.
 
 V8 checks: all 10 existing calculation/history tests pass. A module-level app integration run checked six color/pose previews, label preferences, concrete UTC offsets and editable time, bilingual results, stored readings, all five routes, and a complete non-reduced example (7044 ms) with exactly two stage-start retaps. No runtime errors. Real-browser layout and microphone behavior are not newly verified.
+
+## Transparent palm mark and complete readings (v9)
+
+The original upright palm mark is a transparent SVG with no background shape. The header and portfolio card use the SVG as an alpha mask so its strokes inherit the current text color; the browser-tab SVG adapts to light/dark browser themes. Cache identifiers were updated.
+
+Chinese results preview four verse clauses (two couplets). A native accessible disclosure opens the complete common-version preamble, all eight verse clauses, interpretive notes and a separate 1896 transcription for comparison. English results start with the concise definition and keep the complete English translation and Chinese text inside the same disclosure. The Six signs page follows the same pattern. Da An’s short English definition is the wording supplied by the user; other summaries and full translations are written for this project.
+
+The full common version is transcribed from https://6ren.chaosxy.com/results/ ; that site's English page provides a different 1896 transcription. Apparent errors such as 褥/祷 and 囊/禳 are explicitly noted rather than silently merged. Original source link: https://babel.hathitrust.org/cgi/pt?id=uc1.$b466495&seq=35 (scans 35–36). HathiTrust returned a browser verification challenge during this update, so the scan has not been independently checked; the distinction is explained in Sources.

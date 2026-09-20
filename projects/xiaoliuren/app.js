@@ -1,9 +1,9 @@
-import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask8';
+import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask9';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
-import {copy,meanings} from './content.js?v=ask8';
-import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask8';
-import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask8';
+import {copy,meanings} from './content.js?v=ask9';
+import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask9';
+import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask9';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const preference=(key,fallback)=>{try{return localStorage.getItem(key)||fallback;}catch{return fallback;}};
@@ -76,9 +76,12 @@ function bindTimeEditor(){
 }
 function verseMarkup(index,compact=false){
  const v=verses[index];
- const lines=(start,end)=>`<blockquote lang="zh-CN">${v.zh.slice(start,end).join('<br>')}</blockquote>${lang==='en'?`<p class="verse-translation">${v.en.slice(start,end).map(esc).join('<br>')}</p>`:''}`;
- if(!compact)return `<div class="classical-block">${lines(0,4)}${v.noteZh?`<p class="verse-note">${lang==='zh'?v.noteZh:v.noteEn}</p>`:''}</div>`;
- return `<div class="classical-block compact-verse">${lines(0,2)}<details><summary>${lang==='zh'?'完整歌诀':'Read the complete verse'}</summary>${lines(2,4)}${v.noteZh?`<p class="verse-note">${lang==='zh'?v.noteZh:v.noteEn}</p>`:''}</details></div>`;
+ const chinese=`${v.preambleZh?`<p class="classical-preamble" lang="zh-CN">${esc(v.preambleZh)}</p>`:''}<blockquote lang="zh-CN"><span class="verse-label">断曰</span>${v.zh.map(esc).join('<br>')}</blockquote>`;
+ const english=`${v.preambleEn?`<p class="verse-translation">${esc(v.preambleEn)}</p>`:''}<p class="verse-translation">${v.en.map(esc).join('<br>')}</p>`;
+ const note=v.noteZh?`<p class="verse-note">${esc(lang==='zh'?v.noteZh:v.noteEn)}</p>`:'';
+ const preview=lang==='zh'?`<blockquote class="verse-preview" lang="zh-CN">${v.zh.slice(0,2).map(esc).join('<br>')}</blockquote>`:'';
+ const edition=v.edition1896?`<details class="edition-comparison"><summary>${lang==='zh'?'1896 年版本对照':'Compare the 1896 text'}</summary>${lang==='en'?`<p class="verse-translation">${esc(v.edition1896.fullEn)}</p>`:''}<p class="classical-preamble" lang="zh-Hant">${esc(v.edition1896.fullZh)}</p></details>`:'';
+ return `<div class="classical-block compact-verse${compact?' home-verse':''}">${preview}<details class="verse-details"><summary>${lang==='zh'?'查看完整歌诀与解释':'Read the complete translation and Chinese text'}</summary><div class="verse-full">${lang==='en'?`${english}<p class="verse-label">Chinese text · common version</p>`:''}${chinese}${note}${edition}<p class="verse-source">${lang==='zh'?'原文与版本说明见':'Text and edition notes:'} <a href="#/rules">${lang==='zh'?'来源':'Sources'}</a></p></div></details></div>`;
 }
 function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
 function resultMarkup(r){
@@ -232,7 +235,7 @@ function meaningsPage(){
   $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${t().meaningsEye}</div><h1>${t().meaningsTitle}</h1><p>${t().meaningsIntro}</p></section><section class="meaning-grid">${meanings.map((m,i)=>`<article class="meaning-card" style="--sign-color:${palettes[i].color}"><div class="meaning-top"><span class="sign-swatch"></span><span>0${i+1}</span></div><div class="meaning-name"><h2>${lang==='zh'?m.name:m.romanized}</h2><span>${lang==='en'?m.name+' · ':''}${m.en}</span></div>${lang==='en'?`<p class="sign-summary">${m.summary}</p>`:''}${verseMarkup(i)}<div class="meaning-advice"><span class="section-kicker">${u().modern}</span><p>${m.advice.daily[li()]}</p></div></article>`).join('')}</section><p class="verse-context">${u().verseNote}</p><div class="page-end"><a class="secondary" href="#/">${t().return} ↗</a></div>`;
 }
 function rulesPage(){
-  const links=[[lang==='zh'?'https://6ren.chaosxy.com/results/':'https://6ren.chaosxy.com/en/results/',u().methodSource],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
+  const links=[[lang==='zh'?'https://6ren.chaosxy.com/results/':'https://6ren.chaosxy.com/en/results/',u().methodSource],['https://babel.hathitrust.org/cgi/pt?id=uc1.$b466495&seq=35',lang==='zh'?'1896《中外提福》· 六壬时课（扫描第 35–36 页）':'1896 Zhongwai Tifu · Six Ren Time Lesson (scans 35–36)'],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
   $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}${paletteSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
 }
 function paletteSection(){return `<section class="palette-section"><h2>${lang==='zh'?'六色，六种心境':'Six colors, six states of mind'}</h2><p>${u().colorNote}</p><div class="palette-grid">${palettes.map(p=>`<article style="--swatch:${p.color}"><i aria-hidden="true"></i><h3>${p.name} · ${p.colorName[li()]}</h3><strong>${p.emotion[li()]}</strong><p>${p.note[li()]}</p><a href="${p.sources[0]}" target="_blank" rel="noopener">${lang==='zh'?'色彩来源':'Color source'} ↗</a></article>`).join('')}</div></section>`;}

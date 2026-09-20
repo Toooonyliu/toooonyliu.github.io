@@ -34,7 +34,7 @@ export const meanings = [
       ]
     },
     "romanized": "Da An",
-    "summary": "Traditionally favorable: a stable home and sound prospects, with missing belongings close at hand and a journey still to begin."
+    "summary": "A broadly favorable sign: affairs prosper, the home remains secure and a lost object is nearby, although the traveler has not yet departed."
   },
   {
     "name": "留连",
