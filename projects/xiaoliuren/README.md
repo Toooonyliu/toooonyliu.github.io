@@ -108,3 +108,5 @@ Chinese results preview four verse clauses (two couplets). A native accessible d
 The full common version is transcribed from https://6ren.chaosxy.com/results/ ; that site's English page provides a different 1896 transcription. The cited wording is retained, with general edition context in Sources. Original source link: https://babel.hathitrust.org/cgi/pt?id=uc1.$b466495&seq=35 (scans 35–36). HathiTrust returned a browser verification challenge during this update, so the scan has not been independently checked; the distinction is explained in Sources.
 
 The per-sign textual notes and duplicate 1896 comparison were removed at the user’s request. Complete Chinese readings, English translations and the source links remain available.
+
+English reading disclosures now contain only one continuous translation of the 1896 reference transcription, its corresponding Chinese text and the Sources link. The longer common-version English preamble and duplicate Chinese rendering are removed. Chinese readings retain the common-version poem and explanation, without textual notes or an additional traditional-character edition. The source caption is restored to “原文与版本说明见 来源”.
