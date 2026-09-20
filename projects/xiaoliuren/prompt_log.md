@@ -31,3 +31,5 @@ User approved v7 and requested a quieter production homepage, a slimmer middle f
 ## Transparent icon and complete classical text
 
 User requested pushing the updates to GitHub and redeploying the project, a transparent vector favicon inspired by the supplied antique upright-palm diagram, four Chinese verse clauses on the homepage with expandable complete explanations, an English summary followed by expandable full text, and the HathiTrust source link. Codex refined the existing vector identity, made header and portfolio icon colors inherit their surrounding text, added accessible native disclosures, retained the complete common-version preambles with original English translations, and kept the 1896 reference transcription separately labeled. The HathiTrust scan was blocked by a browser verification page and is not claimed as independently verified. No GPT API was enabled.
+
+User requested removing the repeated textual notes and 1896 comparison shown beneath each reading in both languages. Codex removed those blocks across result and Six signs views, retaining the complete reading and original source links.

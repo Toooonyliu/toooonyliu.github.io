@@ -2,7 +2,7 @@ import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask9';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
 import {copy,meanings} from './content.js?v=ask9';
-import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask9';
+import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask10';
 import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask9';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -78,10 +78,8 @@ function verseMarkup(index,compact=false){
  const v=verses[index];
  const chinese=`${v.preambleZh?`<p class="classical-preamble" lang="zh-CN">${esc(v.preambleZh)}</p>`:''}<blockquote lang="zh-CN"><span class="verse-label">断曰</span>${v.zh.map(esc).join('<br>')}</blockquote>`;
  const english=`${v.preambleEn?`<p class="verse-translation">${esc(v.preambleEn)}</p>`:''}<p class="verse-translation">${v.en.map(esc).join('<br>')}</p>`;
- const note=v.noteZh?`<p class="verse-note">${esc(lang==='zh'?v.noteZh:v.noteEn)}</p>`:'';
  const preview=lang==='zh'?`<blockquote class="verse-preview" lang="zh-CN">${v.zh.slice(0,2).map(esc).join('<br>')}</blockquote>`:'';
- const edition=v.edition1896?`<details class="edition-comparison"><summary>${lang==='zh'?'1896 年版本对照':'Compare the 1896 text'}</summary>${lang==='en'?`<p class="verse-translation">${esc(v.edition1896.fullEn)}</p>`:''}<p class="classical-preamble" lang="zh-Hant">${esc(v.edition1896.fullZh)}</p></details>`:'';
- return `<div class="classical-block compact-verse${compact?' home-verse':''}">${preview}<details class="verse-details"><summary>${lang==='zh'?'查看完整歌诀与解释':'Read the complete translation and Chinese text'}</summary><div class="verse-full">${lang==='en'?`${english}<p class="verse-label">Chinese text · common version</p>`:''}${chinese}${note}${edition}<p class="verse-source">${lang==='zh'?'原文与版本说明见':'Text and edition notes:'} <a href="#/rules">${lang==='zh'?'来源':'Sources'}</a></p></div></details></div>`;
+ return `<div class="classical-block compact-verse${compact?' home-verse':''}">${preview}<details class="verse-details"><summary>${lang==='zh'?'查看完整歌诀与解释':'Read the complete translation and Chinese text'}</summary><div class="verse-full">${lang==='en'?`${english}<p class="verse-label">Chinese text · common version</p>`:''}${chinese}<p class="verse-source">${lang==='zh'?'原文来源见':'Source:'} <a href="#/rules">${lang==='zh'?'来源':'Sources'}</a></p></div></details></div>`;
 }
 function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
 function resultMarkup(r){

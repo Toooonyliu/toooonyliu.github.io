@@ -129,8 +129,7 @@ export const palettes = [
     ]
   }
 ];
-// Common-version Chinese text and original translations; the separately labeled
-// 1896 transcription is retained for comparison. See About for edition sources.
+// Common-version Chinese text and original translations. See About for sources.
 export const verses = [
   {
     "preambleZh": "身不动时，属木青龙，凡谋事一五七（属四肢），贵人西南，冲犯东方，小孩婆姐六畜惊，大人青面阴神。",
@@ -146,13 +145,7 @@ export const verses = [
       "A missing object remains nearby; the household is safe and well.",
       "The traveler has yet to move; the verse foresees no obstacle for the sick.",
       "The general retires to the fields; the last clause calls for careful examination, though its wording here is irregular."
-    ],
-    "noteZh": "“婆姐”及“小孩婆姐六畜惊”的句读不明，英文保留婆姐音译，不擅自指定某种神灵。末句“兴推详”与另一版本“与推详”有异。",
-    "noteEn": "Po jie and the punctuation of the children/livestock phrase are uncertain. Po jie is retained in transliteration rather than assigned an invented identity. The closing clause differs between versions.",
-    "edition1896": {
-      "fullZh": "身不動時，屬木青龍，凡謀事主一五七。斷曰：大安事事昌，求財在坤方，失物去不遠，宅舍保安康，行人身未動，病者主無妨，將軍回田野，仔細與推詳。",
-      "fullEn": "At a time of bodily stillness, the sign is assigned to Wood and the Azure Dragon; undertakings are linked to 1, 5 and 7. The judgment continues: With Da An, affairs flourish; seek wealth toward Kun. A missing object remains nearby; the household is safe and well. The traveler has yet to move; the verse foresees no obstacle for the sick. The general retires to the fields; weigh the matter closely."
-    }
+    ]
   },
   {
     "preambleZh": "人未归时，属水玄武，凡谋事二八十（属肾胃），贵人南方，冲犯北方，小孩游路亡魂，大人乌面夫人。",
@@ -168,13 +161,7 @@ export const verses = [
       "Let all matters proceed slowly; the traveler comes back along the return route.",
       "A missing object appears in the south; seek it promptly to obtain the desired result.",
       "Take care with quarrels; the people of the household remain at peace."
-    ],
-    "noteZh": "“求谋曰未明”的“曰”按参考页保留；此版“去者来回程”与另一版本“去者未回程”不同，不能混用译文。",
-    "noteEn": "The unusual character in the plans clause is preserved. This version describes a return route; the other version explicitly says the return journey has not begun. Their translations must not be mixed.",
-    "edition1896": {
-      "fullZh": "卒未歸時，屬水玄武，凡謀事主二八十。斷曰：留連事難成，求謀日未明，官事只宜緩，去者未回程，失物南方見，急討方稱心，更須防口舌，人口且平平。",
-      "fullEn": "The opening is transcribed as zu wei gui shi, apparently referring to someone not yet returned; its first character is uncertain. The sign is assigned to Water and the Black Tortoise; undertakings are linked to 2, 8 and 10. The judgment continues: With Liu Lian, completion is difficult; the way ahead for plans is unclear. Let official matters wait; the departing traveler has not begun the journey home. A missing object appears in the south; seek it promptly to obtain the desired result. Take care with quarrels; the household’s people remain much as they are."
-    }
+    ]
   },
   {
     "preambleZh": "人便至时，属火朱雀，凡谋事三六九（属心脑），贵人西南，冲犯南方，小孩婆姐动勿惊，大人火箭将军。",
@@ -190,13 +177,7 @@ export const verses = [
       "For a missing object: Shen, Wei, Wu; seek the person encountered along the road.",
       "Official matters enjoy good fortune; the verse says misfortune does not reach the sick.",
       "Fields, homes and livestock fare well; the traveler brings happy tidings."
-    ],
-    "noteZh": "“婆姐动勿惊”及“申未午”的确切解释未明，保留异文与地支名称，不添作应期承诺。",
-    "noteEn": "The po jie clause is obscure. Shen, Wei and Wu are retained as branch names; the text does not specify whether they mean times or directions.",
-    "edition1896": {
-      "fullZh": "人便至時，屬火朱雀，凡謀事主三六九。斷曰：速喜喜來臨，求財向南行，失物申未午，逢人路上尋，官事有福德，病者無禍侵，田家六畜吉，行人有信音。",
-      "fullEn": "When a person is about to arrive, the sign is assigned to Fire and the Vermilion Bird; undertakings are linked to 3, 6 and 9. The judgment continues: With Su Xi, joy approaches; go south in seeking wealth. For a missing object: Shen, Wei, Wu; seek the person encountered along the road. Official matters enjoy good fortune; the verse says misfortune does not reach the sick. Farming families and their livestock fare well; word arrives from the traveler."
-    }
+    ]
   },
   {
     "preambleZh": "官事凶时，属金白虎，凡谋事四七十（属肺胃），贵人东方，冲犯西方，小孩迷魂童子，大人金神七煞。",
@@ -212,13 +193,7 @@ export const verses = [
       "Go quickly to seek a missing object; the traveler feels alarm.",
       "Livestock act strangely; the line about illness says “go out to the west.”",
       "The verse cautions against curses and fears of epidemic sickness."
-    ],
-    "noteZh": "“病者出西方”的确切含义未明，按字面译出；“金神七煞”等为旧时术数称谓。",
-    "noteEn": "The westward illness phrase remains uncertain and is rendered literally. The spirit names belong to historical divinatory terminology.",
-    "edition1896": {
-      "fullZh": "官事凶時，屬金白虎，凡謀事主四七十。斷曰：赤口主口舌，官非切要防，失物急去尋，行人有驚慌，雞犬多作怪，病者出西方，更須防咒咀，恐怕染瘟癀。",
-      "fullEn": "When official matters are ill-fated, the sign is assigned to Metal and the White Tiger; undertakings are linked to 4, 7 and 10. The judgment continues: Chi Kou concerns quarrels; take particular care with official disputes. Go quickly to seek a missing object; the traveler feels alarm. Chickens and dogs act strangely; the line about illness says “go out to the west.” The verse cautions against curses and fears of epidemic sickness."
-    }
+    ]
   },
   {
     "preambleZh": "来喜时，属木六合，凡谋事一五七（属肝肠），贵人西南，冲犯东方，小孩婆姐六畜惊，大人无主家神。",
@@ -234,13 +209,7 @@ export const verses = [
       "A woman brings welcome tidings; a missing object lies toward Kun.",
       "The traveler will arrive shortly; trade and exchange prosper.",
       "Affairs tend toward accord; the final phrase about the sick, ru shang cang, is unclear in this version."
-    ],
-    "noteZh": "“病者褥上苍”按参考页保留，并注明疑文；另一版本为“病者祷上苍”，不在此版中暗改。",
-    "noteEn": "The closing sick-person phrase is unclear as printed. The other version has a prayer to Heaven; that different reading is not silently substituted here.",
-    "edition1896": {
-      "fullZh": "人來喜時，屬木六合，凡謀事主一五七。斷曰：小吉最吉昌，路上好商量，陰人來報喜，失物在坤方，行人立便至，交關甚是強，凡事皆和合，病者禱上蒼。",
-      "fullEn": "When someone comes with glad tidings, the sign is assigned to Wood and the Six Harmonies; undertakings are linked to 1, 5 and 7. The judgment continues: Xiao Ji brings great favor; matters may be agreed upon along the way. A woman brings welcome tidings; a missing object lies toward Kun. The traveler will arrive shortly; dealings and exchange prosper. Affairs tend toward accord; the sick person prays to Heaven."
-    }
+    ]
   },
   {
     "preambleZh": "音信殊时，属土勾陈，凡事谋三六九（属脾脑），贵人北方，冲犯南地，小孩土瘟神煞，大人土压夫人。",
@@ -256,13 +225,7 @@ export const verses = [
       "The search for wealth brings no gain; misfortune meets the traveler.",
       "A missing object eludes the search; official matters involve punishment or injury.",
       "The sick encounter hidden spirits; the closing nang jie phrase about safeguarding well-being is unclear in this version."
-    ],
-    "noteZh": "“音信殊时”“囊解”按参考页保留，含义或传抄用字存疑；另一版本为“音信稀时”“禳解”。",
-    "noteEn": "The news clause and nang jie are uncertain as printed. The other version instead has scarce news and a warding ritual; these are recorded as variants rather than silently substituted.",
-    "edition1896": {
-      "fullZh": "音信稀時，屬土勾陳，凡謀事主三六九。斷曰：空亡事不長，陰人小乖張，求財無利益，行人有災殃，失物尋不見，官事有刑傷，病人逢暗鬼，禳解保安康。",
-      "fullEn": "When news is scarce, the sign is assigned to Earth and Gou Chen; undertakings are linked to 3, 6 and 9. The judgment continues: With Kong Wang, affairs do not endure; the verse calls a woman somewhat contrary. The search for wealth brings no gain; misfortune meets the traveler. A missing object eludes the search; official matters involve punishment or injury. The sick encounter hidden spirits; a warding ritual is prescribed for well-being."
-    }
+    ]
   }
 ];
 export const ui = {
@@ -310,7 +273,7 @@ export const ui = {
     "aboutTitle": "一掌六宫，一事一问。",
     "aboutText": "小六壬是一种中国民间流传的简易问事方法。它把农历月、日和十二时辰，依次放入大安、留连、速喜、赤口、小吉、空亡六个位置循环计数。最后的落宫被用来解释一件具体事情的象意，而不是排列《易经》的六十四卦，也不是推算一生命运。",
     "aboutMore": "速问参考倪海厦讲课的公开整理和示例网站，以可见的掌诀帮助你理解计算过程。传统象意提供一种反思的角度，并没有得到科学验证的预测能力。",
-    "verseNote": "完整释义沿用中文参考页的流传版本；英文全文由本项目按该版重新翻译。参考站英文页另列一份据称出自 1896 年多文堂本 Zhongwai Tifu 的转录，其前文和歌诀用字与中文页不同，不能视为逐句对照。HathiTrust 影像链接供读者查核；本次未能直接核验影像。疑难用字按所引版本保留并注明。六宫英文名称为参考页采用的教学译名，非统一标准。 五行、神煞、身体部位、方位以及病症和性别等表述属于传统民俗文本，不作为现实判断、应期承诺或医疗等专业建议。",
+    "verseNote": "完整释义沿用中文参考页的流传版本；英文全文由本项目按该版重新翻译。参考站英文页另列一份据称出自 1896 年多文堂本 Zhongwai Tifu 的转录，其前文和歌诀用字与中文页不同，不能视为逐句对照。HathiTrust 影像链接供读者查核；本次未能直接核验影像。疑难用字按所引版本保留。六宫英文名称为参考页采用的教学译名，非统一标准。 五行、神煞、身体部位、方位以及病症和性别等表述属于传统民俗文本，不作为现实判断、应期承诺或医疗等专业建议。",
     "colorNote": "取色于中国传统绘画与染色材料；色值和六宫情绪对应为本项目的设计诠释，并非古法定色。",
     "modernNote": "问事解析先识别问题主题，再结合实际落宫选取简短建议。这一版使用本地规则模板，问题不会发送给 AI；无法理解隐含背景，也不作确定预测。",
     "sources": "来源与设计参考",
@@ -370,7 +333,7 @@ export const ui = {
     "aboutTitle": "Six positions. One question.",
     "aboutText": "Xiao Liu Ren is a simple form of Chinese folk divination for a specific question. The month and day in the Chinese lunisolar calendar, and the traditional two-hour period, are counted in turn through six palm positions: 大安, 留连, 速喜, 赤口, 小吉 and 空亡. The final position supplies a symbolic interpretation. These six positions are distinct from the I Ching’s 64 hexagrams and do not form a lifetime birth chart.",
     "aboutMore": "Ask draws on public summaries of Ni Haixia’s teaching and the reference website. The visible hand makes the counting process understandable. Traditional associations offer a lens for reflection, not a scientifically validated way to predict events.",
-    "verseNote": "The complete reading follows the version on the Chinese reference page; its full English translation is newly written for this project. The reference’s English page presents a different text attributed to the 1896 Duo Wen Tang edition of Zhongwai Tifu. Its preambles and some verse readings differ, so the two pages are not line-by-line language counterparts. The HathiTrust link is provided for source checking; the scan was not independently verified in this review. Unclear readings are retained and noted. English sign names follow the reference’s teaching labels, not a universal standard. Elemental, spirit, bodily, directional, illness and gender associations belong to a traditional folk text. They are not evidence about present circumstances, promised timing or professional advice.",
+    "verseNote": "The complete reading follows the version on the Chinese reference page; its full English translation is newly written for this project. The reference’s English page presents a different text attributed to the 1896 Duo Wen Tang edition of Zhongwai Tifu. Its preambles and some verse readings differ, so the two pages are not line-by-line language counterparts. The HathiTrust link is provided for source checking; the scan was not independently verified in this review. Unclear readings are retained as printed. English sign names follow the reference’s teaching labels, not a universal standard. Elemental, spirit, bodily, directional, illness and gender associations belong to a traditional folk text. They are not evidence about present circumstances, promised timing or professional advice.",
     "colorNote": "Inspired by traditional Chinese pigments and dyes. Screen colors and their associations with the six signs are design interpretations, not historical divination rules.",
     "modernNote": "Reflections match the question’s topic with the calculated sign using local written prompts. This version does not send questions to AI or infer unstated context; the text is a reflection, not a definite prediction.",
     "sources": "Sources & visual references",
