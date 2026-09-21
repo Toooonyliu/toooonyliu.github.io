@@ -92,3 +92,20 @@ dialog::backdrop{background:#20291f55;backdrop-filter:blur(4px)}dialog h2{font-s
 body .palm-v8 .palm-labels text{font-size:34px}
 @keyframes ask-palm-idle{0%,100%{transform:rotate(-.25deg) translateY(0)}50%{transform:rotate(.25deg) translateY(-3px)}}
 @media(max-width:760px){body .palm-v8 .palm-labels text{font-size:40px}}
+
+/* Contextual question guidance: hidden until requested. */
+.input-tools{align-items:center;justify-content:space-between;gap:16px}
+.question-help{display:flex;align-items:center;gap:7px;background:none;border:0;padding:8px 0;min-height:44px;font-size:14px;color:var(--muted);white-space:nowrap}
+.question-help span{display:grid;place-items:center;width:17px;height:17px;border:1px solid currentColor;border-radius:50%;font:12px/1 var(--sans)}
+.question-help:hover{text-decoration:underline;text-underline-offset:4px}
+#question-guide{width:min(580px,calc(100% - 32px));max-height:85svh;overflow-y:auto;padding:28px 32px;border-radius:3px;overscroll-behavior:contain}
+.guide-heading{display:flex;justify-content:space-between;align-items:center;gap:15px}.guide-heading h2{font:400 30px/1.3 var(--serif);margin:0}
+.guide-close{background:none;border:0;min-width:44px;min-height:44px;padding:0;font:28px/1 var(--sans)}
+#question-guide-intro{font-size:17px;line-height:1.8;margin:12px 0 23px}
+.guide-rules{padding-left:23px;margin:0 0 24px}.guide-rules li{padding-left:5px;margin-bottom:16px}
+#question-guide h3{font:500 16px/1.6 var(--sans);margin:0 0 4px}.guide-rules p{font-size:16px;line-height:1.8;color:var(--muted);margin:0}
+.guide-formula{border-block:1px solid var(--line);padding:17px 0;margin-bottom:23px}.guide-formula p{font:20px/1.7 var(--serif);margin:7px 0 0}
+.guide-examples dl{margin:12px 0 24px}.guide-examples dl>div{display:grid;grid-template-columns:70px 1fr;gap:12px;margin:12px 0;font-size:16px;line-height:1.75}.guide-examples dt{color:var(--muted)}.guide-examples dd{margin:0}
+.guide-note,.guide-source{font-size:14px;line-height:1.8;color:var(--muted);margin:14px 0}.guide-source a{display:inline-block;margin:5px 18px 0 0;text-underline-offset:4px}
+.guide-done{display:block;margin:22px 0 0 auto;min-height:44px;padding:9px 20px;background:var(--ink);color:var(--bg);border:0;font-size:15px}
+@media(max-width:760px){#question-guide{padding:20px 22px;max-height:88svh}.guide-heading h2{font-size:27px}.guide-examples dl>div{grid-template-columns:1fr;gap:1px}.guide-formula p{font-size:19px}}

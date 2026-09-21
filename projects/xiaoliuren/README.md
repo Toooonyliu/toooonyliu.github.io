@@ -110,3 +110,9 @@ The full common version is transcribed from https://6ren.chaosxy.com/results/ ; 
 The per-sign textual notes and duplicate 1896 comparison were removed at the user’s request. Complete Chinese readings, English translations and the source links remain available.
 
 English reading disclosures now contain only one continuous translation of the 1896 reference transcription, its corresponding Chinese text and the Sources link. The longer common-version English preamble and duplicate Chinese rendering are removed. Chinese readings retain the common-version poem and explanation, without textual notes or an additional traditional-character edition. The source caption is restored to “原文与版本说明见 来源”.
+
+## How-to-ask dialog
+
+The question box now has a bilingual “如何提问 / How to ask” button. It opens a native modal with three short principles, an editorial sentence scaffold, and meeting/travel/lost-document examples. It preserves the draft and never starts a reading. Native dialog behavior provides focus containment and Escape dismissal; explicit close and Done controls return focus to the help button. The modal scrolls within small screens.
+
+Research: Ni Haixia’s Tian Ji Liu Ren segment is linked at https://www.douyin.com/video/7108404140098768140 . Accessible platform-generated transcript at https://www.douyin.com/shipin/7533061246984194099 (related 06:18 “掐指一算：六壬法” clip) was cross-checked with the lesson transcript at https://woniuapp.cn/videos/1/38.html . Video playback/caption endpoints could not be accessed directly, so this is a transcript-based summary, not a claim of listening to the recording. The three supported principles concern one specific matter, the moment the question arises, and not changing the time to force a preferred sign. Example questions and the scaffold are our adaptations. No invented timestamps or claim that a time limit or daily maximum came from this segment.

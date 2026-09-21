@@ -1,3 +1,4 @@
+import {questionGuideMarkup,bindQuestionGuide} from './question-guide.js?v=ask12';
 import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask9';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
@@ -81,7 +82,7 @@ function verseMarkup(index,compact=false){
  const preview=lang==='zh'?`<blockquote class="verse-preview" lang="zh-CN">${v.zh.slice(0,2).map(esc).join('<br>')}</blockquote>`:'';
  return `<div class="classical-block compact-verse${compact?' home-verse':''}">${preview}<details class="verse-details"><summary>${lang==='zh'?'查看完整歌诀与解释':'Read the complete translation and Chinese text'}</summary><div class="verse-full">${lang==='en'?english:chinese}<p class="verse-source">${lang==='zh'?'原文与版本说明见':'Text and edition notes:'} <a href="#/rules">${lang==='zh'?'来源':'Sources'}</a></p></div></details></div>`;
 }
-function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
+function formMarkup(){return `<form id="reading-form" novalidate><h1><label for="question">${u().ask}</label></h1><div class="question-input"><textarea id="question" maxlength="300" required placeholder="${u().placeholder}" aria-describedby="question-status voice-status">${esc(question)}</textarea></div><div class="input-tools"><button class="voice-button" id="voice-input" type="button" aria-label="${u().voice}" aria-pressed="false" title="${u().voice}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span id="voice-button-label">${u().voice}</span></button><button type="button" id="question-help" class="question-help" aria-haspopup="dialog" aria-controls="question-guide">${lang==='zh'?'如何提问':'How to ask'} <span aria-hidden="true">?</span></button></div><div id="voice-status" class="voice-status" role="status" aria-live="polite"></div><div class="status" id="question-status" role="status" aria-live="polite"></div><button type="submit" id="submit-reading" class="primary">${u().begin}<span aria-hidden="true">↗</span></button></form>`;}
 function resultMarkup(r){
  const m=meanings[r.timePalace],topic=r.category;
  const advice=r.reflection?.[li()]||(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
@@ -90,7 +91,7 @@ function resultMarkup(r){
 function home(){
  document.body.dataset.view='home';applyTheme(result?.timePalace??null);
  const showLabels=preference('ask-preview-labels','on')!=='off';
- $('#main').innerHTML=`<div class="home-screen"><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-controls"><label class="label-control"><input id="toggle-labels" type="checkbox" ${showLabels?'checked':''}>${lang==='zh'?'标注卦象':'Label the six signs'}</label>${colorKey()}</div></section><div class="home-workspace">${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section></div></div>${timeEditorMarkup()}`;
+ $('#main').innerHTML=`<div class="home-screen"><section class="palm-region" aria-label="${u().left}">${handPanel()}<div class="palm-controls"><label class="label-control"><input id="toggle-labels" type="checkbox" ${showLabels?'checked':''}>${lang==='zh'?'标注卦象':'Label the six signs'}</label>${colorKey()}</div></section><div class="home-workspace">${timeMarkup()}<section class="question-region" aria-label="${result?u().result:u().ask}">${result?resultMarkup(result):formMarkup()}<p class="home-reminder">${u().reminder}</p></section></div></div>${timeEditorMarkup()}${!result?questionGuideMarkup(lang):''}`;
  $('.palm-frame').classList.toggle('names-off',!showLabels);
  $('#palm-state').textContent=result?t().complete:u().left;activateNode(result?result.timePalace:null,true);
  $('#toggle-labels').onchange=e=>{$('.palm-frame').classList.toggle('names-off',!e.target.checked);savePreference('ask-preview-labels',e.target.checked?'on':'off');};
@@ -101,7 +102,7 @@ function home(){
  $('#retry-calendar').onclick=()=>{let clock;try{clock=clockData();}catch{return;}ensureLunar(clock.date,true);};
  bindTimeEditor();
  if(result){$('#new-question').onclick=()=>{result=null;question='';home();$('#question').focus();};$('#replay').onclick=()=>replayResult();}
- else{$('#question').oninput=e=>{question=e.target.value;};$('#voice-input').onclick=toggleSpeech;$('#reading-form').onsubmit=e=>{e.preventDefault();beginReading();};}
+ else{bindQuestionGuide(stopSpeech);$('#question').oninput=e=>{question=e.target.value;};$('#voice-input').onclick=toggleSpeech;$('#reading-form').onsubmit=e=>{e.preventDefault();beginReading();};}
  refreshTime();
 }
 function paintLunar(lunar,clock){
