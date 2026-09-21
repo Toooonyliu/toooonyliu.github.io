@@ -1,7 +1,7 @@
 /* Ask: the approved flowing palm and a quiet, two-column working surface. */
 :root{--bg:#faf8ef;--ink:#343a33;--muted:#656d62;--line:#343a3333;--accent:#343a33}
 .site-header{max-width:1800px;min-height:100px;padding:20px 4.5%;gap:25px;flex-wrap:nowrap}
-.site-header .brand{gap:12px}.brand-mark{display:block;width:34px;height:40px;flex-shrink:0;background:currentColor;-webkit-mask:url('./mark.svg?v=ask14') center/contain no-repeat;mask:url('./mark.svg?v=ask14') center/contain no-repeat;filter:none!important}
+.site-header .brand{gap:12px}.brand-mark{display:block;width:34px;height:40px;flex-shrink:0;background:currentColor;-webkit-mask:url('./mark.png?v=ask15') center/contain no-repeat;mask:url('./mark.png?v=ask15') center/contain no-repeat;filter:none!important}
 .brand-name{font-size:30px;letter-spacing:.12em}.site-header nav{width:auto;order:0;gap:25px;margin-left:auto}
 .site-header nav a,.language{font-size:14px}.language{min-width:44px;min-height:44px}
 body[data-view=home] #main{max-width:1800px;margin:auto}

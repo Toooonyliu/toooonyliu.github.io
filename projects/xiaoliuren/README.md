@@ -13,7 +13,7 @@ Endpoint: `https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php?date=20
 No packages or build step are required. With Python 3 installed, run from this directory:
 
 ```sh
-python3 -m http.server 4173 --directory .
+python3 -m http.server 4173 --directory dist
 ```
 
 Open `http://localhost:4173/`. JavaScript modules require an HTTP server; don't double-click the HTML file. Optional Google Fonts have system-font fallbacks.
@@ -45,18 +45,18 @@ Official calendar dataset: https://data.gov.hk/en-data/dataset/hk-hko-rss-gregor
 
 ## Files and deployment
 
-- `index.html` and `style.css`: shared responsive interface.
-- `app.js`: bilingual navigation, form state, animation sequence, results.
-- `core.js`: calendar API, parser, time conversion, deterministic calculation.
-- `palm.js`: original functional SVG palm diagram and articulated thumb animation.
-- `content.js`: bilingual teaching copy, six meanings and the original reflection prompts.
-- `journal.js`: validated device-local history, outcome copy, and source-qualified timing associations.
-- `experience.js`: six colors, classical verses, English translations, speech copy, local topic matching, and additional reflections (48 topic/position pairs across both content files).
+- `dist/index.html` and `dist/style.css`: shared responsive interface.
+- `dist/app.js`: bilingual navigation, form state, animation sequence, results.
+- `dist/core.js`: calendar API, parser, time conversion, deterministic calculation.
+- `dist/palm.js`: original functional SVG palm diagram and articulated thumb animation.
+- `dist/content.js`: bilingual teaching copy, six meanings and the original reflection prompts.
+- `dist/journal.js`: validated device-local history, outcome copy, and source-qualified timing associations.
+- `dist/experience.js`: six colors, classical verses, English translations, speech copy, local topic matching, and additional reflections (48 topic/position pairs across both content files).
 - `tests/core.test.mjs` and `tests/journal.test.mjs`: calculation, API and persistent-history checks.
 - `previews/palm-study.html`: standalone character-shaded 2.5D palm study. It is not imported by the production app and requires no server or packages; open this HTML directly.
 - `prompt_log.md`: AI tool usage and key prompts.
 
-This directory is deployed at https://toooonyliu.github.io/projects/xiaoliuren/ through the portfolio’s GitHub Pages site. All assets use relative URLs and secondary views use hash routes, so direct links and refreshes work without a server rewrite. The Sites working copy and hosting metadata are maintained separately.
+For GitHub Pages, copy the contents of `dist/` into `projects/xiaoliuren/` in the portfolio repository and link the project card to `projects/xiaoliuren/`. All assets use relative URLs; secondary views use hash routes, so direct links and refreshes work without a server rewrite. Sites hosting metadata is kept separately in `.openai/hosting.json`.
 
 ## Validation
 
@@ -95,7 +95,7 @@ Recommended optional next step: keep calendar conversion and the six-position ca
 
 Official references: https://developers.openai.com/api/docs/guides/structured-outputs and https://developers.openai.com/api/reference/overview .
 
-New files: `home.css` (approved layout and responsive refinements), `time.js` (date-specific offset and civil-time validation). Existing history, voice, method examples and deterministic calculation remain.
+New files: `dist/home.css` (approved layout and responsive refinements), `dist/time.js` (date-specific offset and civil-time validation). Existing history, voice, method examples and deterministic calculation remain.
 
 V8 checks: all 10 existing calculation/history tests pass. A module-level app integration run checked six color/pose previews, label preferences, concrete UTC offsets and editable time, bilingual results, stored readings, all five routes, and a complete non-reduced example (7044 ms) with exactly two stage-start retaps. No runtime errors. Real-browser layout and microphone behavior are not newly verified.
 
@@ -121,4 +121,4 @@ The guide now links directly to the Bilibili lesson at https://www.bilibili.com/
 
 ## Approved brush palm identity
 
-The selected generated brush-stroke hand is now the favicon, header mark and portfolio project mark. The original approved PNG is preserved in `previews/branding/approved-brush-palm.png`. `mark.png` is a transparent, compact web export. `mark.svg` embeds that alpha image to preserve the approved brushwork exactly rather than approximating it with a new contour; it is an SVG container, not a traced vector drawing. Its adaptive ink filter supports light/dark browser tabs and a slight alpha expansion improves tiny-size legibility. Header and portfolio masks continue to inherit the surrounding text color.
+The selected generated brush-stroke hand is now the favicon, header mark and portfolio project mark. The original approved PNG is preserved in `previews/branding/approved-brush-palm.png`. `mark.png` is a transparent, compact web export, with `mark-light.png` for dark browser tabs. Header and portfolio CSS alpha masks inherit the surrounding text color. These exports preserve the approved brushwork as raster artwork, rather than claiming a traced vector. The earlier SVG wrapper is retained as an unused archive asset; production uses PNG directly for compatibility.
