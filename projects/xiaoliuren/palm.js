@@ -2,7 +2,8 @@
 // Coordinates stay in one 1024 x 1536 drawing space; only the artwork is narrowed.
 const REST_TIP=[310,443], REST_BEND=[0,0,0];
 const DEFAULT_NAMES=['大安','留连','速喜','赤口','小吉','空亡'];
-const LABEL_OFFSETS=[[-85,10,'end'],[-75,-20,'end'],[-80,-20,'end'],[75,-20,'start'],[65,15,'start'],[0,65,'middle']];
+const LABEL_OFFSETS=Array.from({length:6},()=>[0,36,'middle']);
+function labelText(name,x,y){return /^[A-Za-z ]+$/.test(name)?name.split(' ').map((word,i)=>`<tspan x="${x}" y="${y+i*34}">${esc(word)}</tspan>`).join(''):esc(name);}
 let frame=0, generation=0, mount=0, target=-1, retaps=0;
 let state={tip:[...REST_TIP],bend:[...REST_BEND],engage:0,pulse:0};
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -68,7 +69,7 @@ function paint(){
   dot.style.setProperty('r',(active?6+state.pulse*3:4.5)+'px');
   halo.setAttribute('r',String(18+state.pulse*13));halo.style.opacity=active?String(.22+state.pulse*.6):'0';
   const [dx,dy,anchor]=LABEL_OFFSETS[i],text=label.querySelector('text');
-  text.setAttribute('x',String(x+dx));text.setAttribute('y',String(y+dy));text.setAttribute('text-anchor',anchor);label.classList.toggle('active',active);
+  text.setAttribute('x',String(x+dx));text.querySelectorAll('tspan').forEach((span,j)=>{span.setAttribute('x',String(x+dx));span.setAttribute('y',String(y+dy+j*34));});text.setAttribute('y',String(y+dy));text.setAttribute('text-anchor',anchor);label.classList.toggle('active',active);
  });
  svg.dataset.pose=String(target);svg.dataset.tip=state.tip.map(v=>v.toFixed(2)).join(',');svg.dataset.bend=state.bend.map(v=>v.toFixed(3)).join(',');svg.dataset.retapCount=String(retaps);
  return true;
@@ -90,7 +91,7 @@ export function palmMarkup(names=DEFAULT_NAMES){
  .palm-v8 .palm-node{cursor:pointer;outline:none}.palm-v8 .node-hit{fill:transparent;stroke:none;pointer-events:all}
  .palm-v8 .node-dot{fill:var(--ink)}.palm-v8 .node-halo{fill:none;stroke:var(--ink);stroke-width:1.8;opacity:0;transition:none}
  .palm-v8 .palm-node:focus-visible .node-halo{opacity:1!important;stroke-width:3}
- .palm-v8 .palm-labels{pointer-events:none}.palm-v8 .palm-labels text{fill:var(--ink);font:24px var(--serif,serif);letter-spacing:.08em}
+ .palm-v8 .palm-labels{pointer-events:none}.palm-v8 .palm-labels text{fill:var(--ink);font:34px var(--serif,serif);letter-spacing:.02em;paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round}
  .palm-v8.names-off .palm-labels{display:none!important}
  </style><svg class="palm-svg" viewBox="0 0 1024 1536" role="group" aria-label="${esc(labels.join(' → '))}" data-palm-mount="${mount}" data-pose="-1" data-tip="310.00,443.00" data-bend="0.000,0.000,0.000" data-retap-count="0" data-animating="false">
  <g class="hand-gesture"><g class="hand-art" transform="translate(512 0) scale(.94 1) translate(-512 0)" aria-hidden="true"><g class="hand-lines">
@@ -98,7 +99,7 @@ export function palmMarkup(names=DEFAULT_NAMES){
  <path class="palm-fold" d="M 369 783 C 457 816 492 907 486 983 C 486 1045 465 1097 501 1152 M 506 711 C 567 776 647 819 724 840"/></g>
  <g class="thumb"><path id="thumb-mask" class="thumb-mask" d="${thumb.fill}"/><path id="thumb-line" class="thumb-line" d="${thumb.d}"/></g></g>
  <g class="palm-nodes">${nodes.map(([x,y],i)=>`<g class="palm-node" data-node="${i}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${esc(labels[i])}" aria-pressed="false"><circle class="node-hit" r="48"/><circle class="node-halo" r="18"/><circle class="node-dot" r="4.5"/></g>`).join('')}</g>
- <g class="palm-labels">${nodes.map(([x,y],i)=>{const [dx,dy,anchor]=LABEL_OFFSETS[i];return `<g data-label="${i}"><text x="${x+dx}" y="${y+dy}" text-anchor="${anchor}">${esc(labels[i])}</text></g>`;}).join('')}</g>
+ <g class="palm-labels">${nodes.map(([x,y],i)=>{const [dx,dy,anchor]=LABEL_OFFSETS[i];return `<g data-label="${i}"><text x="${x+dx}" y="${y+dy}" text-anchor="${anchor}">${labelText(labels[i],x+dx,y+dy)}</text></g>`;}).join('')}</g>
  <g class="stage-marks" id="stage-marks"></g></g></svg><span class="sr-only" id="palm-state"></span></div>`;
 }
 export function activateNode(index,reduced=false,options={}){

@@ -89,9 +89,9 @@ dialog::backdrop{background:#20291f55;backdrop-filter:blur(4px)}dialog h2{font-s
 .meaning-name h2,.history-sign{color:var(--ink)}
 .palm-v8 .hand-gesture{animation:ask-palm-idle 12s ease-in-out infinite}
 .counting .palm-v8 .hand-gesture{animation-play-state:paused}
-body .palm-v8 .palm-labels text{font-size:34px}
+body .palm-v8 .palm-labels text{font-size:34px}html[lang=en] .palm-v8 .palm-labels text{font-family:var(--sans);font-size:30px;letter-spacing:.015em}
 @keyframes ask-palm-idle{0%,100%{transform:rotate(-.25deg) translateY(0)}50%{transform:rotate(.25deg) translateY(-3px)}}
-@media(max-width:760px){body .palm-v8 .palm-labels text{font-size:40px}}
+@media(max-width:760px){body .palm-v8 .palm-labels text{font-size:34px}}
 
 /* Contextual question guidance: hidden until requested. */
 .input-tools{align-items:center;justify-content:space-between;gap:16px}

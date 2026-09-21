@@ -1,5 +1,5 @@
-import {questionGuideMarkup,bindQuestionGuide} from './question-guide.js?v=ask12';
-import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask9';
+import {questionGuideMarkup,bindQuestionGuide} from './question-guide.js?v=ask13';
+import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask13';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
 import {copy,meanings} from './content.js?v=ask9';
@@ -44,7 +44,7 @@ function updateChrome(){
 function processMarkup(data=null){
   return `<div class="process-bar" aria-label="${lang==='zh'?'计算步骤':'Calculation steps'}">${t().steps.map((title,i)=>`<div class="process-step" data-step="${i}"><span class="step-num">0${i+1}</span><div><div class="step-title">${title}</div><div class="step-desc" data-step-description="${i}">${data?esc(positionName(data.stages[i].end)):t().stepDesc[i]}</div></div></div>`).join('')}</div>`;
 }
-function handPanel(){return `<div class="hand-panel">${palmMarkup(NAMES)}<div class="count-callout" id="count-callout" hidden><span class="count-label" id="count-label"></span><strong id="count-position"></strong><span class="count-detail" id="count-detail"></span></div><button type="button" class="skip-animation text-button" id="skip-animation" hidden>${t().skip}</button></div>`;}
+function handPanel(){return `<div class="hand-panel">${palmMarkup(lang==='zh'?NAMES:meanings.map(m=>m.romanized))}<div class="count-callout" id="count-callout" hidden><span class="count-label" id="count-label"></span><strong id="count-position"></strong><span class="count-detail" id="count-detail"></span></div><button type="button" class="skip-animation text-button" id="skip-animation" hidden>${t().skip}</button></div>`;}
 function applyTheme(index=null){
  document.body.dataset.sign=index===null?'':String(index);
  document.body.classList.toggle('result-mode',index!==null);
