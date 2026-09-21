@@ -43,3 +43,5 @@ User requested removing the guide’s disclaimer paragraph, replacing broken sou
 User selected the middle-finger/ thumb-contact hand image, requested brush-like strokes with all other details preserved, approved the resulting image and asked to push it live. Codex integrated that approved transparent image into the project favicon, header and portfolio card, preserving the original PNG and using transparent PNG alpha masks for adaptive page ink and a light-ink export for dark browser tabs. The animated calculation palm remains unchanged.
 
 User requested a slightly larger favicon. Reduced icon padding for approximately 9% larger palm artwork, preserving the approved strokes and transparency. Separate favicon exports keep header and portfolio marks unchanged.
+
+User requested a larger header icon balanced with the title. Increased its box from 34×40 to 44×48 pixels and tightened the title gap from 12 to 8 pixels, keeping both vertically centered.
