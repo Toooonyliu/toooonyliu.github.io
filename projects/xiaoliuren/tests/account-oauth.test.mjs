@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {finishOAuth,googleSignIn} from '../dist/account-oauth.js';
+import {finishOAuth,googleSignIn} from '../account-oauth.js';
 test('Google login returns to the same application folder without forwarding query parameters',async()=>{
  let call;await googleSignIn({auth:{signInWithOAuth:async value=>{call=value;return{};}}},'https://toooonyliu.github.io/projects/xiaoliuren/account-ui.js?v=ask18');
  assert.deepEqual(call,{provider:'google',options:{redirectTo:'https://toooonyliu.github.io/projects/xiaoliuren/'}});

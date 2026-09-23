@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AccountStore} from '../dist/account-store.js';
-import {calculate} from '../dist/core.js';
-import {writeJournal,readJournal,recordReading} from '../dist/journal.js';
+import {AccountStore} from '../account-store.js';
+import {calculate} from '../core.js';
+import {writeJournal,readJournal,recordReading} from '../journal.js';
 const reading=id=>({...recordReading({question:'Question '+id,date:'2026-09-20',clock:'12:00',hour:12,timeZone:'America/New_York',lunar:{month:8,day:10,text:'八月初十'},hourIndex:7,...calculate(8,10,7),category:'work',reflection:['建议','Advice']}),id});
 const storage=()=>{const m=new Map();return{getItem:k=>m.get(k),setItem:(k,v)=>m.set(k,v)};};
 function fakeClient(){

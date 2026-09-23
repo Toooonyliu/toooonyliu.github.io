@@ -13,7 +13,7 @@ Endpoint: `https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php?date=20
 No packages or build step are required. With Python 3 installed, run from this directory:
 
 ```sh
-python3 -m http.server 4173 --directory dist
+python3 -m http.server 4173 --directory .
 ```
 
 Open `http://localhost:4173/`. JavaScript modules require an HTTP server; don't double-click the HTML file. Optional Google Fonts have system-font fallbacks.
@@ -125,7 +125,7 @@ The selected generated brush-stroke hand is now the favicon, header mark and por
 
 ## Account history integration — Google sign-in
 
-Google sign-in is enabled through Supabase. The project owner has configured the provider and the public website return URL. Email-code login remains an optional code path and requires SMTP if selected; it is not the active login method. See [Google setup instructions](supabase/GOOGLE-SETUP.md), [schema](supabase/schema.sql), and [database access checks](supabase/verify-access.sql). Only a Project URL and browser publishable key belong in `dist/account-config.js`; no administrative credential belongs in the website.
+Google sign-in is enabled through Supabase. The project owner has configured the provider and the public website return URL. Email-code login remains an optional code path and requires SMTP if selected; it is not the active login method. See [Google setup instructions](supabase/GOOGLE-SETUP.md), [schema](supabase/schema.sql), and [database access checks](supabase/verify-access.sql). Only a Project URL and browser publishable key belong in `account-config.js`; no administrative credential belongs in the website.
 
 Guest records retain the existing browser store. Account records stay separate and sync through user-scoped database policies. Importing guest history requires an explicit action. Failed cloud writes remain visibly pending in page memory with a retry action and leave-page warning. Account changes clear the previous account's page state. Cross-device review edits use last successful write; use Refresh history to see changes from another device.
 
