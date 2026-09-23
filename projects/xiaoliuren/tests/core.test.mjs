@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {calculate,parseLunar,shichen,timeAt,validateDate,fetchLunar} from '../core.js';
+import {calculate,parseLunar,shichen,timeAt,validateDate,fetchLunar} from '../dist/core.js';
 test('worked examples match independent hand counts',()=>{
   assert.deepEqual(calculate(3,3,5).stages.map(s=>s.end),[2,4,2]);
   assert.deepEqual(calculate(4,5,11).stages.map(s=>s.end),[3,1,5]);

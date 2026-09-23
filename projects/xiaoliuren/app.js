@@ -1,10 +1,14 @@
+import {finishOAuth} from './account-oauth.js?v=ask18';
+import {accountConfig} from './account-config.js?v=ask18';
+import {AccountStore} from './account-store.js?v=ask18';
+import {createAccountUI,accountHistoryMarkup,bindAccountHistory,accountStatus,accountWords} from './account-ui.js?v=ask18';
 import {questionGuideMarkup,bindQuestionGuide} from './question-guide.js?v=ask13';
 import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask13';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
 import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
 import {copy,meanings} from './content.js?v=ask9';
 import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask11';
-import {readJournal,writeJournal,recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask9';
+import {recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask9';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const preference=(key,fallback)=>{try{return localStorage.getItem(key)||fallback;}catch{return fallback;}};
@@ -14,7 +18,11 @@ let zone=preference('palm-zone',Intl.DateTimeFormat().resolvedOptions().timeZone
 try{timeAt(new Date(),zone);}catch{zone='Asia/Shanghai';}
 let question='',category='daily',timeMode='now',recorded='',settingsOpen=false,result=null,busy=false,routeVersion=0,animationVersion=0,skipAnimation=false,exampleIndex=0;
 const storage={getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)};
-const journalState=readJournal(storage);let journal=journalState.entries,storageFailed=journalState.error;
+const cloudClient=accountConfig.enabled&&/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(accountConfig.url)&&accountConfig.publishableKey.startsWith('sb_publishable_')?window.supabase.createClient(accountConfig.url,accountConfig.publishableKey,{auth:{storageKey:'ask-account-session-v1',persistSession:true,autoRefreshToken:true,flowType:'pkce',detectSessionInUrl:false},global:{fetch:async(input,options={})=>{const controller=new AbortController(),cancel=()=>controller.abort();if(options.signal?.aborted)cancel();options.signal?.addEventListener('abort',cancel,{once:true});const timer=setTimeout(cancel,15000);try{return await fetch(input,{...options,signal:controller.signal});}finally{clearTimeout(timer);options.signal?.removeEventListener('abort',cancel);}}}}):null;
+const account=new AccountStore(storage,cloudClient);
+let pendingAuthError=false;
+let accountState=account.snapshot(),journal=accountState.entries,storageFailed=!!accountState.error;
+const accountUI=createAccountUI(account,()=>lang);
 const readings=new Map(journal.map(r=>[questionKey(r.question),r]));
 const jc=()=>journalCopy[lang];
 const outcomeKeys=['pending','matched','partial','missed','unclear'];
@@ -39,6 +47,7 @@ function updateChrome(){
   $('#language').setAttribute('aria-label',lang==='zh'?'Switch to English':'切换至中文');
   $('#footer-note').textContent=route()==='/'?'':t().footer;
   document.title=`${t().nav[Math.max(0,routes.indexOf(route()))]} · ${jc().brand}`;
+  accountUI.update();
   $('.brand-name').textContent=jc().brand;$('.brand').setAttribute('aria-label',jc().brand);
 }
 function processMarkup(data=null){
@@ -86,7 +95,7 @@ function formMarkup(){return `<form id="reading-form" novalidate><h1><label for=
 function resultMarkup(r){
  const m=meanings[r.timePalace],topic=r.category;
  const advice=r.reflection?.[li()]||(extraAdvice[topic]?.[r.timePalace]||m.advice[topic]||m.advice.daily)[li()];
- return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${lang==='zh'?m.name:m.romanized}</h1>${lang==='en'?`<p class="sign-subtitle">${m.name} · ${m.en}</p>`:''}</div>${lang==='en'?`<p class="sign-summary">${m.summary}</p>`:''}${verseMarkup(r.timePalace,true)}<div class="modern-block"><span class="section-kicker">${u().modern}</span><p>${esc(advice)}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay}</button><button class="text-button" id="new-question" type="button">${u().again}</button></div><div class="status" id="question-status" role="status">${storageFailed?jc().storageError:''}</div></div>`;
+ return `<div class="result-panel"><p class="result-question">${esc(r.question)}</p><div class="result-heading"><h1>${lang==='zh'?m.name:m.romanized}</h1>${lang==='en'?`<p class="sign-subtitle">${m.name} · ${m.en}</p>`:''}</div>${lang==='en'?`<p class="sign-summary">${m.summary}</p>`:''}${verseMarkup(r.timePalace,true)}<div class="modern-block"><span class="section-kicker">${u().modern}</span><p>${esc(advice)}</p></div><div class="result-actions"><button class="text-button" id="replay" type="button">${u().replay}</button><button class="text-button" id="new-question" type="button">${u().again}</button></div><div class="status" id="question-status" role="status">${storageFailed?esc(accountState.user?accountStatus(accountState,lang):jc().storageError):''}</div></div>`;
 }
 function home(){
  document.body.dataset.view='home';applyTheme(result?.timePalace??null);
@@ -195,6 +204,7 @@ async function animate(data){
 }
 async function beginReading(){
   if(busy)return;
+  if(accountState.loading||accountState.error==='load_error'){status(accountStatus(accountState,lang));return;}
   stopSpeech();
   question=$('#question').value.trim();
   if(!question){status(t().empty,true);$('#question').focus();return;}
@@ -213,7 +223,7 @@ async function beginReading(){
     paintLunar(lunar,clock);status('');
     $('#submit-reading').textContent=t().calculating;
     if(window.innerWidth<=760)$('.palm-region')?.scrollIntoView?.({behavior:reduced()?'instant':'smooth',block:'center'});
-    if(await animate(calculation)){result=candidate;readings.set(key,candidate);journal.unshift(candidate);storageFailed=journalState.error||!writeJournal(storage,journal);home();if(window.innerWidth<=760)$('.question-region')?.scrollIntoView?.({behavior:'instant',block:'start'});}
+    if(await animate(calculation)){result=candidate;readings.set(key,candidate);await account.add(candidate);if(version!==routeVersion)return;home();if(window.innerWidth<=760)$('.question-region')?.scrollIntoView?.({behavior:'instant',block:'start'});}
   }catch(error){if(version===routeVersion){status(t()[error.message]||t().network,true);$('#submit-reading').innerHTML=`${u().begin}<span>↗</span>`;}}
   finally{if(version===routeVersion)lockForm(false);}
 }
@@ -235,14 +245,24 @@ function meaningsPage(){
 }
 function rulesPage(){
   const links=[[lang==='zh'?'https://6ren.chaosxy.com/results/':'https://6ren.chaosxy.com/en/results/',u().methodSource],['https://babel.hathitrust.org/cgi/pt?id=uc1.$b466495&seq=35',lang==='zh'?'1896《中外提福》· 六壬时课（扫描第 35–36 页）':'1896 Zhongwai Tifu · Six Ren Time Lesson (scans 35–36)'],['https://www.bilibili.com/video/BV1im4y197mW/',u().courseSource],['https://data.gov.hk/tc-data/dataset/hk-hko-rss-gregorian-lunar-calendar-conversion-table',u().calendarSource],['https://www.karolortyl.com/',u().artSource]];
-  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}${paletteSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${u().privacy}</p></div></section>`;
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">小六壬 / XIAO LIU REN</div><h1>${u().aboutTitle}</h1><p>${u().aboutText}</p><p>${u().aboutMore}</p></section><section class="rules-layout"><div class="rule-list">${t().rules.map(([title,body],i)=>`<article><span class="rule-number">0${i+1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join('')}</div><aside class="conventions"><h2>${t().conventionsTitle}</h2><p>${t().conventionsText}</p>${t().conventions.map(([title,body])=>`<details><summary>${title}<span>+</span></summary><p>${body}</p></details>`).join('')}</aside></section>${timingSection()}${paletteSection()}<section class="sources-section"><h2>${u().sources}</h2><div class="sources-grid">${links.map(([url,title],i)=>`<a href="${url}" target="_blank" rel="noopener"><span>0${i+1} ↗</span><h3>${title}</h3><p>${new URL(url).hostname}</p></a>`).join('')}</div><div class="source-notes"><p>${u().verseNote}</p><p>${u().colorNote}</p><p>${u().modernNote}</p><p>${accountState.enabled?(lang==='zh'?'游客记录保存在当前浏览器；登录后的问题、结果和复盘通过 Supabase 保存在账号中，可在记录页删除。本机记录仅在主动导入时上传。语音可能由浏览器的语音服务处理。':'Guest readings stay in this browser. Signed-in questions, results and reflections are stored in your account through Supabase and can be deleted in History. Browser history uploads only when you choose to import it. Voice audio may be processed by your browser’s speech service.'):u().privacy}</p></div></section>`;
 }
 function paletteSection(){return `<section class="palette-section"><h2>${lang==='zh'?'六色，六种心境':'Six colors, six states of mind'}</h2><p>${u().colorNote}</p><div class="palette-grid">${palettes.map(p=>`<article style="--swatch:${p.color}"><i aria-hidden="true"></i><h3>${p.name} · ${p.colorName[li()]}</h3><strong>${p.emotion[li()]}</strong><p>${p.note[li()]}</p><a href="${p.sources[0]}" target="_blank" rel="noopener">${lang==='zh'?'色彩来源':'Color source'} ↗</a></article>`).join('')}</div></section>`;}
 function historyPage(){
-  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${jc().history}</div><h1>${jc().historyTitle}</h1><p>${jc().historyIntro}</p>${storageFailed?`<p role="status">${journalState.error?jc().corrupt:jc().storageError}</p>`:''}</section><section class="history-list">${journal.length?journal.map((r,i)=>`<article class="history-card" data-record="${i}" style="--sign-color:${palettes[r.timePalace].color}"><div class="history-summary"><div><p class="history-date">${esc(r.date)} · ${esc(r.clock)} · ${esc(r.timeZone)}</p><h2>${esc(r.question)}</h2><p class="history-sign">${NAMES[r.timePalace]} <span>${lang==='en'?palettes[r.timePalace].en:''}</span></p></div><button class="secondary" type="button" data-open="${i}">${jc().open} ↗</button></div><details><summary>${jc().outcome} · ${jc().outcomes[Math.max(0,outcomeKeys.indexOf(r.review?.outcome))]}</summary><form data-review="${i}"><label>${jc().outcome}<select name="outcome">${outcomeKeys.map((k,n)=>`<option value="${k}" ${r.review?.outcome===k?'selected':''}>${jc().outcomes[n]}</option>`).join('')}</select></label><label>${jc().actualDate}<input name="actualDate" type="date" value="${esc(r.review?.actualDate||'')}"></label><label class="note-label">${jc().note}<textarea name="note" maxlength="2000" placeholder="${jc().notePlaceholder}">${esc(r.review?.note||'')}</textarea></label><div class="review-actions"><button class="secondary" type="submit">${jc().save}</button><button class="text-button" type="button" data-delete="${i}">${jc().delete}</button><span class="review-status" role="status"></span></div></form></details></article>`).join(''):`<p>${jc().empty}</p><a class="secondary" href="#/">${jc().back} ↗</a>`}</section>`;
+  $('#main').innerHTML=`<section class="page-intro"><div class="eyebrow">${jc().history}</div><h1>${jc().historyTitle}</h1>${accountState.enabled?accountHistoryMarkup(account,lang):`<p>${jc().historyIntro}</p>${storageFailed?`<p role="status">${jc().storageError}</p>`:''}`}</section><section class="history-list">${accountState.loading?`<p role="status">${accountWords(lang).loading}</p>`:journal.length?journal.map((r,i)=>`<article class="history-card" data-record="${i}" style="--sign-color:${palettes[r.timePalace].color}"><div class="history-summary"><div><p class="history-date">${esc(r.date)} · ${esc(r.clock)} · ${esc(r.timeZone)}</p><h2>${esc(r.question)}</h2><p class="history-sign">${NAMES[r.timePalace]} <span>${lang==='en'?palettes[r.timePalace].en:''}</span></p></div><button class="secondary" type="button" data-open="${i}">${jc().open} ↗</button></div><details><summary>${jc().outcome} · ${jc().outcomes[Math.max(0,outcomeKeys.indexOf(r.review?.outcome))]}</summary><form data-review="${i}"><label>${jc().outcome}<select name="outcome">${outcomeKeys.map((k,n)=>`<option value="${k}" ${r.review?.outcome===k?'selected':''}>${jc().outcomes[n]}</option>`).join('')}</select></label><label>${jc().actualDate}<input name="actualDate" type="date" value="${esc(r.review?.actualDate||'')}"></label><label class="note-label">${jc().note}<textarea name="note" maxlength="2000" placeholder="${jc().notePlaceholder}">${esc(r.review?.note||'')}</textarea></label><div class="review-actions"><button class="secondary" type="submit">${jc().save}</button><button class="text-button" type="button" data-delete="${i}">${jc().delete}</button><span class="review-status" role="status"></span></div></form></details></article>`).join(''):`<p>${jc().empty}</p><a class="secondary" href="#/">${jc().back} ↗</a>`}</section>`;
   document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>{result=journal[Number(button.dataset.open)];question=result.question;location.hash='/';});
-  document.querySelectorAll('[data-review]').forEach(form=>form.onsubmit=event=>{event.preventDefault();const r=journal[Number(form.dataset.review)];r.review={outcome:form.elements.outcome.value,actualDate:form.elements.actualDate.value,note:form.elements.note.value.trim()};storageFailed=journalState.error||!writeJournal(storage,journal);form.querySelector('.review-status').textContent=storageFailed?jc().storageError:jc().saved;form.closest('details').querySelector('summary').textContent=`${jc().outcome} · ${jc().outcomes[outcomeKeys.indexOf(r.review.outcome)]}`;});
-  document.querySelectorAll('[data-delete]').forEach(button=>button.onclick=()=>{if(!window.confirm(jc().confirmDelete))return;const r=journal[Number(button.dataset.delete)],next=journal.filter(entry=>entry.id!==r.id);if(journalState.error||!writeJournal(storage,next)){button.closest('form').querySelector('.review-status').textContent=jc().storageError;return;}journal=next;readings.delete(questionKey(r.question));if(result?.id===r.id){result=null;question='';}historyPage();});
+  bindAccountHistory(account,lang,accountUI.open,historyPage);
+  document.querySelectorAll('[data-review]').forEach(form=>form.onsubmit=async event=>{
+    event.preventDefault();const r=journal[Number(form.dataset.review)],epoch=accountState.epoch;
+    const review={outcome:form.elements.outcome.value,actualDate:form.elements.actualDate.value,note:form.elements.note.value.trim()};
+    form.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=true);
+    try{const ok=await account.review(r.id,review);if(epoch!==accountState.epoch)return;form.querySelector('.review-status').textContent=ok?jc().saved:accountStatus(accountState,lang);form.closest('details').querySelector('summary').textContent=`${jc().outcome} · ${jc().outcomes[outcomeKeys.indexOf(review.outcome)]}`;}finally{form.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);}
+  });
+  document.querySelectorAll('[data-delete]').forEach(button=>button.onclick=async()=>{
+    if(!window.confirm(jc().confirmDelete))return;const r=journal[Number(button.dataset.delete)],epoch=accountState.epoch;
+    button.disabled=true;await account.remove(r.id);if(epoch!==accountState.epoch)return;
+    if(result?.id===r.id){result=null;question='';}historyPage();
+  });
 }
 function timingSection(){return `<section class="timing-section"><h2>${jc().timingTitle}</h2><p>${jc().timingIntro}</p><div class="timing-grid">${timing.map((row,i)=>`<article><h3>${NAMES[i]}</h3><strong>${row[li()]}</strong><p>${row[li()+2]}</p></article>`).join('')}</div><p class="small-note">${jc().timingNote} <a href="https://www.shenjige.cn/details/I8TyiKp2X.html" target="_blank" rel="noopener">${lang==='zh'?'查阅整理原文':'Read the secondary summary'} ↗</a></p></section>`;}
 function render(){
@@ -251,10 +271,24 @@ function render(){
 }
 $('#language').onclick=()=>{lang=lang==='zh'?'en':'zh';savePreference('palm-language',lang);render();};
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
+account.subscribe(state=>{
+  const identityChanged=state.epoch!==accountState.epoch,finishedLoading=accountState.loading&&!state.loading;
+  accountState=state;journal=state.entries;storageFailed=!!state.error;
+  readings.clear();journal.forEach(r=>readings.set(questionKey(r.question),r));
+  if(identityChanged){result=null;question='';accountUI.close();render();if(pendingAuthError){pendingAuthError=false;accountUI.showLoginError();}}
+  else{accountUI.update();if(route()==='/history'){
+    if(finishedLoading)historyPage();
+    else{const panel=document.querySelector('.account-history');if(panel){panel.outerHTML=accountHistoryMarkup(account,lang);bindAccountHistory(account,lang,accountUI.open,historyPage);}}
+  }}
+});
+window.addEventListener('beforeunload',event=>{if(accountState.pending){event.preventDefault();event.returnValue='';}});
 render();
+if(cloudClient){
+ finishOAuth(cloudClient,window.location,window.history).then(callback=>{pendingAuthError=callback.error;account.start();if(callback.handled)render();});
+}
 const clockTimer=setInterval(()=>{if(!busy)refreshTime();},1000);
 window.addEventListener('pagehide',()=>{clearInterval(clockTimer);stopSpeech();});
-// Preferences and history persist only in this browser. Voice audio is handled by its speech service.
+// Guest history is local; signed-in history is stored in the account under database row-level policies.
 if(document.modelContext?.registerTool){
   const lifecycle=new AbortController();
   const tool={name:'show_xiaoliuren_example',title:'Explore a Xiao Liu Ren example',description:'Navigate to the method page and show one of its two worked examples. Does not create a personal reading.',inputSchema:{type:'object',properties:{example:{type:'integer',enum:[1,2]}},required:['example'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async input=>{if(!input||![1,2].includes(input.example))throw new Error('Example must be 1 or 2.');exampleIndex=input.example-1;if(route()!=='/method'){location.hash='/method';await new Promise(resolve=>window.addEventListener('hashchange',resolve,{once:true}));}else render();const e=exampleData(),c=calculate(e.month,e.day,e.hourIndex);activateNode(c.timePalace,true);showCallout(2,e.hourIndex,e.hourIndex,c.timePalace);return {example:input.example,month:e.month,day:e.day,hourIndex:e.hourIndex,result:NAMES[c.timePalace]};}};

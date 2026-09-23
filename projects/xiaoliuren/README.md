@@ -31,7 +31,7 @@ With Node.js 18+ installed, run the calculation and journal tests using `npm tes
 
 Voice uses `SpeechRecognition` or `webkitSpeechRecognition` where available. It may send audio to the browser vendor’s speech service. HTTPS and microphone permission are required on the deployed site; typing and device-keyboard dictation remain alternatives. Speech support varies by browser. Audio is not recorded or stored by this app.
 
-Readings now persist in localStorage on the current browser, alongside language/time-zone preferences. History lets you reopen the original question, timestamp, calendar data and saved modern reflection; add an outcome, actual event date and notes; or delete one record. Repeating a saved question returns its first reading. History does not sync across devices and is lost if site data is cleared. Storage failures are shown; unreadable stored data is not silently overwritten. Reduced-motion users receive final positions without the counting animation.
+Guest readings persist in localStorage on the current browser, alongside language/time-zone preferences. History lets you reopen the original question, timestamp, calendar data and saved modern reflection; add an outcome, actual event date and notes; or delete one record. Repeating a saved question returns its first reading. Guest history does not sync and is lost if site data is cleared. Signed-in history syncs through Supabase; local records upload only after explicit import. Storage failures are shown; unreadable stored data is not silently overwritten. Reduced-motion users receive final positions without the counting animation.
 
 ## Calculation and source boundaries
 
@@ -89,7 +89,7 @@ English uses Da An, Liu Lian, Su Xi, Chi Kou, Xiao Ji and Kong Wang, with the re
 
 ### Question-specific interpretation choices
 
-The current implementation retains deterministic local topic/sign prompts, with no GPT call or secret key. It is instant, free of model usage charges, and keeps questions on the device. It handles eight topic categories but cannot interpret arbitrary context.
+The current implementation retains deterministic local topic/sign prompts, with no GPT call or secret key. It is instant, free of model usage charges, and never sends questions to an AI service; signed-in history is stored in Supabase. It handles eight topic categories but cannot interpret arbitrary context.
 
 Recommended optional next step: keep calendar conversion and the six-position calculation deterministic; send only the user’s question, calculated sign, vetted symbolic meaning and interface language to a server endpoint that calls the OpenAI Responses API. Return a short interpretation plus one practical next step with Structured Outputs; prohibit changing the sign, inventing dates, or presenting predictions as facts. Validate output and fall back to the current prompt on timeout/refusal. A server must hold the API key; never place it in GitHub Pages assets. Show the question-sharing notice before enabling AI and save the delivered interpretation with the existing local history. This is a proposed option, not a connected feature in this release.
 
@@ -122,3 +122,11 @@ The guide now links directly to the Bilibili lesson at https://www.bilibili.com/
 ## Approved brush palm identity
 
 The selected generated brush-stroke hand is now the favicon, header mark and portfolio project mark. The original approved PNG is preserved in `previews/branding/approved-brush-palm.png`. `mark.png` is a transparent, compact web export, with `mark-light.png` for dark browser tabs. Header and portfolio CSS alpha masks inherit the surrounding text color. These exports preserve the approved brushwork as raster artwork, rather than claiming a traced vector. The earlier SVG wrapper is retained as an unused archive asset; production uses PNG directly for compatibility.
+
+## Account history integration — Google sign-in
+
+Google sign-in is enabled through Supabase. The project owner has configured the provider and the public website return URL. Email-code login remains an optional code path and requires SMTP if selected; it is not the active login method. See [Google setup instructions](supabase/GOOGLE-SETUP.md), [schema](supabase/schema.sql), and [database access checks](supabase/verify-access.sql). Only a Project URL and browser publishable key belong in `dist/account-config.js`; no administrative credential belongs in the website.
+
+Guest records retain the existing browser store. Account records stay separate and sync through user-scoped database policies. Importing guest history requires an explicit action. Failed cloud writes remain visibly pending in page memory with a retry action and leave-page warning. Account changes clear the previous account's page state. Cross-device review edits use last successful write; use Refresh history to see changes from another device.
+
+Validation: 20 Node tests pass, including account isolation, stale responses, explicit/idempotent import, offline retry and deletion. The actual SQL permission checks also pass in an isolated PostgreSQL-compatible PGlite instance. The live Google authorization endpoint redirects to Google and anonymous database reads are denied. Actual user authorization and two-device sign-in verification must be completed by the account owner after deployment. No OAuth client secret is shipped in the website.

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {calculate} from '../core.js';
-import {JOURNAL_KEY,readJournal,writeJournal,recordReading,questionKey} from '../journal.js';
+import {calculate} from '../dist/core.js';
+import {JOURNAL_KEY,readJournal,writeJournal,recordReading,questionKey} from '../dist/journal.js';
 const reading=()=>recordReading({question:'Will my interview go well?',date:'2026-09-20',clock:'12:00',hour:12,timeZone:'America/New_York',lunar:{month:8,day:10,text:'八月初十'},hourIndex:7,...calculate(8,10,7),category:'work',reflection:['原建议','Original reflection']},new Date('2026-09-20T16:00:00Z'));
 test('history survives a storage round trip with original time and reflection intact',()=>{
  const map=new Map(),storage={getItem:k=>map.get(k),setItem:(k,v)=>map.set(k,v)},r=reading();

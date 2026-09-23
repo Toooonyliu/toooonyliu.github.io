@@ -10,16 +10,19 @@
   <link rel="icon" href="./favicon-light.png?v=ask16" type="image/png" sizes="512x512" media="(prefers-color-scheme: dark)">
   <link rel="stylesheet" href="./style.css?v=ask9">
   <link rel="stylesheet" href="./home.css?v=ask17">
+  <link rel="stylesheet" href="./account.css?v=ask18">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content / 跳至内容</a>
   <header class="site-header">
     <a class="brand" href="#/" aria-label="速问"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">速问</span></a>
     <nav aria-label="Main navigation" id="navigation"></nav>
+    <button class="header-account" id="account-button" type="button" hidden>登录</button>
     <button class="language" id="language" type="button" aria-label="Switch to English">中 <span>/ EN</span></button>
   </header>
   <main id="main" tabindex="-1"></main>
   <footer class="site-footer"><span id="footer-note"></span><a href="https://toooonyliu.github.io/#work" id="portfolio-link">TONY LIU ↗</a></footer>
-  <script type="module" src="./app.js?v=ask13"></script>
+  <script src="./vendor/supabase-2.117.0.js"></script>
+  <script type="module" src="./app.js?v=ask18"></script>
 </body>
 </html>
