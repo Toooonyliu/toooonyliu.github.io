@@ -5,8 +5,9 @@ import {createAccountUI,accountHistoryMarkup,bindAccountHistory,accountStatus,ac
 import {questionGuideMarkup,bindQuestionGuide} from './question-guide.js?v=ask13';
 import {palmMarkup,activateNode,cancelPalmMotion} from './palm.js?v=ask13';
 import {localStamp,offsetLabel,resolveWallTime} from './time.js';
-import {NAMES,BRANCHES,calculate,shichen,timeAt,fetchLunar,validateDate} from './core.js';
-import {copy,meanings} from './content.js?v=ask9';
+import {NAMES,BRANCHES,calculate,shichen,timeAt,validateDate} from './core.js';
+import {fetchLunar,fetchReading} from './backend-api.js';
+import {copy,meanings} from './content.js?v=hw4-backend1';
 import {ui,verses,palettes,inferTopic,extraAdvice} from './experience.js?v=ask11';
 import {recordReading,questionKey,timing,journalCopy} from './journal.js?v=ask9';
 const $=s=>document.querySelector(s);
@@ -214,9 +215,10 @@ async function beginReading(){
   const version=routeVersion;
   lockForm(true);$('#submit-reading').textContent=t().preparing;status(t().loading);
   try{
-    const lunar=await fetchLunar(clock.date);
+    const reading=await fetchReading(clock);
     if(version!==routeVersion)return;
-    const hourIndex=shichen(clock.hour),calculation=calculate(lunar.month,lunar.day,hourIndex);
+    const {lunar,hourIndex,monthPalace,dayPalace,timePalace,stages}=reading;
+    const calculation={monthPalace,dayPalace,timePalace,stages};
     category=inferTopic(question);
     const reflection=extraAdvice[category]?.[calculation.timePalace]||meanings[calculation.timePalace].advice[category]||meanings[calculation.timePalace].advice.daily;
     const candidate=recordReading({...clock,lunar,hourIndex,...calculation,question,category,reflection:[...reflection]});

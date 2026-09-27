@@ -2,23 +2,27 @@
 
 A bilingual Chinese/English Xiao Liu Ren learning and reflection website by Tony Liu, made for CMU 15-113 HW3. It pairs an animated, original vector palm diagram with a real Gregorian–Chinese lunisolar calendar API. The minimal home contains three regions: an original animated left-hand drawing, Gregorian/Chinese lunisolar time, and a question box that becomes a colored result. Supporting pages contain worked examples, the six signs, background, and sources. It is a static site suitable for GitHub Pages, desktop and mobile.
 
+## HW4 — backend migration
+
+Ask sends calendar and personal-reading requests to the Flask backend at https://ask-backend-s507.onrender.com. See [HW4 integration notes](HW4.md) for setup and deployment status. The revision notes below are retained as project history; their descriptions of direct browser API requests refer to HW3.
+
 ## How the API works
 
-The app makes an HTTPS GET request with the browser's built-in `fetch` to Hong Kong Observatory's `lunardate.php` endpoint, passing a Gregorian `date` in `YYYY-MM-DD` format. The response is JSON with Chinese strings `LunarYear` and `LunarDate`, such as `丙午年，馬` and `八月初九`. The app parses the lunar month and day into numbers, derives the traditional hour from the selected local clock time, and computes three inclusive six-position counts locally. It loads the live Chinese lunisolar date on arrival and when the chosen date changes, shares simultaneous requests for the same date, caches successful lookups in memory, times out requests after 10 seconds, and displays an actionable error instead of inventing data when a request or parsing fails. No API key is needed, and the user's question is never sent to the calendar service or an AI model.
+`backend-api.js` calls `GET /api/calendar?date=YYYY-MM-DD` for the date display and `POST /api/reading` when a new reading begins. The POST sends only `date`, `clock`, and `timeZone`. The backend validates input, calls Hong Kong Observatory, parses its calendar response, calculates the three stages, and returns JSON for the existing hand animation. Question text and Supabase credentials are not sent to this backend. Written reflections still use local keyword matching. The Method page retains local worked examples.
 
-Endpoint: `https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php?date=2026-09-19`
+No calendar API key is needed. Failed requests show a retryable error, without substituting local calculations or invented data. Frontend requests allow up to 75 seconds for the backend to wake up. The backend uses a bounded in-memory calendar cache.
 
 ## Run locally
 
-No packages or build step are required. With Python 3 installed, run from this directory:
+The frontend requires no build step. Start the separate `ask-backend` service on port 5050, then serve this directory:
 
 ```sh
-python3 -m http.server 4173 --directory .
+python3 -m http.server 4173 --bind 127.0.0.1
 ```
 
-Open `http://localhost:4173/`. JavaScript modules require an HTTP server; don't double-click the HTML file. Optional Google Fonts have system-font fallbacks.
+Open http://127.0.0.1:4173/ . The frontend selects http://127.0.0.1:5050 automatically on localhost. On deployed hosts it uses `DEPLOYED_BACKEND_URL` in `backend-config.js`, which must be filled with the verified Render address before publication. Local origins on port 4173 are allowed by the backend's local defaults.
 
-With Node.js 18+ installed, run the calculation and journal tests using `npm test`.
+With Node.js 18+ installed, run `npm test` for frontend calculation, history, account, and API-client checks. Backend instructions and Python tests are in its separate repository.
 
 ## How to use
 

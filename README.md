@@ -4,7 +4,11 @@ Tony Liu's personal portfolio — hand-built HTML/CSS/JS, no framework or build 
 
 Built for CMU 15-113 (Effective Coding with AI), Project 1.
 
-## HW3 — Ask (速问)
+## HW4 — Ask backend integration
+
+The local HW4 update connects Ask to a separate Python/Flask backend for calendar lookup and personal-reading calculation. See [integration and deployment notes](projects/xiaoliuren/HW4.md). Backend: https://ask-backend-s507.onrender.com — the frontend configuration uses this deployed service.
+
+## HW3 — Ask (速问): original implementation
 
 [Live app](https://toooonyliu.github.io/projects/xiaoliuren/) · [Source and project README](projects/xiaoliuren/) · [AI prompt log](projects/xiaoliuren/prompt_log.md)
 

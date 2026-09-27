@@ -1,6 +1,5 @@
 export const NAMES = ['大安','留连','速喜','赤口','小吉','空亡'];
 export const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-export const API_URL = 'https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php';
 const numbers = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12,'正':1,'冬':11,'腊':12,'臘':12};
 export function parseLunar(text) {
   if(typeof text!=='string') throw new Error('format');
@@ -35,29 +34,4 @@ export function validateDate(date,currentYear=new Date().getUTCFullYear()) {
   const d=new Date(date+'T12:00:00Z');
   if(!Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==date||date<'2023-01-01'||Number(date.slice(0,4))>currentYear+2) throw new Error('date');
   return date;
-}
-const lunarCache=new Map();
-async function fetchLunarOnce(date,{fetcher=fetch,timeout=10000}={}) {
-  validateDate(date);
-  if(lunarCache.has(date)) return lunarCache.get(date);
-  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),timeout);
-  try {
-    const response=await fetcher(`${API_URL}?date=${encodeURIComponent(date)}`,{signal:controller.signal});
-    if(!response.ok) throw new Error('network');
-    const data=await response.json();
-    const parsed=parseLunar(data.LunarDate);
-    const result={...parsed,year:typeof data.LunarYear==='string'?data.LunarYear:'',date};
-    lunarCache.set(date,result);
-    return result;
-  } catch(error) {throw new Error(error.message==='format'?'format':'network');}
-  finally {clearTimeout(timer);}
-}
-
-const inFlight=new Map();
-export async function fetchLunar(date,options={}){
-  if(lunarCache.has(date))return lunarCache.get(date);
-  if(inFlight.has(date))return inFlight.get(date);
-  const pending=fetchLunarOnce(date,options).finally(()=>inFlight.delete(date));
-  inFlight.set(date,pending);
-  return pending;
 }

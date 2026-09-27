@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {calculate,parseLunar,shichen,timeAt,validateDate,fetchLunar} from '../core.js';
+import {calculate,parseLunar,shichen,timeAt,validateDate} from '../core.js';
 test('worked examples match independent hand counts',()=>{
   assert.deepEqual(calculate(3,3,5).stages.map(s=>s.end),[2,4,2]);
   assert.deepEqual(calculate(4,5,11).stages.map(s=>s.end),[3,1,5]);
@@ -39,23 +39,4 @@ test('invalid/out-of-range dates and algorithm inputs fail intentionally',()=>{
   for(const date of ['2026-02-30','2026-13-01','2022-12-31','2029-01-01','garbage'])assert.throws(()=>validateDate(date,2026));
   assert.equal(validateDate('2024-02-29',2026),'2024-02-29');
   assert.throws(()=>calculate(0,1,1));assert.throws(()=>calculate(1,31,1));
-});
-test('API response parsed and cached; failed requests are not cached',async()=>{
-  let calls=0;
-  const fetcher=async(url)=>{calls++;assert.ok(url.endsWith('date=2026-09-19'));return{ok:true,json:async()=>({LunarYear:'丙午年，馬',LunarDate:'八月初九'})};};
-  const first=await fetchLunar('2026-09-19',{fetcher});
-  assert.equal(first.day,9);await fetchLunar('2026-09-19',{fetcher});assert.equal(calls,1);
-  await assert.rejects(fetchLunar('2026-09-20',{fetcher:async()=>{throw new Error('offline');}}),/network/);
-  assert.equal((await fetchLunar('2026-09-20',{fetcher:async()=>({ok:true,json:async()=>({LunarDate:'八月初十'})})})).day,10);
-  await assert.rejects(fetchLunar('2026-09-21',{fetcher:async()=>({ok:true,json:async()=>({LunarDate:'bad'})})}),/format/);
-});
-test('live calendar and reading share an in-flight date request',async()=>{
-  let calls=0,release;
-  const fetcher=()=>{calls++;return new Promise(resolve=>{release=resolve;});};
-  const calendar=fetchLunar('2026-09-22',{fetcher});
-  const reading=fetchLunar('2026-09-22',{fetcher});
-  assert.equal(calls,1);
-  release({ok:true,json:async()=>({LunarDate:'八月十三'})});
-  const [a,b]=await Promise.all([calendar,reading]);
-  assert.deepEqual(a,b);assert.equal(a.day,13);
 });

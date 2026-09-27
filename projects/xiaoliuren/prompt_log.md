@@ -53,3 +53,10 @@ User supplied the Supabase project URL and publishable key. The public Auth sett
 User accepted the recommended Google sign-in alternative after discussing SMTP setup limitations. Prepared Google sign-in in the existing account dialog, added PKCE authorization-code callback handling and callback tests, and documented exact Google/Supabase settings. Email-code implementation remains available but is not the selected login entry. Activation and production deployment are still pending the user's Google OAuth provider setup; no Google Client secret is present in the source.
 
 User confirmed Google provider credentials and website redirect settings are saved. Google is enabled in the public Auth settings and the authorization endpoint redirects to accounts.google.com with the expected Supabase callback. Anonymous history reads return permission denied. Enabled Google login for deployment; real user OAuth authorization and cross-device tests are still awaiting the owner’s login. No client secret was copied from screenshots into source.
+
+
+## HW4 backend migration — September 27, 2026
+
+Tool: Codex (GPT-6-based coding agent in this session).
+
+User requested adapting HW3 Ask into a deployed backend assignment and asked for beginner-friendly, teacher-style explanations throughout. Implementation moves calendar lookup and personal-reading calculation into a separate Flask service, while preserving the hand animation, bilingual reflections, and existing history/account behavior. New `backend-api.js` sends only date, clock, and timeZone and validates the returned stages. Deployment configuration remains pending until a real Render URL is available. Key prompts and backend test details are in the separate backend's `prompt_log.md`.
