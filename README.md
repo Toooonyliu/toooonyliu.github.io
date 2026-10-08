@@ -4,6 +4,16 @@ Tony Liu's personal portfolio — hand-built HTML/CSS/JS, no framework or build 
 
 Built for CMU 15-113 (Effective Coding with AI), Project 1.
 
+## Project 2 — One Cut Atlas
+
+[Play the game](https://toooonyliu.github.io/projects/one-cut-atlas/) · [Project README](projects/one-cut-atlas/README.md) · [English walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) · [AI prompt log](projects/one-cut-atlas/prompt_log.md)
+
+One Cut Atlas is a browser-based pixel-art sword-dueling game where players explore an interactive globe, choose regional arenas, and use photos to customize their fighter or rival. Directional attacks, guards and evasions shape each one-hit duel, followed by a short playable victory aftermath.
+
+The optional **AI Colors** feature calls a separate Render-hosted Node backend using the OpenAI Responses API to suggest a color palette and an existing outfit—not a recreated face or new sprite sheet. The API key stays server-side, while custom duels, photos and progress are saved locally in IndexedDB.
+
+[Backend source](https://github.com/Toooonyliu/OneCutAtlas_Backend) · [Live backend](https://one-cut-atlas-api.onrender.com)
+
 ## HW4 — Ask backend integration
 
 The local HW4 update connects Ask to a separate Python/Flask backend for calendar lookup and personal-reading calculation. See [integration and deployment notes](projects/xiaoliuren/HW4.md). Backend: https://ask-backend-s507.onrender.com — the frontend configuration uses this deployed service.
