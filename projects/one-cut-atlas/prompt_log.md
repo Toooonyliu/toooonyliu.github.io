@@ -11,8 +11,6 @@ time spent, and the code he personally writes or substantially changes.
   the scope through questions, implemented the requested web-game changes,
   assisted with testing, and drafted this log and the HTML walkthrough. Verify
   the exact model labels against the exported conversation before submission.
-  The current session contains a model-switch notice from a GPT-5-based Codex
-  agent to a GPT-6-based Codex agent.
 - **Built-in ImageGen:** produced original raster scenery and animation atlases.
   The existing asset records preserve the full prompts and source paths.
 - **Browser and local test tools:** checked the running interface and game
@@ -86,8 +84,9 @@ Q26，可以，render，没问题的。Q27，同意。Q28接受。Q29，同意�
 These are existing evidence records, not a claim that the whole earlier
 conversation is present:
 
-- [Design QA](./design-qa.md) records the earlier globe/combat work, its fixes
-  and then-current validation. New validation belongs in a later dated entry.
+- The historical local file design-qa.md records the earlier globe/combat work,
+  its fixes and then-current validation. It is not part of this public folder
+  and does not describe the current iteration's final validation.
 - [Art provenance](./assets/art/README.md) identifies original generated art.
 - [Fighter prompts](./assets/art/fighters-v3-provenance.json) contain the exact
   attack/defense prompt strings. The generated source dimensions differ from
@@ -95,7 +94,8 @@ conversation is present:
 - The workspace file ../art-candidates/environment-v2-prompts.json preserves
   the exact four earlier environment prompts. Its prompt strings are reproduced
   verbatim in the appendix below so they travel with this frontend folder.
-- New regional art prompt records must be added when those generations finish.
+- The three new regional art prompts are appended below and preserved in
+  assets/art/zone-v1-provenance.json.
 
 ## Where the earlier result fell short
 
@@ -225,6 +225,12 @@ scaffolded separately; no real provider request or credential setup has been
 claimed. Local automated verification passed 65 tests, including HTTP fallback
 and combat lifecycle checks. Original PNGs were retained; WebP derivatives bake
 backgrounds to the existing 480×270 renderer grid and preserve sprite pixels.
+
+The frontend game, English walkthrough and public source are published through
+the portfolio's GitHub Pages project folder and have been checked live in a
+browser. Tony's own README wording, personal code tuning, actual time record and
+recorded demonstration video remain pending. Render setup and API credentials
+also remain pending.
 
 Final prompts sent to the built-in ImageGen tool:
 
