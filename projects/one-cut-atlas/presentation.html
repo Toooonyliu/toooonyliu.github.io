@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10181b">
+  <meta name="description" content="One Cut Atlas, an English walkthrough of a pixel globe and sword-duel web game.">
+  <title>One Cut Atlas · Project Walkthrough</title>
+  <style>
+    :root{color-scheme:dark;--ink:#10181b;--paper:#e9e6d8;--muted:#a6b5b1;--gold:#ecb875;--teal:#75b6ae;--line:#60736c4d}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#080c0e;color:var(--paper);font-family:Arial,Helvetica,sans-serif}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit}button,a:focus-visible{outline:3px solid var(--gold);outline-offset:5px}button{cursor:pointer}a{color:var(--gold)}
+    .presentation{position:relative;width:min(100vw,177.7778vh);height:min(56.25vw,100vh);margin:auto;overflow:hidden;background:var(--ink);top:50%;transform:translateY(-50%);font-size:clamp(10px,1.25vw,22px)}
+    .slide{position:absolute;inset:0;display:none;padding:7.3% 6.5% 7%;background:var(--ink)}.slide.active{display:flex;flex-direction:column}.slide::after{content:"";pointer-events:none;position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,#03070614 3px 4px);z-index:8;opacity:.3}
+    .masthead{position:absolute;top:3.9%;left:6.5%;right:6.5%;display:flex;align-items:center;justify-content:space-between;z-index:20;font-size:.67em;letter-spacing:.16em;color:var(--muted)}.wordmark{color:var(--paper);font-weight:700;letter-spacing:.18em}.chapter{font-family:monospace;letter-spacing:.12em}
+    .kicker{margin:0 0 1em;color:var(--gold);font-size:.78em;letter-spacing:.2em;font-family:monospace;text-transform:uppercase}h1,h2,h3,p{margin:0}h1{font-size:5.8em;line-height:.94;letter-spacing:-.055em;max-width:70%;font-weight:700}h2{font-size:3.05em;line-height:1.04;letter-spacing:-.045em;max-width:85%}h3{font-size:1.25em;letter-spacing:-.015em}.lede{font-size:1.32em;line-height:1.45;max-width:33em;color:#c2ceca}.body{font-size:1.02em;line-height:1.5;color:#c2ceca}.muted{color:var(--muted)}.accent{color:var(--gold)}.tiny{font-family:monospace;font-size:.68em;line-height:1.45;color:var(--muted)}
+    .cover{justify-content:center}.cover .kicker{margin-top:1em}.cover .lede{margin-top:1.5em;max-width:30em}.cover-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;opacity:.57}.cover::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#10181be8 0%,#10181bab 48%,#10181b22 100%),linear-gradient(0deg,#10181b 0%,transparent 38%);z-index:1}.cover>*:not(.cover-art){position:relative;z-index:2}.cover .credit{position:absolute;bottom:14%;font-family:monospace;font-size:.78em;color:var(--muted)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:6%;margin-top:4%;align-items:start}.text-col p+p{margin-top:1em}.large-number{font-family:monospace;font-size:5em;line-height:1;color:var(--gold);margin-bottom:.16em}.rule{height:1px;background:var(--line);margin:1.45em 0}.quiet-list{list-style:none;padding:0;margin:1.3em 0 0}.quiet-list li{padding:.67em 0;border-bottom:1px solid var(--line);font-size:1.1em}.quiet-list strong{color:var(--paper);font-weight:400}.quiet-list span{display:block;font-size:.78em;color:var(--muted);margin-top:.3em}
+    .photo-strip{height:100%;min-height:15em;width:100%;object-fit:cover;image-rendering:pixelated}.image-caption{font-family:monospace;color:var(--muted);font-size:.68em;margin-top:.7em;line-height:1.4}.zone-list{display:grid;grid-template-columns:repeat(3,1fr);gap:0 3em;list-style:none;padding:0;margin:2.5% 0 0;counter-reset:zone}.zone-list li{padding:.75em 0;border-bottom:1px solid var(--line);font-size:1em;counter-increment:zone}.zone-list li::before{content:counter(zone,decimal-leading-zero);font-family:monospace;font-size:.7em;color:var(--gold);margin-right:1em}.zone-foot{margin-top:2em;font-size:.9em;max-width:45em;color:var(--muted);line-height:1.45}
+    .stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.3%;margin-top:4%;flex:1}.stage-grid figure{margin:0;min-width:0}.stage-grid img{width:100%;height:11em;object-fit:cover;image-rendering:pixelated}.stage-grid figcaption{padding-top:1em}.stage-grid h3{color:var(--gold);font-size:1.18em;margin-bottom:.45em}.stage-grid p{font-size:.85em;line-height:1.45;color:#c2ceca}.stage-grid .tiny{display:block;margin-bottom:.6em}
+    .flow{display:flex;align-items:center;gap:1.35em;margin:2em 0 1.5em}.flow .step{flex:1;border-top:2px solid var(--gold);padding-top:.85em}.flow .step span{display:block;font-family:monospace;color:var(--gold);font-size:.68em;margin-bottom:.75em}.flow .step strong{display:block;font-size:1.15em;font-weight:400}.swatches{display:flex;height:2.2em;gap:.4em;margin:1.2em 0}.swatches i{width:4em;background:var(--swatch);display:block}.code{font-family:monospace;white-space:pre-wrap;font-size:.85em;line-height:1.55;color:#c7ddd6;margin:1.35em 0 0;padding:1em 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .control-list{display:grid;grid-template-columns:1.1fr 2fr;row-gap:.7em;column-gap:1em;margin-top:1.7em;font-size:1em}.control-list dt{font-family:monospace;color:var(--gold)}.control-list dd{margin:0;color:#c2ceca}.aftermath{margin-top:1em;font-size:1.1em;line-height:1.5;max-width:24em}.aftermath strong{display:block;font-family:monospace;font-weight:400;color:var(--gold);font-size:3.4em;line-height:1.1;margin-bottom:.2em}
+    .iteration{display:grid;grid-template-columns:1fr 1fr;gap:5%;margin-top:3.3%}.iteration section{border-top:2px solid var(--line);padding-top:1em}.iteration h3{color:var(--gold);font-family:monospace;font-size:.8em;letter-spacing:.14em;margin-bottom:1em}.iteration p{font-size:1.05em;line-height:1.47}.iteration p+p{margin-top:1em}.module-table{margin-top:2em;width:100%;border-collapse:collapse;font-size:.85em}.module-table td{padding:.9em 0;border-bottom:1px solid var(--line);vertical-align:top}.module-table td:first-child{font-family:monospace;color:var(--gold);width:31%}.module-table td:last-child{color:#c2ceca}.process-note{margin-top:1.5em;max-width:50em;font-size:.9em;line-height:1.5;color:var(--muted)}
+    .demo-slide{padding-bottom:6.5%}.demo-heading{display:flex;align-items:end;justify-content:space-between;gap:2em;margin-bottom:1.2em}.demo-heading>div{flex:1}.demo-heading h2{font-size:2.25em;max-width:none}.demo-heading a{font-size:.8em;white-space:nowrap;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:.25em}.demo-frame{position:relative;flex:1;min-height:0;overflow:hidden;background:#0c1418;border:1px solid var(--line)}.demo-frame iframe{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform:translate(-50%,-50%) scale(var(--demo-scale,.6));border:0;display:block;pointer-events:none}.demo-frame.playing iframe{pointer-events:auto}.demo-cover{position:absolute;inset:0;background:#10181b80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1em}.demo-cover button{padding:.85em 1.3em;border:1px solid var(--gold);background:var(--ink);color:var(--gold);font-family:monospace;font-size:1em}.demo-frame.playing .demo-cover{display:none}.demo-return{display:none;position:absolute;top:.7em;right:.7em;border:1px solid var(--gold);background:#10181bef;color:var(--gold);padding:.5em .8em;font-size:.7em;z-index:4}.demo-frame.playing .demo-return{display:block}.demo-instructions{margin-top:.65em;font-family:monospace;font-size:.65em;color:var(--muted)}
+    .next-steps{display:grid;grid-template-columns:1fr 1fr;gap:6%;margin-top:3.5%}.next-steps h3{color:var(--gold);margin-bottom:.9em}.next-steps p{line-height:1.5;font-size:1em;color:#c2ceca}.closing{margin-top:auto;font-size:1.25em;color:var(--paper);line-height:1.3}.closing a{display:inline-block;text-decoration:none;margin-top:.4em;font-size:.78em}.nav{position:absolute;bottom:3.4%;left:6.5%;right:6.5%;z-index:20;display:flex;align-items:center;justify-content:space-between}.nav .hint{font-family:monospace;font-size:.64em;color:#91a6a0}.nav-actions{display:flex;align-items:center;gap:1.2em}.nav button{background:none;border:0;color:var(--paper);font-family:monospace;font-size:.72em;padding:.4em}.nav button:hover{color:var(--gold)}.nav button:disabled{opacity:.25;cursor:default}.progress{position:absolute;bottom:0;left:0;height:3px;background:var(--gold);z-index:22;width:10%;transition:width .2s}.count{font-family:monospace;font-size:.7em;color:var(--gold);min-width:5em;text-align:center}.notes{display:none;position:absolute;z-index:40;left:6.5%;right:6.5%;bottom:9%;padding:1.1em 1.3em;background:#080d0ffa;border:1px solid var(--gold);font-size:.85em;line-height:1.5;box-shadow:0 0 3em #0009}.notes.visible{display:block}.notes strong{display:block;color:var(--gold);font-family:monospace;font-size:.74em;letter-spacing:.12em;margin-bottom:.65em}.notes p{max-width:65em}.presentation:fullscreen{width:100vw;height:100vh;top:0;transform:none}.presentation:fullscreen .slide{padding-top:7.3%}
+    @media (prefers-reduced-motion:reduce){.progress{transition:none}}@media(max-width:640px){.presentation{font-size:1.28vw}.nav .hint{font-size:.74em}.nav button{font-size:.85em}.two-col{gap:4%}.notes{font-size:1em}}
+  </style>
+</head>
+<body>
+<main class="presentation" id="presentation" aria-label="One Cut Atlas project walkthrough">
+  <header class="masthead"><span class="wordmark">ONE CUT ATLAS</span><span class="chapter" id="chapter">01 / THE IDEA</span></header>
+
+  <section class="slide cover active" data-chapter="THE IDEA" data-notes="One Cut Atlas is a browser game that turns choosing a destination into choosing a duel. My starting point was the atmosphere and short, decisive fights in First Cut. I wanted to connect that feeling to a travel atlas and to something personal that a player can upload.">
+    <img class="cover-art" src="./assets/art/zone-east-asia-v1.webp" data-fallback="./assets/art/street-v2.webp" alt="Original pixel stage with a traditional Japanese street">
+    <p class="kicker">CMU 15-113 · Creative Web App</p>
+    <h1>One Cut<br>Atlas</h1>
+    <p class="lede">A pixel globe. A destination. A duel that feels personal.</p>
+    <p class="credit">Project walkthrough · Tony Liu</p>
+  </section>
+
+  <section class="slide" data-chapter="WHY THIS GAME" data-notes="I chose a game because the result has to respond to the player, rather than only look convincing in a screenshot. The world map gives the player a reason to explore. A regional stage gives each fight a sense of place. A portrait upload adds a small personal choice while keeping the underlying combat readable.">
+    <p class="kicker">The starting point</p>
+    <h2>A travel memory becomes<br>a game choice</h2>
+    <div class="two-col">
+      <div class="text-col"><p class="lede">The atlas gives each duel a place. A photo gives the fighter a personal palette.</p><div class="rule"></div><p class="body">I wanted the calm of exploring a map to meet the tension of a fight decided by one clean hit.</p><p class="body">The challenge is making the whole experience feel like one game, with a consistent pixel scale and clear controls.</p></div>
+      <div><img class="photo-strip" src="./assets/art/forest-v2.webp" alt="An original autumn pixel forest arena"><p class="image-caption">Original game art. First Cut informed the atmosphere and combat reference.</p></div>
+    </div>
+  </section>
+
+  <section class="slide demo-slide" data-chapter="LIVE DEMO" data-notes="For the recording, I can show three actions here. First, rotate the globe and select a Travel Zone. Then open the portrait editor and preview a visible change to the fighter. Finally, enter a duel and show the short aftermath before the result overlay. The same app also opens in a full browser tab.">
+    <div class="demo-heading"><div><p class="kicker">The working app</p><h2>Explore. Personalize. Duel.</h2></div><a href="./index.html" target="_blank" rel="noopener">Open full game ↗</a></div>
+    <div class="demo-frame" id="demo-frame"><iframe id="demo" title="Playable One Cut Atlas demo" loading="lazy" tabindex="-1" data-src="./index.html"></iframe><div class="demo-cover"><button id="demo-play" type="button">PLAY THE LIVE DEMO</button><p class="tiny">The game uses its own keyboard controls.</p></div><button id="demo-return" class="demo-return" type="button">Return to walkthrough</button></div>
+    <p class="demo-instructions">Rotate the globe, choose a zone, then challenge it. Use the return button to resume the slides.</p>
+  </section>
+
+  <section class="slide" data-chapter="THE ATLAS" data-notes="The first idea was a country-by-country map with provinces for larger countries. That scope would require too many unique scenes for this version. I kept the whole globe and chose eleven broad Travel Zones. They are artistic navigation regions. They do not claim to represent exact political or cultural boundaries. Every zone remains selectable, while three places receive the most detailed visual treatment first.">
+    <p class="kicker">A manageable world</p>
+    <h2>11 Travel Zones</h2>
+    <ol class="zone-list"><li>East Asia</li><li>South Asia</li><li>Southeast Asia</li><li>West &amp; Central Asia</li><li>Europe</li><li>Africa</li><li>North America</li><li>South America</li><li>Oceania</li><li>Arctic</li><li>Antarctic</li></ol>
+    <p class="zone-foot">Each zone has a playable preset. Three flagship stages lead the visual direction. The remaining zones give the atlas room to grow.</p>
+  </section>
+
+  <section class="slide" data-chapter="REGIONAL STAGES" data-notes="These stages use specific places as their starting points. Kyoto uses timber, paper screens and warm lantern light. Cairo uses Nile-side stone and dusk colors. New York uses an underpass and wet urban surfaces. The composition stays simple behind the fighters so I can read an attack quickly. One scene does not represent every place in its larger Travel Zone.">
+    <p class="kicker">A place with its own visual rhythm</p>
+    <h2>Three flagship stages</h2>
+    <div class="stage-grid">
+      <figure><img src="./assets/art/zone-east-asia-v1.webp" data-fallback="./assets/art/street-v2.webp" alt="Kyoto Rain pixel stage"><figcaption><span class="tiny">EAST ASIA</span><h3>Kyoto Rain</h3><p>Timber and paper screens.<br>Amber light on wet stone.</p></figcaption></figure>
+      <figure><img src="./assets/art/zone-africa-v1.webp" data-fallback="./assets/art/wilderness-v2.webp" alt="Cairo River Dusk pixel stage"><figcaption><span class="tiny">AFRICA</span><h3>Cairo River Dusk</h3><p>Nile-side stone silhouettes.<br>Indigo shadows and copper dusk.</p></figcaption></figure>
+      <figure><img src="./assets/art/zone-north-america-v1.webp" data-fallback="./assets/art/city-v2.webp" alt="New York Underpass pixel stage"><figcaption><span class="tiny">NORTH AMERICA</span><h3>New York Underpass</h3><p>Columns and a distant city.<br>Rain, asphalt and sodium light.</p></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="slide" data-chapter="PHOTO PERSONALIZATION" data-notes="The current photo path extracts colors in the browser and applies them to an existing fighter. The player can see the result before saving. This makes the feature work without an API key. It does not reconstruct a face or create a new animation sheet. The next AI step is deliberately smaller: return structured appearance features, then map those features onto the same tested sprites.">
+    <p class="kicker">Visible feedback from an upload</p>
+    <h2>A portrait changes the fighter</h2>
+    <div class="flow"><div class="step"><span>01</span><strong>Upload a photo</strong></div><div class="step"><span>02</span><strong>Extract a palette</strong></div><div class="step"><span>03</span><strong>Preview the fighter</strong></div></div>
+    <div class="two-col" style="margin-top:1.5%"><div><p class="body">The local version maps photo colors to the fighter and keeps the regional stage consistent.</p><div class="swatches" aria-label="Illustrative portrait colors"><i style="--swatch:#283f45"></i><i style="--swatch:#bd896b"></i><i style="--swatch:#547c78"></i><i style="--swatch:#d5b787"></i></div><p class="tiny">Illustrative palette. Photo colors and manual settings shape the avatar.</p></div><div><h3 class="accent">Next: AI appearance features</h3><pre class="code">{
+  "style": "traveler",
+  "hairStyle": "short",
+  "palette": {
+    "hair": "#283f45", "skin": "#bd896b",
+    "outfit": "#547c78", "accent": "#d5b787"
+  },
+  "summary": "Dark hair and a muted teal outfit."
+}</pre><p class="tiny" style="margin-top:.7em">Example output. The AI service is a later setup step.</p></div></div>
+  </section>
+
+  <section class="slide" data-chapter="COMBAT FEEL" data-notes="The duel uses three blade lanes, charging and matching guards. A clear hit ends the fight. I also wanted the final moment to feel physical, so the result waits through a short aftermath. After a victory, the player can keep moving and swinging, and the scene retains marks of the fight. The reference was the public First Cut instructions and the screenshots I supplied, rather than its source code.">
+    <p class="kicker">The fight needs readable choices</p>
+    <h2>One hit, with an aftermath</h2>
+    <div class="two-col"><div><dl class="control-list"><dt>A / D</dt><dd>Adjust distance</dd><dt>W / X / S</dt><dd>Select the blade lane</dd><dt>Hold J, release J</dt><dd>Charge, then strike</dd><dt>Hold K</dt><dd>Guard the selected lane</dd><dt>Space / C</dt><dd>Evade back or duck</dd><dt>L / V</dt><dd>Counter or shove</dd></dl></div><div class="aftermath"><strong>5 seconds</strong>to move and strike after a victory.<div class="rule"></div><p class="body">Persistent marks make the background feel involved in the fight. The result appears after the final motion has time to finish.</p></div></div>
+  </section>
+
+  <section class="slide" data-chapter="ITERATION" data-notes="My feedback on the earlier demo was specific. The home page still felt rough. The detailed scenery competed with the action. Uploading a photo did not make the promised visual change. The result overlay also interrupted the finish. That feedback became separate changes to the map, regional presets, portrait preview and combat state. Each change can be checked in the running game.">
+    <p class="kicker">Feedback became concrete changes</p>
+    <h2>What I changed in the brief</h2>
+    <div class="iteration"><section><h3>EARLIER DEMO</h3><p>The photo upload did not produce the expected visual change.</p><p>Scenery felt too detailed and the map had no clear regional progression.</p><p>The result arrived before the finish felt complete.</p></section><section><h3>THIS VERSION</h3><p>A portrait has an immediate fighter preview.</p><p>Travel Zones organize exploration. Simpler regional stages give the characters room.</p><p>A short victory phase keeps the character under player control.</p></section></div>
+  </section>
+
+  <section class="slide" data-chapter="DEVELOPMENT PROCESS" data-notes="The app separates geography, photo processing, rendering and combat. That separation helped me ask for focused changes and check their effects. AI assisted with implementation, debugging and original raster art. I supplied the references and narrowed the product decisions through the interview. The prompt log keeps the substantial prompts and asset provenance. Any code changes I personally make still need to be recorded with their actual values.">
+    <p class="kicker">How the app works</p>
+    <h2>Small modules, focused iterations</h2>
+    <table class="module-table"><tbody><tr><td>globe.js + region-presets.js</td><td>Choose a Travel Zone and its stage.</td></tr><tr><td>photo.js + avatar.js</td><td>Extract a local palette and preview the avatar.</td></tr><tr><td>engine.js</td><td>Resolve timing, blade lanes, guards and the victory phase.</td></tr><tr><td>render.js + art.js</td><td>Draw authored sprite poses, stage layers and persistent effects.</td></tr><tr><td>storage.js</td><td>Keep photos, destinations and progress on this device.</td></tr></tbody></table>
+    <p class="process-note">AI assisted code and original game art. My input defined the direction, references and scope. The prompt log preserves the important prompts and records which tools handled each job.</p>
+  </section>
+
+  <section class="slide" data-chapter="NEXT ITERATION" data-notes="The local version comes first. The next service will analyze a portrait and return a small appearance JSON response. The backend repository already exists, and Render is the intended host. Credentials stay on that server. I also want to review the exposed combat and scene values myself, record the changes I actually make, and then finish the public deployment and a short video walkthrough.">
+    <p class="kicker">Where the project can go next</p>
+    <h2>More places, more personal fighters</h2>
+    <div class="next-steps"><div><h3>AI on a small backend</h3><p>Analyze an authorized portrait and return appearance features. Map them to existing sprites through a Render service.</p><p class="tiny" style="margin-top:1em">Backend repository created. API credentials and deployment remain a setup step.</p></div><div><h3>Further game development</h3><p>Add more distinct regional stages. Tune combat through playtesting. Later explore photo-based scenery and saved journeys across devices.</p></div></div>
+    <p class="closing">The next destination is a new duel.<br><a href="./index.html" target="_blank" rel="noopener">Play One Cut Atlas ↗</a></p>
+  </section>
+
+  <aside class="notes" id="notes" aria-label="Speaker notes"><strong>SPEAKER NOTES</strong><p id="note-text"></p></aside>
+  <nav class="nav" aria-label="Walkthrough navigation"><span class="hint">← → Slides &nbsp; N Notes &nbsp; F Fullscreen</span><div class="nav-actions"><button id="previous" type="button" aria-label="Previous slide">PREV</button><span class="count" id="count" aria-live="polite">01 / 10</span><button id="next" type="button" aria-label="Next slide">NEXT</button></div></nav>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+</main>
+<script>
+  const slides=[...document.querySelectorAll('.slide')], stage=document.querySelector('#presentation');
+  const notes=document.querySelector('#notes'), noteText=document.querySelector('#note-text');
+  const demoFrame=document.querySelector('#demo-frame'),demo=document.querySelector('#demo');
+  new ResizeObserver(([entry])=>{const {width,height}=entry.contentRect;if(width&&height)demoFrame.style.setProperty('--demo-scale',Math.min(width/1280,height/720));}).observe(demoFrame);
+  let current=0;
+  function show(index){current=Math.max(0,Math.min(slides.length-1,index));slides.forEach((slide,i)=>{slide.classList.toggle('active',i===current);slide.setAttribute('aria-hidden',String(i!==current));});document.querySelector('#count').textContent=`${String(current+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;document.querySelector('#chapter').textContent=`${String(current+1).padStart(2,'0')} / ${slides[current].dataset.chapter}`;document.querySelector('#progress').style.width=`${(current+1)/slides.length*100}%`;document.querySelector('#previous').disabled=current===0;document.querySelector('#next').disabled=current===slides.length-1;noteText.textContent=slides[current].dataset.notes;if(current===2&&!demo.src)demo.src=demo.dataset.src;if(current!==2)demoFrame.classList.remove('playing');history.replaceState(null,'',`#slide-${current+1}`);}
+  document.querySelector('#previous').addEventListener('click',()=>show(current-1));document.querySelector('#next').addEventListener('click',()=>show(current+1));
+  document.querySelector('#demo-play').addEventListener('click',()=>{demoFrame.classList.add('playing');demo.tabIndex=0;demo.focus();});
+  document.querySelector('#demo-return').addEventListener('click',()=>{demoFrame.classList.remove('playing');demo.tabIndex=-1;document.querySelector('#next').focus();});
+  async function fullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else await stage.requestFullscreen();}catch{}}
+  document.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey)return;if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();show(current+1);}else if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();show(current-1);}else if(event.key==='Home'){event.preventDefault();show(0);}else if(event.key==='End'){event.preventDefault();show(slides.length-1);}else if(event.key.toLowerCase()==='n'){notes.classList.toggle('visible');}else if(event.key.toLowerCase()==='f'){fullscreen();}else if(event.key==='Escape'){notes.classList.remove('visible');}});
+  document.querySelectorAll('img[data-fallback]').forEach(img=>img.addEventListener('error',()=>{if(img.dataset.fallback){const fallback=img.dataset.fallback;delete img.dataset.fallback;img.src=fallback;}}));
+  window.addEventListener('hashchange',()=>show(Number(location.hash.match(/slide-(\d+)/)?.[1]||1)-1));
+  const initial=Number(location.hash.match(/slide-(\d+)/)?.[1]||1)-1;show(initial);
+</script>
+</body>
+</html>
