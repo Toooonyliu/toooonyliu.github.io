@@ -47,11 +47,13 @@ approval of AI-generated code is different from personally modifying it.
   speaker notes and F for fullscreen.
 - The demo slide embeds the real game. Click “Play the live demo” to give it
   keyboard input. “Return to walkthrough” restores slide navigation.
-- Show a zone selection, a portrait preview, a duel, and the victory aftermath.
+- Show a zone selection, a portrait preview, AI Colors, a duel, and the victory aftermath.
 - Explain the idea and why you chose it. Explain a concrete iteration and one
   code change you understand.
-- Say that local photo colors work now. Describe AI feature extraction and the
-  Render backend as next steps until they are genuinely configured.
+- Explain that AI Colors calls a live Render service using OpenAI Responses
+  with `gpt-6-luna`. It returns an approximate palette and existing outfit
+  choice, not a recreated face or newly generated fighter sprites. Show that
+  local photo colors and manual controls still work without AI.
 - Record the browser with your voice using your preferred screen recorder.
   This HTML page does not automatically produce a video.
 
@@ -63,7 +65,14 @@ approval of AI-generated code is different from personally modifying it.
 - [x] Link the project from the portfolio's work section.
 - [ ] Finish the student-authored README.
 - [x] Merge the supplied earlier development transcript into prompt_log.md:
-      17 actual human messages across two chats, with original wording retained.
+      19 selected actual human messages across two chats, with original wording retained.
+- [x] Deploy the backend at https://one-cut-atlas-api.onrender.com and verify a
+      real OpenAI provider analysis returned HTTP 200 on October 8.
+- [x] Configure the public backend URL in the local frontend release; keep the
+      OpenAI key only in private server environment variables.
+- [ ] Publish that connected frontend release and verify upload → AI Colors →
+      preview → save/fight → reload in the deployed browser game. Only then
+      claim live frontend-backend communication and secure third-party API use.
 - [ ] Confirm any other missing chats and exact model labels. Short check-ins
       are identified, not presented as extra substantial development prompts.
 - [ ] Add actual code edits and elapsed work. Review the documented ImageGen
@@ -77,6 +86,8 @@ or the prompt log.
 
 Updated October 8, 2026. [submission-answers.md](./submission-answers.md) provides
 first-person draft answers, verified feature choices, public links and the
-remaining student-only fields. No live backend, recorded video or form
-submission is claimed. The assignment's listed October 7 deadline has passed
+remaining student-only fields. The backend is live and its real provider call
+passed; the latest connected frontend still needs its public-game check. No
+recorded video, student-authored code edit or form submission is claimed.
+The assignment's listed October 7 deadline has passed
 as of this update; check actual submission status and course instructions.

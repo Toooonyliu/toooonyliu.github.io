@@ -6,6 +6,7 @@ const $ = id => document.getElementById(id);
 const globe = new Globe($('world-map'), {onSelect:id=>selectLevel(id), onCreate:point=>openCreator({point})});
 const demos = createZoneLevels();
 let levels=structuredClone(demos),selectedId=levels[0].id,modules=null,gameReady=false,land=null,draft=null,photoVersion=0,photoBusy=false,analysisBusy=false;
+let analysisController=null,analysisPhase='waking';
 let engine=null,currentLevel=null,raf=0,previousTime=0,accumulator=0,resultHandled=false,toastTimer=0,firstLitId=null,audio=null,heard=new Set(),duelGeneration=0;
 let bloodDecals=[],bloodSeen=new Set();
 const keys={left:false,right:false,attack:false,parry:false,dodge:false,duck:false,counter:false,shove:false};
@@ -57,6 +58,7 @@ function setupChoices(){
 }
 function openCreator({level=null,point=null}={}){
  if(!ensureReady())return;
+ analysisController?.abort();analysisController=null;
  const zone=point?zoneForCoordinates(point.lat,point.lon):getZone(selected()?.scene.travelZone);
  photoVersion++;draft=level?structuredClone(level):{id:crypto.randomUUID(),name:`${zone.stage} · Custom`,location:{name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon},scene:sceneForZone(zone.id),photo:null,cleared:false,createdAt:new Date().toISOString()};
  draft.avatar=validateAvatar(draft.avatar||{style:draft.scene.opponentStyle});draft.editing=Boolean(level);$('creator-title').textContent='Choose Your Fighter';$('level-name').value=draft.name;$('creator-error').hidden=true;$('gps-note').textContent='Regional arena. Your fighter.';$('photo-message').textContent=draft.photo?'Saved on this device.':'Use a photo to choose your colors.';
@@ -73,21 +75,22 @@ function updateCreator(){
 }
 function markManual(){draft.scene.source='manual';draft.scene.summary=`${LABELS[draft.scene.environment]} · ${LABELS[draft.scene.lighting]}.`;}
 function updateLocationFields(){const custom=$('location-select').value==='custom';$('custom-location-fields').hidden=!custom;['custom-name','custom-lat','custom-lon'].forEach(id=>$(id).required=custom);}
-function setBusy(){const busy=photoBusy||analysisBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=analysisBusy?'Analyzing…':'AI Colors';const privacy=$('photo-privacy');if(privacy)privacy.textContent=apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.';}
+function setBusy(){const busy=photoBusy||analysisBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=analysisBusy?(analysisPhase==='waking'?'Waking AI…':'Analyzing…'):'AI Colors';const privacy=$('photo-privacy');if(privacy)privacy.textContent=apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.';}
 function creatorError(message){$('creator-error').textContent=message;$('creator-error').hidden=false;}
 async function pickPhoto(file){
- if(!file||!draft)return;const version=++photoVersion;analysisBusy=false;photoBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Reading photo…';
+ if(!file||!draft)return;analysisController?.abort();analysisController=null;const version=++photoVersion;analysisBusy=false;photoBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Reading photo…';
  try{const result=await modules.preparePhoto(file);if(version!==photoVersion)return;draft.photo=result.thumbnail;draft.apiImage=result.dataUrl;draft.avatar=avatarFromPalette(result.palette,draft.avatar.target,draft.avatar.style);updatePhotoPreview();updateCreator();$('photo-message').textContent='Colors applied. Tune your fighter.';}
  catch(error){if(version!==photoVersion)return;creatorError(error.message||'Could not read this photo. Try another.');$('photo-message').textContent=draft.photo?'Your previous photo is kept.':'Choose JPEG, PNG or WebP.';}
  finally{if(version===photoVersion){photoBusy=false;setBusy();}}
 }
 async function analyze(){
+ if(photoBusy||analysisBusy)return;
  if(!hasAvatarApi()){creatorError('AI is not connected. Photo colors still work.');return;}
  if(!draft?.photo){creatorError('Choose a photo first.');return;}
- const version=photoVersion,target=draft.avatar.target;analysisBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Finding your fighter’s colors…';
- try{const avatar=await requestAvatar(draft.apiImage||draft.photo);if(version!==photoVersion)return;draft.avatar={...avatar,target};updateCreator();updatePhotoPreview();$('photo-message').textContent=avatar.summary;}
+ const version=photoVersion,controller=new AbortController();analysisController=controller;analysisBusy=true;analysisPhase='waking';setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Waking AI… First use can take a minute.';
+ try{const avatar=await requestAvatar(draft.apiImage||draft.photo,{signal:controller.signal,onStatus:phase=>{if(version!==photoVersion)return;analysisPhase=phase;setBusy();$('photo-message').textContent=phase==='waking'?'Waking AI… First use can take a minute.':'Finding your fighter’s colors…';}});if(version!==photoVersion)return;draft.avatar={...avatar,target:draft.avatar.target};updateCreator();updatePhotoPreview();$('photo-message').textContent=avatar.summary;}
  catch(error){if(version!==photoVersion)return;creatorError(error.message||'AI unavailable. Photo colors are kept.');$('photo-message').textContent='Your fighter is kept. Ready to fight.';}
- finally{if(version===photoVersion){analysisBusy=false;setBusy();}}
+ finally{if(analysisController===controller)analysisController=null;if(version===photoVersion){analysisBusy=false;setBusy();}}
 }
 async function saveAndPlay(event){
  event.preventDefault();if(photoBusy||analysisBusy)return;
@@ -154,7 +157,7 @@ function openHelp(){if(engine)togglePause(true);$('help-dialog').showModal();}
 function registerTools(){const context=document.modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();const tools=[{name:'read_atlas',description:'Read saved local levels and which stops have been cleared.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {levels:levels.map(l=>({id:l.id,name:l.name,location:l.location.name,cleared:l.cleared}))};}},{name:'start_duel',description:'Start the visible one-cut duel for an existing local level; winning requires gameplay.',inputSchema:{type:'object',properties:{levelId:{type:'string'}},required:['levelId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||Object.keys(input).some(k=>k!=='levelId')||typeof input.levelId!=='string')throw new Error('Expected a levelId string');const level=levels.find(l=>l.id===input.levelId);if(!level||!modules||!gameReady)throw new Error('Level unavailable');if($('creator').open||$('help-dialog').open)throw new Error('Close the open dialog first');startDuel(level);return {levelId:level.id,phase:engine.snapshot().phase};}}];for(const tool of tools){try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
 $('brand')?.addEventListener('click',returnToMap);document.querySelector('.brand').onclick=event=>{event.preventDefault();if(engine)returnToMap();};
 $('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>startDuel(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-help').onclick=openHelp;
-$('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('help-close').onclick=()=>$('help-dialog').close();$('help-play').onclick=()=>{$('help-dialog').close();startDuel(selected());};$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
+$('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{analysisController?.abort();analysisController=null;photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('help-close').onclick=()=>$('help-dialog').close();$('help-play').onclick=()=>{$('help-dialog').close();startDuel(selected());};$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
 $('photo-input').onchange=event=>pickPhoto(event.target.files[0]);$('photo-drop').addEventListener('dragover',event=>{event.preventDefault();$('photo-drop').classList.add('dragover');});$('photo-drop').addEventListener('dragleave',()=>$('photo-drop').classList.remove('dragover'));$('photo-drop').addEventListener('drop',event=>{event.preventDefault();$('photo-drop').classList.remove('dragover');pickPhoto(event.dataTransfer.files[0]);});
 $('location-select').onchange=updateLocationFields;$('lighting-select').onchange=()=>{draft.scene.lighting=$('lighting-select').value;markManual();updateCreator();};$('style-select').onchange=()=>{draft.avatar.style=$('style-select').value;updateCreator();};$('ai-analyze').onclick=analyze;$('creator-form').onsubmit=saveAndPlay;
 $('zone-select').onchange=()=>{const zone=getZone($('zone-select').value);draft.scene=sceneForZone(zone.id);draft.location={name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon};$('level-name').value=`${zone.stage} · Custom`;const city=CITIES.find(city=>city.name===zone.place);$('location-select').value=city?.id||'custom';$('custom-name').value=zone.place;$('custom-lat').value=zone.lat;$('custom-lon').value=zone.lon;updateLocationFields();updateCreator();};

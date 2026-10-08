@@ -14,20 +14,55 @@ export function avatarFromPalette(palette,target='opponent',style='traveler'){
 }
 function avatarApiBase(){
  const value=globalThis.ONE_CUT_API_BASE||globalThis.document?.querySelector('meta[name="one-cut-api-base"]')?.content;
- return typeof value==='string'?value.trim().replace(/\/$/,''):'';
+ if(typeof value!=='string'||!value.trim())return '';
+ try{
+  const base=new URL(value.trim());
+  const local=['localhost','127.0.0.1','[::1]'].includes(base.hostname);
+  if(base.username||base.password||base.search||base.hash||(base.protocol!=='https:'&&!(base.protocol==='http:'&&local)))return '';
+  return base.href.replace(/\/+$/,'');
+ }catch{return '';}
 }
 /** A static build must not advertise an API that has not been connected. */
 export function hasAvatarApi(){return Boolean(avatarApiBase());}
-export async function requestAvatar(image,{endpoint}={}){
+const timeoutValue=(value,fallback)=>Number.isFinite(value)&&value>0?Math.min(value,120000):fallback;
+const publicError=(data,fallback)=>typeof data?.error==='string'&&data.error.trim()?data.error.slice(0,240):fallback;
+const canceled=()=>Object.assign(new Error('AI canceled. Your fighter is kept.'),{name:'AbortError'});
+/** Wake a sleeping host before sending a photo. Paid POST requests are never retried.
+ * Explicit endpoint adapters skip warmup unless a healthEndpoint is provided.
+ * Timeouts/fetcher are injectable for tests; no provider credential belongs here.
+ */
+export async function requestAvatar(image,{endpoint,healthEndpoint,signal,onStatus,fetcher=globalThis.fetch,startupTimeoutMs=85000,analysisTimeoutMs=30000}={}){
  const base=avatarApiBase();
  if(!endpoint&&!base)throw new Error('AI is not connected. Photo colors still work.');
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);
+ if(signal?.aborted)throw canceled();
+ const controller=new AbortController();
+ let timer,phase='startup',timedOut=false;
+ const cancel=()=>controller.abort();
+ signal?.addEventListener('abort',cancel,{once:true});
+ const startTimer=duration=>{clearTimeout(timer);timer=setTimeout(()=>{timedOut=true;controller.abort();},duration);};
+ const readJson=async response=>{try{return await response.json();}catch{throw new Error('AI is unavailable. Photo colors are kept.');}};
  try{
-  const response=await fetch(endpoint||`${base}/api/analyze-avatar`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image}),signal:controller.signal});
-  let data;try{data=await response.json();}catch{throw new Error('AI is unavailable. Photo colors are kept.');}
-  if(!response.ok)throw new Error(data.error||'AI is unavailable. Photo colors are kept.');
-  const value=data.avatar;
+  if(healthEndpoint||!endpoint){
+   onStatus?.('waking');startTimer(timeoutValue(startupTimeoutMs,85000));
+   const response=await fetcher(healthEndpoint||`${base}/health`,{method:'GET',cache:'no-store',signal:controller.signal});
+   const health=await readJson(response);
+   if(!response.ok)throw new Error(publicError(health,'AI is unavailable. Photo colors are kept.'));
+   if(health?.avatarAnalysisConfigured!==true)throw new Error('AI is not configured yet. Photo colors still work.');
+  }
+  if(controller.signal.aborted)throw canceled();
+  phase='analysis';onStatus?.('analyzing');startTimer(timeoutValue(analysisTimeoutMs,30000));
+  const response=await fetcher(endpoint||`${base}/api/analyze-avatar`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image}),signal:controller.signal});
+  const data=await readJson(response);
+  if(!response.ok)throw new Error(publicError(data,'AI is unavailable. Photo colors are kept.'));
+  const value=data?.avatar;
   if(!value||!['kendo','suit','cowboy','traveler'].includes(value.style)||!Object.keys(DEFAULT_AVATAR).every(key=>hex(value.palette?.[key])))throw new Error('AI returned an unsupported fighter. Photo colors are kept.');
   return validateAvatar({...value,source:'ai'});
- }catch(error){if(error.name==='AbortError')throw new Error('AI timed out. Your fighter is kept.');throw error;}finally{clearTimeout(timer);}
+ }catch(error){
+  if(controller.signal.aborted||error.name==='AbortError'){
+   if(timedOut)throw new Error(phase==='startup'?'AI startup timed out. Your fighter is kept.':'AI timed out. Your fighter is kept.');
+   throw canceled();
+  }
+  if(error instanceof TypeError)throw new Error('Could not connect to AI. Photo colors are kept.');
+  throw error;
+ }finally{clearTimeout(timer);signal?.removeEventListener('abort',cancel);}
 }

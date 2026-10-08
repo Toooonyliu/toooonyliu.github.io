@@ -3,10 +3,10 @@
 Updated October 8, 2026. This document was assembled with Codex assistance.
 
 I am building One Cut Atlas, a photo-customizable pixel-art sword-duel game.
-This log combines my available prompts from two chats. It preserves **17 actual
-user messages**: seven from the imported development chat and ten from the
-planning, implementation and submission chat. Short progress checks and
-confirmations are identified as such; the count is not a claim that all 17 are
+This log combines my available prompts from two chats. It preserves **19 selected actual
+user messages**: seven from the imported development chat and twelve from the
+planning, implementation, submission and deployment chat. Short progress checks and
+confirmations are identified as such; the count is not a claim that all 19 are
 substantial development specifications. Exact art-generation prompts are
 recorded separately below and in the linked provenance files.
 
@@ -41,10 +41,11 @@ focused work time and code I personally wrote or substantially changed.
   successfully inspected in the imported chat. Natural Earth is the bundled
   geographic dataset, not an AI model or a live map API.
 
-The current portrait fallback processes colors locally. A planned OpenAI
-portrait-analysis service is separate from that working fallback. Do not
-describe the future service as deployed until it has been configured and
-verified.
+The local portrait fallback processes colors without a provider. On October 8,
+Codex deployed the separate Node service to Render and verified a real OpenAI
+Responses request using `gpt-6-luna`. It returns palette colors and an existing
+fictional outfit, not a generated face or animation sheet. The private key is
+stored in Render's environment settings, not the frontend or this log.
 
 ## Session A — imported development chat (7 actual prompts)
 
@@ -132,7 +133,7 @@ I requested a mergeable Markdown record. Codex used the assignment and my
 submission-form screenshot as requirements, preserved the actual messages,
 and identified missing student-authored work rather than fabricating it.
 
-## Session B — this planning and implementation chat (10 actual prompts)
+## Session B — this planning, implementation and deployment chat (12 selected actual prompts)
 
 The following blocks reproduce the user's messages. The numbered questions
 they answer are not all present in this file. Add the corresponding interview
@@ -421,7 +422,7 @@ kept the actual wording, and drafted first-person form answers separately in
 are AI-assisted drafts. They do not prove that I wrote the implementation or
 the required README myself.
 
-### What is verified and what I still need to supply
+### What was verified at the submission-merge checkpoint
 
 The frontend and backend repositories were verified public on October 8.
 The frontend source, project README, prompt log and required distributed art
@@ -478,3 +479,54 @@ not an edit performed by me or a completed contribution. Until I actually do it
 and record the result, my personal-code contribution requirement remains
 incomplete. This follow-up clarification is not counted as an additional
 development specification.
+
+## Backend deployment and connection — October 8, 2026
+
+### 11. User request (verbatim)
+
+~~~text
+I need a backend deployed link, choose the best plan, like the GPT one, and set it up, update the backend repo and make it work on the game
+~~~
+
+I asked for an operational backend rather than source code alone. Codex selected
+a Render Free Node web service and the OpenAI Responses API with `gpt-6-luna`
+for bounded appearance extraction. After I confirmed private credential setup,
+Codex configured the existing project key in Render's private settings. Keys
+and private environment-file contents are deliberately excluded from this log.
+
+The backend repository is
+[OneCutAtlas_Backend](https://github.com/Toooonyliu/OneCutAtlas_Backend), and its
+deployed service is [one-cut-atlas-api](https://one-cut-atlas-api.onrender.com).
+The game warms `/health` before its compressed-image POST, separates startup
+and analysis timeouts, never automatically retries a billable analysis, and
+keeps local photo colors when the service fails. Request size, rate, concurrent
+calls and returned JSON are bounded. These are demo safeguards, not user
+authentication or a durable spending cap.
+
+### 12. User request (verbatim)
+
+~~~text
+现在好了，你看看可不可以接入后端了；同时；我这里应该填什么
+~~~
+
+I supplied screenshots of the API-credit balance and the assignment's backend
+URL field. A displayed balance alone did not prove that my project's model
+requests would work, so Codex tested the existing key and deployed service.
+The first large sprite-atlas cloud request timed out; local customization was
+kept. A smaller, authorized fictional game screenshot then returned HTTP 200
+from Render in about 4.4 seconds, with `source: ai`, four palette colors, outfit
+style and an appearance summary. This verified a real provider request, not
+just a mock test or the presence of an environment variable. The earlier
+not-yet-deployed statements above describe historical checkpoints.
+
+The frontend API base is `https://one-cut-atlas-api.onrender.com`. This is also
+the backend URL for the assignment form; it is not the source repository URL
+or the `/api/analyze-avatar` route. Only pressing **AI Colors** sends the
+compressed photo to the backend/OpenAI. Local color sampling and browser-local
+IndexedDB remain available independently. The service does not identify a
+person, generate a face, create accounts, or store cloud progress.
+
+The setup confirmations are not added to the selected prompt count. My own
+README, genuine personal code edit, focused-work record and recorded video
+remain separate outstanding student requirements; deploying the API does not
+complete them.

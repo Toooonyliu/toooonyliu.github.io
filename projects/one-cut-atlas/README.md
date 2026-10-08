@@ -52,12 +52,26 @@ The fighter workshop maps local photo colors onto the player's or rival's
 authored sprite frames. Choose a silhouette and adjust hair, skin, outfit and
 accent colors in the live preview. Local color sampling does not recognize a
 face or produce a photorealistic likeness. Regional stage art keeps its preset
-palette. Optional semantic appearance analysis uses `/api/analyze-avatar`;
-private server setup is described in the
-[backend repository](https://github.com/Toooonyliu/OneCutAtlas_Backend). The public frontend
-accepts a configured API base via a `one-cut-api-base` meta tag; no key belongs
-in browser code. AI controls stay hidden until an endpoint is configured.
-Without the service, local customization remains playable.
+palette. **AI Colors** adds GPT-assisted appearance analysis through the live
+[Render backend](https://one-cut-atlas-api.onrender.com). It uses the OpenAI
+Responses API with `gpt-6-luna` to return four colors and a choice among existing
+outfit silhouettes. It does not generate sprite images, reconstruct a face,
+identify a person or create new animation frames. The backend returned HTTP 200
+for a real provider analysis of an authorized fictional test image on October 8.
+
+The frontend's `one-cut-api-base` meta tag points to the public service URL;
+the OpenAI key stays in private server environment variables, never browser code.
+The connected frontend release still needs its final published-game browser check.
+The free Render service can sleep, so AI Colors wakes `/health` before sending
+one compressed photo to `/api/analyze-avatar`. Requests are not automatically
+retried. OpenAI API usage is separate from Render hosting and can consume API
+credits. Only use photos you own or have permission to send. The service is
+stateless and requests provider responses with `store: false`; this is not a
+promise that a third-party provider retains no data under its own policies.
+Private setup is described in the
+[backend repository](https://github.com/Toooonyliu/OneCutAtlas_Backend).
+If AI is unavailable, existing local colors and manual customization remain
+playable. This version has no accounts or cross-device cloud history.
 Photos, destinations and victory progress are saved locally in IndexedDB.
 
 ## Walkthrough and submission
@@ -65,7 +79,7 @@ Photos, destinations and victory progress are saved locally in IndexedDB.
 `presentation.html` is a separate English, ten-slide walkthrough with a live
 game embed. Use arrows to move, N for notes and F for fullscreen. It supports
 screen recording; it is not itself a recorded video. `prompt_log.md` preserves
-the available prompts and art provenance. `submission-checklist.md` identifies
+19 selected actual user messages and art provenance. `submission-checklist.md` identifies
 remaining student-authored README, actual code edits and recording work.
 `submission-answers.md` contains first-person form drafts and an evidence-based
 gap check; unresolved personal-work and video fields are not completed claims.
