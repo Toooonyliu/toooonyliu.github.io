@@ -25,7 +25,7 @@ export class Globe {
     this.velocity = { x: 0, y: 0 };
     this.pointers = new Map();
     this.projected = [];
-    // Geography stays pixelated; small Chinese place names use the browser's
+    // Geography stays pixelated; small place names use the browser's
     // native text rasterizer so they remain readable at any display density.
     this.labels = canvas.parentElement.querySelector('#map-pins');
     this.labelNodes = new Map();
@@ -40,7 +40,7 @@ export class Globe {
     const signal = this.events.signal;
     canvas.tabIndex = 0;
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', '可转动的像素地球。拖动旋转，滚轮或双指缩放；方向键旋转，加减键缩放，回车选择地点。也可展开旅途列表选择。');
+    canvas.setAttribute('aria-label', 'Pixel globe. Drag or use arrow keys to rotate; scroll, pinch, or use plus and minus to zoom. Press Enter to choose a destination, or use the region buttons.');
     canvas.addEventListener('pointerdown', event => this.pointerDown(event), { signal });
     canvas.addEventListener('pointermove', event => this.pointerMove(event), { signal });
     canvas.addEventListener('pointerup', event => this.pointerUp(event), { signal });
@@ -383,7 +383,7 @@ export class Globe {
     if (!pointer) {
       const marker = this.hitMarker(event.clientX, event.clientY);
       this.canvas.style.cursor = marker ? 'pointer' : 'grab';
-      this.canvas.title = marker ? marker.levels.length > 1 ? `${marker.level.location.name} · ${marker.levels.length} 处风景；再次点击切换` : `${marker.level.location.name} · ${marker.level.name}` : '';
+      this.canvas.title = marker ? marker.levels.length > 1 ? `${marker.level.location.name} · ${marker.levels.length} stages; click again to cycle` : `${marker.level.location.name} · ${marker.level.name}` : '';
       return;
     }
     const dx = event.clientX - pointer.x, dy = event.clientY - pointer.y;

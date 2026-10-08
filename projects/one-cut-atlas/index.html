@@ -1,73 +1,71 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111b20"><meta name="description" content="把旅行照片化作像素决斗，逐站点亮你的世界。One Cut Atlas 本地试玩版。">
-  <title>One Cut Atlas · 一刀，一站</title>
+  <meta name="theme-color" content="#111b20"><meta name="description" content="Choose a destination. Make a fighter your own. Win with one decisive cut.">
+  <title>One Cut Atlas</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23111b20'/%3E%3Cpath d='M8 24L24 8M8 8v7M8 8h7M24 24v-7M24 24h-7' stroke='%23edb777' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
  <header class="topbar">
-  <a class="brand" href="#" aria-label="One Cut Atlas 世界地图"><span class="brand-mark">一</span><span>ONE CUT <b>ATLAS</b></span></a>
-  <nav aria-label="主导航"><button id="nav-map" class="nav-link active">世界</button><button id="nav-help" class="nav-link">剑谱</button><a class="nav-link presentation-link" href="./presentation.html">Walkthrough ↗</a></nav>
+  <a class="brand" href="#" aria-label="One Cut Atlas world menu"><span class="brand-mark" aria-hidden="true">╱</span><span>ONE CUT <b>ATLAS</b></span></a>
+  <nav aria-label="Game menu"><button id="nav-map" class="nav-link active" hidden>World</button><button id="nav-help" class="nav-link">Help</button><a class="nav-link portfolio-link" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></nav>
  </header>
  <main id="atlas-screen">
   <div class="atlas-stage">
-   <section class="map-panel" aria-label="转动地球，选择旅途">
-    <div id="map-wrap" class="map-wrap"><canvas id="world-map" width="640" height="340" tabindex="0" aria-label="拖动旋转像素地球，点亮地点选择关卡；也可展开旅途列表。"></canvas><div id="map-pins" hidden></div></div>
-    <p class="globe-hint"><span aria-hidden="true">↔</span> 拖动探索 <span class="hint-dot">·</span> <span class="wheel-hint">滚轮缩放</span><span class="touch-hint">双指缩放</span></p>
+   <section class="map-panel" aria-label="Choose a destination on the globe">
+    <div id="map-wrap" class="map-wrap"><canvas id="world-map" width="640" height="340" tabindex="0" aria-label="Drag to rotate the globe. Click land to choose a duel, or open Destinations."></canvas><div id="map-pins" hidden></div></div>
+    <p class="globe-hint"><span aria-hidden="true">↔</span> Drag to explore</p>
    </section>
-   <section class="atlas-menu" aria-label="开始旅程">
-    <p class="eyebrow">ONE CUT ATLAS / WORLD SELECT</p>
-    <h1>一刀。<br>一世界。</h1>
-    <p class="menu-note">十一片旅区。你的角色。一次决胜。</p>
-    <p id="zone-progress" class="zone-progress">0 / 11 ZONES CLEARED</p>
-    <div id="zone-list" class="zone-list" role="group" aria-label="选择世界旅区"></div>
-    <section id="selected-level" class="selected-level" aria-label="所选关卡预览">
-     <div class="selected-art"><canvas id="selected-preview" width="960" height="540" aria-label="像素场景预览"></canvas><span id="selected-source" class="scene-tag">示例</span></div>
-     <div class="selected-info"><p class="eyebrow" id="selected-region">EAST ASIA / 京都</p><h2 id="selected-title">Kyoto Rain</h2><p id="selected-description"></p><div id="selected-tags" hidden></div></div>
-     <details class="destination-options"><summary aria-label="关卡选项">⋯</summary><button id="edit-selected" class="text-button">角色工坊</button></details>
+   <section class="atlas-menu" aria-label="Start a duel">
+    <p class="eyebrow">CHOOSE YOUR DUEL</p>
+    <h1><span>One world.</span><span>One cut.</span></h1>
+    <p id="zone-progress" class="zone-progress">0 / 11 cleared</p>
+    <section id="selected-level" class="selected-level" aria-label="Selected arena">
+     <div class="selected-art"><canvas id="selected-preview" width="960" height="540" aria-label="Pixel arena preview"></canvas><span id="selected-source" class="scene-tag" hidden></span></div>
+     <div class="selected-info"><p class="eyebrow" id="selected-region">EAST ASIA / KYOTO</p><h2 id="selected-title">Kyoto Rain</h2><p id="selected-description" hidden></p><div id="selected-tags" hidden></div></div>
+     <button id="edit-selected" class="text-button" hidden>Fighter</button>
     </section>
-    <label class="difficulty-choice">剑斗强度<select id="difficulty-select"><option value="beginner">初旅 · 看清刀路</option><option value="normal">决斗 · 更快应对</option><option value="hard">修罗 · 高压挑战</option></select></label>
-    <div class="menu-actions"><button id="challenge-selected" class="button primary">挑战这站 <span aria-hidden="true">→</span></button><button id="upload-open" class="button secondary">＋ 角色工坊</button></div>
-    <button id="play-demo" hidden>先玩一局</button>
+    <label class="difficulty-choice">Difficulty<select id="difficulty-select"><option value="beginner">Wanderer</option><option value="normal">Duelist</option><option value="hard">Master</option></select></label>
+    <div class="menu-actions"><button id="challenge-selected" class="button primary">Fight <span aria-hidden="true">→</span></button><button id="upload-open" class="button secondary">Fighter</button></div>
+    <button id="play-demo" hidden>Fight</button>
    </section>
    <details id="journey-drawer" class="journey-drawer">
-    <summary><span aria-hidden="true">◇</span> 旅途 <span class="drawer-arrow" aria-hidden="true">＋</span></summary>
-    <div class="journey-content"><div class="journey-counts"><span><strong id="cleared-count">00</strong> 已点亮</span><span><span id="level-count">04</span> 处风景</span></div><div id="level-list" class="level-list" aria-label="已保存关卡"></div><div class="progress-track" hidden><span id="progress-fill"></span></div><p id="progress-copy" hidden></p><p class="device-note">旅途保存在这台设备。</p></div>
+    <summary><span aria-hidden="true">◇</span> Destinations <span class="drawer-arrow" aria-hidden="true">＋</span></summary>
+    <div class="journey-content"><div id="zone-list" class="zone-list" role="group" aria-label="Travel zones"></div><details class="saved-duels"><summary>My duels <span aria-hidden="true">＋</span></summary><div class="journey-counts"><span><strong id="cleared-count">00</strong> cleared</span><span><span id="level-count">11</span> duels</span></div><div id="level-list" class="level-list" aria-label="Saved duels"></div><p class="device-note">Saved on this device.</p></details><div class="progress-track" hidden><span id="progress-fill"></span></div><p id="progress-copy" hidden></p></div>
    </details>
-   <footer class="site-footer"><span>★ 3 SIGNATURE STAGES · 11 TRAVEL ZONES</span><a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Geography: Natural Earth · Artistic zones</a></footer>
+   <footer class="site-footer"><a href="./presentation.html">Walkthrough ↗</a><a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Map: Natural Earth</a></footer>
   </div>
  </main>
  <main id="duel-screen" hidden>
-  <div class="duel-top"><button id="duel-back" class="text-button">返回地图</button><div><p id="duel-region" class="eyebrow"></p><h1 id="duel-title"></h1></div><button id="pause-button" class="button secondary small">暂停 <span class="key-mini">Esc</span></button></div>
-  <div class="arena-shell"><canvas id="duel-canvas" width="960" height="540" tabindex="0" aria-label="像素剑斗战场；A D 移动，W S X 换架势，按住 J 蓄力松开出剑，K 招架，空格后闪，C 蹲避，L 回劈，V 推撞，Esc 暂停。"></canvas><div class="arena-identity"><span>旅人 <small>YOU</small><small id="player-stance">横斩</small></span><span>守关人 <small>RIVAL</small><small id="rival-stance">横斩</small></span></div><div id="duel-status" class="duel-status" aria-live="polite"></div><div id="result-panel" class="result-panel" hidden></div></div>
-  <div class="duel-bottom"><div class="stance-controls" role="group" aria-label="剑术架势"><button data-stance="high" aria-pressed="false">上劈</button><button data-stance="mid" class="active" aria-pressed="true">横斩</button><button data-stance="low" aria-pressed="false">下撩</button><progress id="charge-meter" class="charge-meter" value="0" max="1" aria-label="出剑蓄力"></progress></div><p id="combat-tip" class="muted">寻找距离，等待破绽。</p><details class="combat-guide"><summary>按键 <span aria-hidden="true">＋</span></summary><div class="combat-guide-content"><span><kbd>A D</kbd> 移动</span><span><kbd>W X S</kbd> 上劈 / 横斩 / 下撩</span><span><kbd>J</kbd> 按住蓄力，松开出剑</span><span><kbd>K</kbd> 招架</span><span><kbd>Space</kbd> 后闪</span><span><kbd>C</kbd> 蹲避</span><span><kbd>L</kbd> 回劈</span><span><kbd>V</kbd> 推撞</span><span><kbd>Esc / R</kbd> 暂停 / 重试</span></div></details></div>
-  <div class="touch-controls" aria-label="触屏战斗操作"><div class="touch-move"><button data-control="left" aria-label="向左移动">◀</button><button data-control="right" aria-label="向右移动">▶</button></div><div class="touch-actions"><button data-control="dodge">后闪</button><button data-control="duck">蹲避</button><button data-control="shove">推撞</button><button data-control="parry">招架</button><button data-control="counter">回劈</button><button data-control="attack" class="touch-attack">出剑</button></div></div>
+  <div class="duel-top"><div class="duel-exits"><button id="duel-back" class="text-button">← World</button><a class="text-button" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></div><div><p id="duel-region" class="eyebrow"></p><h1 id="duel-title"></h1></div><button id="pause-button" class="button secondary small">Pause <span class="key-mini">Esc</span></button></div>
+  <div class="arena-shell"><canvas id="duel-canvas" width="960" height="540" tabindex="0" aria-label="Sword duel. A D move. W X S choose high, mid or low stance. Hold J to charge, release to strike. Hold K to guard. Space evade. C duck. L counter. V shove. Esc pause."></canvas><div class="arena-identity"><span>YOU<small id="player-stance">Mid</small></span><span>RIVAL<small id="rival-stance">Mid</small></span></div><div id="duel-status" class="duel-status" aria-live="polite"></div><div id="result-panel" class="result-panel" hidden></div></div>
+  <div class="duel-bottom"><div class="stance-controls" role="group" aria-label="Sword stance"><button data-stance="high" aria-pressed="false">High</button><button data-stance="mid" class="active" aria-pressed="true">Mid</button><button data-stance="low" aria-pressed="false">Low</button><progress id="charge-meter" class="charge-meter" value="0" max="1" aria-label="Strike charge"></progress></div><p id="combat-tip" class="muted"></p><details class="combat-guide"><summary>Controls <span aria-hidden="true">＋</span></summary><div class="combat-guide-content"><span><kbd>A D</kbd> Move</span><span><kbd>W X S</kbd> High / mid / low</span><span><kbd>J</kbd> Hold to charge · release to strike</span><span><kbd>K</kbd> Hold to guard matching stance</span><span><kbd>Space</kbd> Evade</span><span><kbd>C</kbd> Duck</span><span><kbd>L</kbd> Counter</span><span><kbd>V</kbd> Shove</span><span><kbd>Esc / R</kbd> Pause / retry</span></div></details></div>
+  <div class="touch-controls" aria-label="Touch combat controls"><div class="touch-move"><button data-control="left" aria-label="Move left">◀</button><button data-control="right" aria-label="Move right">▶</button></div><div class="touch-actions"><button data-control="dodge">Evade</button><button data-control="duck">Duck</button><button data-control="shove">Shove</button><button data-control="parry">Guard</button><button data-control="counter">Counter</button><button data-control="attack" class="touch-attack">Strike</button></div></div>
  </main>
  <dialog id="creator" class="creator-dialog" aria-labelledby="creator-title">
-  <div class="dialog-top"><div><p class="eyebrow">PORTRAIT / FIGHTER WORKSHOP</p><h2 id="creator-title">为这一站，创造对手。</h2></div><button id="creator-close" class="close-button" aria-label="关闭">×</button></div>
+  <div class="dialog-top"><div><h2 id="creator-title">Your fighter</h2></div><button id="creator-close" class="close-button" aria-label="Close">×</button></div>
   <div class="creator-grid">
-   <div class="creator-visual"><canvas id="creator-preview" width="960" height="540" aria-label="角色实时预览"></canvas><div class="creator-preview-caption"><span id="creator-mode">本地角色工坊</span><span>即时预览</span></div><label class="photo-drop" id="photo-drop"><input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp"><img id="photo-image" alt="上传的人物参考照片" hidden><span id="photo-placeholder"><b>＋ 选择或拖入人物照片</b><small>JPEG / PNG / WebP · 最大 12 MB</small></span><span id="photo-change" hidden>点击更换照片</span></label><div id="palette-swatches" class="palette-swatches"></div><p id="photo-message" class="muted" role="status">照片颜色映射到角色；可以手动微调。</p><p class="field-note privacy-note">仅使用你拥有或获准使用的照片。照片保存在此设备；只有点击 AI 分析时才会发送压缩图像。</p></div>
+   <div class="creator-visual"><canvas id="creator-preview" width="960" height="540" aria-label="Live fighter preview"></canvas><div class="creator-preview-caption"><span id="creator-mode">Photo colors</span><span>Preview</span></div><label class="photo-drop" id="photo-drop"><input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp"><img id="photo-image" alt="Uploaded reference photo" hidden><span id="photo-placeholder"><b>＋ Add a photo</b><small>JPG / PNG / WebP · 12 MB max</small></span><span id="photo-change" hidden>Change photo</span></label><div id="palette-swatches" class="palette-swatches" hidden></div><p id="photo-message" class="muted" role="status">Use photo colors, or pick your own.</p><p id="photo-privacy" class="field-note privacy-note">Use photos you own or have permission to use. Saved on this device.</p></div>
    <form id="creator-form" class="creator-form">
-    <label>关卡名称<input id="level-name" maxlength="60" required value="我的下一站" autocomplete="off"></label>
-    <label>旅区场景<select id="zone-select"></select></label>
-    <div class="field-pair"><label>自定义谁<select id="avatar-target"><option value="opponent">对手 / Rival</option><option value="player">自己 / Player</option></select></label><label>角色轮廓<select id="style-select"></select></label></div>
-    <fieldset><legend>角色配色 <small>上传后可微调</small></legend><div class="avatar-colors"><label>头发<input id="avatar-hair" type="color" value="#28252c"></label><label>肤色<input id="avatar-skin" type="color" value="#bd8d73"></label><label>服装<input id="avatar-outfit" type="color" value="#5d7779"></label><label>饰色<input id="avatar-accent" type="color" value="#c9b587"></label></div></fieldset>
+    <label>Duel name<input id="level-name" maxlength="60" required value="My duel" autocomplete="off"></label>
+    <label>Arena<select id="zone-select"></select></label>
+    <div class="field-pair"><label>Customize<select id="avatar-target"><option value="opponent">Rival</option><option value="player">You</option></select></label><label>Outfit<select id="style-select"></select></label></div>
+    <fieldset><legend>Colors</legend><div class="avatar-colors"><label>Hair<input id="avatar-hair" type="color" value="#28252c"></label><label>Skin<input id="avatar-skin" type="color" value="#bd8d73"></label><label>Clothes<input id="avatar-outfit" type="color" value="#5d7779"></label><label>Accent<input id="avatar-accent" type="color" value="#c9b587"></label></div></fieldset>
     <div hidden>
-    <label>地点<select id="location-select"></select></label><p id="gps-note" class="field-note"></p>
-    <div id="custom-location-fields" hidden><label>地点名<input id="custom-name" maxlength="60" placeholder="给这个坐标起个名字"></label><div class="field-pair"><label>纬度<input id="custom-lat" type="number" min="-85" max="85" step="any"></label><label>经度<input id="custom-lon" type="number" min="-180" max="180" step="any"></label></div></div>
-    <fieldset><legend>环境</legend><div id="environment-options" class="choice-grid"></div></fieldset>
-    <label>光照<select id="lighting-select"></select></label>
-    <fieldset><legend>场景元素 <small>最多 4 个</small></legend><div id="element-options" class="element-options"></div></fieldset>
+    <label>Location<select id="location-select"></select></label><p id="gps-note" class="field-note"></p>
+    <div id="custom-location-fields" hidden><label>Place name<input id="custom-name" maxlength="60" placeholder="Name this place"></label><div class="field-pair"><label>Latitude<input id="custom-lat" type="number" min="-85" max="85" step="any"></label><label>Longitude<input id="custom-lon" type="number" min="-180" max="180" step="any"></label></div></div>
+    <fieldset><legend>Environment</legend><div id="environment-options" class="choice-grid"></div></fieldset>
+    <label>Lighting<select id="lighting-select"></select></label>
+    <fieldset><legend>Scenery <small>Up to 4</small></legend><div id="element-options" class="element-options"></div></fieldset>
     </div>
-    <button id="ai-analyze" type="button" class="button secondary full">AI 外观分析（可选）</button><p class="field-note">本地配色现在可用。接入 AI 服务后，可识别人物外观并匹配已有角色轮廓。</p>
-    <div id="creator-error" class="form-error" role="alert" hidden></div><button id="save-start" type="submit" class="button primary full">保存关卡并出剑</button>
+    <button id="ai-analyze" type="button" class="button secondary full" hidden>AI colors</button>
+    <div id="creator-error" class="form-error" role="alert" hidden></div><button id="save-start" type="submit" class="button primary full">Save & fight</button>
    </form>
   </div>
  </dialog>
- <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title"><button id="help-close" class="close-button" aria-label="关闭">×</button><p class="eyebrow">A TRAVELER'S FIELD GUIDE</p><h2 id="help-title">一刀的距离。</h2><p>观察架势，寻找破绽。一次有效命中，决定胜负。</p><div class="help-row"><kbd>A / D</kbd><span>移动；方向键也可使用。</span></div><div class="help-row"><kbd>W / X / S</kbd><span>上劈 / 横斩 / 下撩；也可用 1 / 2 / 3。</span></div><div class="help-row"><kbd>J</kbd><span>按住蓄力，松开出剑。</span></div><div class="help-row"><kbd>K / L</kbd><span>同向招架；成功防御后快速回劈。</span></div><div class="help-row"><kbd>Space / C</kbd><span>后闪避纵斩；俯身避横斩。</span></div><div class="help-row"><kbd>V</kbd><span>近身推撞，打乱对手架势。</span></div><div class="help-row"><kbd>Esc / R</kbd><span>暂停 / 结算后重试。</span></div><button id="help-play" class="button primary full">去试一刀</button></dialog>
+ <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title"><button id="help-close" class="close-button" aria-label="Close">×</button><p class="eyebrow">HOW TO PLAY</p><h2 id="help-title">One clean hit.</h2><p>Read the blade. Control the distance.</p><div class="help-row"><kbd>A / D</kbd><span>Move. Arrow keys work too.</span></div><div class="help-row"><kbd>W / X / S</kbd><span>High / mid / low stance. Or 1 / 2 / 3.</span></div><div class="help-row"><kbd>J</kbd><span>Hold to charge. Release to strike.</span></div><div class="help-row"><kbd>K</kbd><span>Hold to guard in the matching stance.</span></div><div class="help-row"><kbd>L</kbd><span>Counter after a successful guard or evade.</span></div><div class="help-row"><kbd>Space / C</kbd><span>Evade vertical cuts / duck mid cuts.</span></div><div class="help-row"><kbd>V</kbd><span>Shove at close range.</span></div><div class="help-row"><kbd>Esc / R</kbd><span>Pause / retry after the result.</span></div><button id="help-play" class="button primary full">Fight</button></dialog>
  <div id="toast" class="toast" role="status" hidden></div>
  <script type="module" src="./src/app.js"></script>
 </body>

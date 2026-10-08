@@ -3,14 +3,16 @@
 A pixel-art travel and sword-duel prototype. Run `npm start` and open
 the printed localhost URL (default 4173; set `PORT` for another port).
 `npm test` runs the tests included with this checkout; `npm run build` produces
-`dist/`. The published frontend includes combat and avatar/region tests. The
+`dist/`. The published frontend includes combat, avatar/region and save tests. The
 separate backend repository contains its HTTP and model-boundary tests.
 
 ## Explore
 
 Drag the shaded pixel globe to rotate it; use the wheel or pinch to zoom.
-Choose a colored land region, one of eleven Travel Zone buttons, or open
-**旅途** to select a saved destination. Three original flagship stages are
+Choose a colored land region, or open **Destinations** for eleven Travel Zones.
+**My duels** holds saved custom arenas. The game interface is English, with
+controls in **Help** and an exit to the portfolio on the menu and duel screens.
+Three original flagship stages are
 Kyoto Rain, Cairo River Dusk and New York Underpass; eight more zones use
 playable foundation presets. The approximate zones are artistic navigation,
 not political boundaries. Keyboard users
@@ -54,7 +56,8 @@ palette. Optional semantic appearance analysis uses `/api/analyze-avatar`;
 private server setup is described in the
 [backend repository](https://github.com/Toooonyliu/OneCutAtlas_Backend). The public frontend
 accepts a configured API base via a `one-cut-api-base` meta tag; no key belongs
-in browser code. Without the service, local customization remains playable.
+in browser code. AI controls stay hidden until an endpoint is configured.
+Without the service, local customization remains playable.
 Photos, destinations and victory progress are saved locally in IndexedDB.
 
 ## Walkthrough and submission

@@ -258,5 +258,25 @@ Distributed asset: assets/art/zone-africa-v1.webp.
 Generate an original 16:9 pixel-art background asset for a 2D side-view sword duel game named One Cut Atlas. No characters, no weapons, no blood, no text, no lettering, no logos, no watermark. Deliberately simple game environment with crisp chunky pixels on a consistent low-resolution 480x270 logical grid, 12-16 restrained colors, large quiet shapes, no smooth gradients or painterly rendering. The camera is exactly side-on and static. Three to five flat depth layers; a clear flat ground strip extends all the way across at 78 percent image height, with only ground below it. The center of the image, especially horizontal band from 50 to 78 percent height, has subdued mid-value wall or architecture so two dark fighters read strongly in silhouette. Restrained texture and repeating structural rhythms. It must look authored for a pixel game, not a detailed AI illustration. Scene: New York Underpass. An empty New York rail viaduct underpass on a rainy night, massive simple square iron columns and broad brick wall, distant rows of tiny apartment window pixels above, one sodium amber pool of light, very restrained cyan reflections on asphalt. Palette: blue charcoal, dusty violet, dark rust, sodium amber, a few cyan pixels. Straight-on elevation, no vanishing-point road. Broad quiet brick background at fighter height. Flat asphalt ground starts exactly at 78 percent height.
 ~~~
 
+## English game-menu revision
+
+### User feedback (verbatim)
+
+~~~text
+几个事情，第一个事情是，我需要这个整个游戏需要一个英文版本。第二，目前不需要这么多的文字的形式，就是有点太多了，更像感觉是我在用一个功能型的APP，而非在玩一个游戏。嗯，然后第三点是具体的这个后端的 repository，它的这个 API 调用的是什么什么内容，然后它是，它有什么用？它用的是 GPT 的 API吗，还是什么东西？然后它能不能现在投入正常的使用，是一个很重要的问题。嗯，同时，我在进入这个游戏之后，我应该也有一个办法可以退回到我的主页，对吧。
+~~~
+
+Codex translated the complete runtime interface and errors into English,
+collapsed region choices into Destinations, shortened combat and result copy,
+and added Portfolio exit links to both world and duel screens. Unconfigured
+AI controls are hidden instead of calling a nonexistent GitHub Pages API.
+Local fighter customization remains available. A discovered save bug that
+dropped the avatar configuration was fixed, with a save/load regression test.
+The final local suite passed 67 tests. These changes were AI-assisted; they do
+not establish student-authored code. The backend uses OpenAI Responses image
+analysis to return palette/style JSON, not generated animation sheets. Render,
+private key/model configuration and one actual authorized-photo test remain
+pending; no provider request was made during this revision.
+
 Saved original: assets/art/zone-north-america-v1.png.
 Distributed asset: assets/art/zone-north-america-v1.webp.

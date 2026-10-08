@@ -12,7 +12,7 @@ const DIRECTIONS = ['high', 'mid', 'low'];
 const ACTIONS = ['attack', 'parry', 'dodge', 'duck', 'counter', 'shove'];
 // Contact sparks follow the authored head/chest/shin blade positions.
 const HEIGHT = { high: WORLD.ground - 104, mid: WORLD.ground - 89, low: WORLD.ground - 29 };
-const DIRECTION_NAME = { high: '上段', mid: '中段', low: '下段' };
+const DIRECTION_NAME = { high: 'HIGH', mid: 'MID', low: 'LOW' };
 const PROFILES = {
   beginner: { speed: 145, windup: 0.40, reaction: 0.28, attackChance: 0.47, parryChance: 0.18, evadeChance: 0.16 },
   normal: { speed: 172, windup: 0.30, reaction: 0.22, attackChance: 0.56, parryChance: 0.30, evadeChance: 0.25 },
@@ -89,7 +89,7 @@ export class DuelEngine {
     this.paused = false;
     this.hitstop = 0;
     this.shake = 0;
-    this.message = '准备 · 上中下三段，一击决胜';
+    this.message = 'Ready · One cut wins';
     this._effects = [];
     this._effectSerial = 0;
     this._attackSerial = 0;
@@ -206,7 +206,7 @@ export class DuelEngine {
     f.attackKind = 'normal';
     f._aiChargeDuration = duration;
     this._setState(f, 'charge', MAX_CHARGE);
-    if (f === this._opponent) this.message = `对手${DIRECTION_NAME[f.stance]}蓄势 · 看准方向再闪避`;
+    if (f === this._opponent) this.message = `Rival winds up ${DIRECTION_NAME[f.stance]}`;
     return true;
   }
 
@@ -232,7 +232,7 @@ export class DuelEngine {
     f.fatigue = clamp(f.fatigue + 0.10 + f.charge * 0.08, 0, 1);
     this._setState(f, 'windup', windup);
     if (isPlayer) this._playerAttackSerial++;
-    else this.message = `对手${DIRECTION_NAME[f.attackDirection]}出剑 · ${f.attackDirection === 'mid' ? '下潜或同向格挡' : '后闪或同向格挡'}`;
+    else this.message = `${DIRECTION_NAME[f.attackDirection]} cut · ${f.attackDirection === 'mid' ? 'Duck / match guard' : 'Backstep / match guard'}`;
     return true;
   }
 
@@ -499,7 +499,7 @@ export class DuelEngine {
         defender.counterReady = true;
         this._effect('evade', defender.x, this._bladeY(attacker), defender.facing, 0.25,
           { direction: attacker.attackDirection, strength: 0.7 });
-        if (defender === this._player) this.message = '闪过刀锋 · 按 L 回身反斩';
+        if (defender === this._player) this.message = 'Evaded · L to counter';
       }
       return false;
     }
@@ -526,7 +526,7 @@ export class DuelEngine {
     this._effect('parry', defender.x + defender.facing * 37, this._bladeY(attacker), defender.facing, 0.38,
       { direction: attacker.attackDirection, strength: strong ? 1 : 0.65 });
     this._impact(strong ? 0.065 : 0.045, strong ? 0.55 : 0.28);
-    this.message = defender === this._player ? '同向格挡成功 · 按 J 或 L 抢先反击' : '被格挡 · 后闪或推开对手';
+    this.message = defender === this._player ? 'Parried · J / L to counter' : 'Blocked · Reset your distance';
     return true;
   }
 
@@ -547,7 +547,7 @@ export class DuelEngine {
     this._effect('shove', (attacker.x + defender.x) / 2, WORLD.ground - 62, attacker.facing, 0.30,
       { direction: 'mid', shoveKind: attacker.shoveKind, strength: 0.7 });
     this._impact(0.025, 0.25);
-    this.message = attacker === this._player ? `${attacker.shoveKind === 'pull' ? '拉近' : '推开'}对手 · 重整距离` : '被推开 · 等站稳再出剑';
+    this.message = attacker === this._player ? `${attacker.shoveKind === 'pull' ? 'Pull' : 'Push'} · Reset your distance` : 'Shoved · Recover';
   }
 
   _collide() {
@@ -566,7 +566,7 @@ export class DuelEngine {
       this._setState(player, 'stunned', 0.19 - advantage * 0.065);
       this._setState(enemy, 'stunned', 0.19 + advantage * 0.065);
       this._impact(0.065, 0.65);
-      this.message = Math.abs(advantage) > 0.5 ? '蓄力撞刀 · 趁对手踉跄抢占距离' : '同向撞刀 · 双方震退，再找破绽';
+      this.message = Math.abs(advantage) > 0.5 ? 'Charged clash · Take ground' : 'Clash · Find an opening';
       return;
     }
     this._deflect(player, enemy);
@@ -590,7 +590,7 @@ export class DuelEngine {
     this._aiMove = 0;
     this._pendingThreatAt = Infinity;
     this._impact(0.085, 1);
-    this.message = { victory: '胜利 · 继续移动挥刀，留下你的印记', defeat: '败北 · 看清刀路，再试一刀', draw: '同时命中 · 此地尚未点亮' }[this.result];
+    this.message = { victory: 'Victory · Keep moving', defeat: 'Defeat · Try again', draw: 'Double hit · Draw' }[this.result];
   }
 
   _kill(defender, attacker) {
@@ -641,7 +641,7 @@ export class DuelEngine {
       if (this.countdown < 1e-8) {
         this.countdown = 0;
         this.phase = 'playing';
-        this.message = '开始 · W / X / S 选刀路，按住 J 蓄力，松开出剑';
+        this.message = 'Fight!';
       }
       return;
     }

@@ -3,7 +3,7 @@
 .eyebrow{margin:0 0 10px;color:var(--gold);font:10px var(--mono);letter-spacing:2px}.muted{margin:0;color:var(--muted);font-size:13px;line-height:1.7}.button{display:inline-flex;align-items:center;justify-content:center;gap:15px;min-height:44px;padding:11px 20px;border:1px solid transparent;border-radius:1px;font-size:13px;font-weight:500;white-space:nowrap}.primary{background:var(--rust);color:#fff0d6;border-color:#d39377;box-shadow:0 2px 0 #6e463e}.secondary{background:#1a252377;border-color:#68645a;color:#dfd2be}.small{min-height:34px;padding:7px 13px;font-size:12px}.full{width:100%}.text-button{padding:6px 0;background:none;color:var(--muted);font-size:12px}.text-button:hover{color:var(--gold)}.key-mini{border:1px solid currentColor;padding:1px 4px;font:10px var(--mono);opacity:.55}
 /* A quiet game menu around a single, tangible world. */
 .topbar{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:center;height:72px;max-width:1440px;margin:auto;padding:0 4%}.brand{display:flex;align-items:center;gap:12px;color:#c8c5b4;font:13px var(--mono);letter-spacing:2px}.brand b{color:var(--gold);font-weight:400}.brand-mark{color:var(--rust);font:30px var(--serif)}nav{display:flex;align-items:center;gap:30px;height:100%}.nav-link{height:100%;padding:0;background:none;color:#a5a89b;font-size:12px}.nav-link.active{color:var(--ink)}.nav-link.active::after{content:"";display:block;height:2px;width:13px;background:var(--rust);margin:6px auto -8px}
-#atlas-screen{max-width:1440px;margin:auto}.atlas-stage{position:relative;min-height:580px;height:calc(100dvh - 72px);isolation:isolate;overflow:clip}.atlas-stage::before{content:"";position:absolute;z-index:-2;inset:-72px -6% 0;background:linear-gradient(90deg,#111b1cf2 0%,#111b1cbf 36%,#111b1c88 66%,#111b1cbf 100%),linear-gradient(0deg,#111b1c 0%,transparent 35%,#111b1c99 100%),url('../assets/art/forest-v2.png') center/cover;opacity:.55;image-rendering:pixelated}.atlas-stage::after{content:"旅";position:absolute;z-index:-1;left:1%;top:9%;color:#e6bd9c;opacity:.025;font:330px/1 var(--serif);pointer-events:none}.map-panel{position:absolute;inset:0}.map-wrap{width:100%;height:100%}#world-map{width:100%;height:100%;display:block;image-rendering:pixelated;touch-action:none;cursor:grab}#world-map.is-dragging{cursor:grabbing!important}#world-map:focus-visible{outline-offset:-5px}.globe-hint{position:absolute;bottom:7%;right:21%;margin:0;color:#a8a396;font-size:11px;letter-spacing:1px;pointer-events:none}.globe-hint>span:first-child{color:#d0ab89;font-size:14px;margin-right:6px}.hint-dot{margin:0 12px;opacity:.5}.touch-hint{display:none}
+#atlas-screen{max-width:1440px;margin:auto}.atlas-stage{position:relative;min-height:580px;height:calc(100dvh - 72px);isolation:isolate;overflow:clip}.atlas-stage::before{content:"";position:absolute;z-index:-2;inset:-72px -6% 0;background:linear-gradient(90deg,#111b1cf2 0%,#111b1cbf 36%,#111b1c88 66%,#111b1cbf 100%),linear-gradient(0deg,#111b1c 0%,transparent 35%,#111b1c99 100%),url('../assets/art/forest-v2.webp') center/cover;opacity:.55;image-rendering:pixelated}.atlas-stage::after{content:"";position:absolute;z-index:-1;left:1%;top:9%;color:#e6bd9c;opacity:.025;font:330px/1 var(--serif);pointer-events:none}.map-panel{position:absolute;inset:0}.map-wrap{width:100%;height:100%}#world-map{width:100%;height:100%;display:block;image-rendering:pixelated;touch-action:none;cursor:grab}#world-map.is-dragging{cursor:grabbing!important}#world-map:focus-visible{outline-offset:-5px}.globe-hint{position:absolute;bottom:7%;right:21%;margin:0;color:#a8a396;font-size:11px;letter-spacing:1px;pointer-events:none}.globe-hint>span:first-child{color:#d0ab89;font-size:14px;margin-right:6px}.hint-dot{margin:0 12px;opacity:.5}.touch-hint{display:none}
 .atlas-menu{position:absolute;z-index:2;top:12%;left:4%;width:350px;pointer-events:none}.atlas-menu>*,.atlas-menu button,.atlas-menu details{pointer-events:auto}.atlas-menu>.eyebrow{color:#b79e88;font-size:9px;letter-spacing:3px}.atlas-menu h1{margin:20px 0 18px;color:#e7dbc3;font:76px/1.1 var(--serif);letter-spacing:5px;font-weight:500;text-shadow:0 3px 0 #111b1c}.menu-note{margin:0;color:#b6b2a1;font-size:12px;letter-spacing:2px}.selected-level{position:relative;display:grid;grid-template-columns:130px minmax(0,1fr);align-items:center;gap:14px;margin:28px 0 16px;padding:10px;border-left:2px solid #a0715e;background:linear-gradient(90deg,#20302bc9,#20282773);box-shadow:0 8px 25px #0002}.selected-art{overflow:hidden;aspect-ratio:16/9;background:#23372e}.selected-art canvas{display:block;width:100%;height:100%;image-rendering:pixelated}.selected-info{min-width:0}.selected-info .eyebrow{color:#aaa694;font-size:9px;letter-spacing:1px;margin:0 0 7px}.selected-info h2{margin:0;color:#e2d6be;font:16px/1.5 var(--serif);font-weight:600;overflow-wrap:anywhere}.destination-options{position:absolute;top:0;right:3px}.destination-options summary{width:23px;text-align:center;color:#bba78e;font-size:18px;line-height:20px}.destination-options[open] .text-button{position:absolute;z-index:6;top:23px;right:0;width:95px;padding:11px;background:#182622;border:1px solid #6e5e50;color:var(--ink)}.menu-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.menu-actions .button{padding:10px 13px}
 .journey-drawer{position:absolute;z-index:6;right:4%;top:18px;width:265px}.journey-drawer>summary{display:flex;align-items:center;gap:9px;width:fit-content;min-height:35px;margin-left:auto;color:#d5c6aa;font-size:12px;letter-spacing:2px}.journey-drawer>summary>span:first-child{color:var(--rust);font-size:15px}.drawer-arrow{color:#ae9d85;margin-left:17px;transition:transform .2s}.journey-drawer[open] .drawer-arrow{transform:rotate(45deg)}.journey-content{margin-top:9px;padding:16px 13px 12px;background:#17231fea;border:1px solid #665e4e;box-shadow:0 18px 40px #03080870;backdrop-filter:blur(10px)}.journey-counts{display:flex;justify-content:space-between;align-items:center;margin:0 5px 13px;color:#a8a68e;font-size:10px}.journey-counts strong{font:14px var(--mono);color:var(--gold);margin-right:5px}.level-list{display:flex;flex-direction:column;gap:4px;max-height:min(360px,57dvh);overflow:auto}.level-item{display:flex;align-items:center;gap:11px;min-height:57px;padding:8px 9px;border-left:2px solid transparent;background:none;text-align:left}.level-item.selected{border-color:var(--rust);background:#39443588}.level-item .level-dot{color:#82927f;font-size:17px}.level-item.cleared .level-dot{color:#e2b780}.level-item b{display:block;font-size:13px;font-weight:500}.level-item small{display:block;margin-top:3px;color:#9aa191;font-size:10px}.level-chevron{margin-left:auto;color:#9a9c86}.device-note{margin:15px 5px 0;color:#8d9485;font-size:10px}.site-footer{position:absolute;inset:auto 4% 17px;display:flex;justify-content:space-between;color:#879185;font:8px var(--mono);letter-spacing:2px;opacity:.6;pointer-events:none}.site-footer a{font-size:8px;letter-spacing:0;pointer-events:auto}
 /* Combat uses the whole viewport, with an unobtrusive stance strip. */
@@ -74,4 +74,55 @@ dialog{border-radius:0;background:#18272d;box-shadow:6px 6px #09121a,0 30px 90px
  .menu-actions{bottom:0}.globe-hint{bottom:295px;font-size:9px}.journey-drawer{top:19px}.journey-drawer>summary{font-size:10px}.journey-drawer>summary>span:first-child{display:none}
  .selected-level{bottom:92px}.difficulty-choice{position:absolute;bottom:46px;width:100%}.globe-hint{bottom:330px}
  .creator-dialog{width:94vw}.avatar-colors{gap:7px}
+}
+
+/* Game-first English menu: destinations and instructions stay off the stage. */
+:root{--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.portfolio-link{display:flex;align-items:center;font:10px var(--mono);color:#b8c1b9;white-space:nowrap}
+.atlas-stage{min-height:560px;height:calc(100dvh - 64px)}
+.atlas-menu{top:12%;width:350px}
+.atlas-menu h1{margin:12px 0 16px;font:58px/1.05 var(--serif);letter-spacing:-1.5px}
+.atlas-menu h1 span{display:block}
+.zone-progress{margin:0 0 20px;color:#8fa5a0;font:10px var(--mono);letter-spacing:1px}
+.selected-level{margin:0 0 14px}
+.selected-art{aspect-ratio:16/8}
+.selected-info{padding:12px 14px}
+.selected-info .eyebrow{font-size:9px;letter-spacing:1px;margin:0 0 5px}
+.selected-info h2{font:19px/1.3 var(--mono)}
+.difficulty-choice{font-size:10px;letter-spacing:0;margin-bottom:12px}
+.difficulty-choice select{min-width:100px;font:11px var(--mono)}
+.menu-actions .button{min-height:46px;font:13px var(--mono);letter-spacing:1px}
+.journey-drawer{width:330px;top:20px}
+.journey-drawer>summary{letter-spacing:0;font:12px var(--mono)}
+.journey-content{padding:13px;max-height:calc(100dvh - 140px);overflow:auto}
+.journey-content .zone-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.journey-content .zone-button{min-height:36px;font:10px/1.3 var(--mono)}
+.saved-duels{margin-top:13px;border-top:1px solid #425458}
+.saved-duels>summary{padding:12px 3px 0;font:11px var(--mono);color:#9cb1a8;display:flex;justify-content:space-between}
+.saved-duels .journey-counts{margin-top:14px}
+.globe-hint{bottom:7%;right:23%;letter-spacing:0}
+.duel-exits{display:flex;align-items:center;gap:18px;text-align:left!important}
+.duel-exits .text-button{font:11px var(--mono);white-space:nowrap}
+.duel-top>div:last-of-type{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none}
+.duel-bottom .muted{font:11px/1.4 var(--mono)}
+.result-panel .eyebrow,.result-panel .result-hint{display:none}
+.dialog-top h2{font:27px/1.2 var(--serif)}
+.creator-preview-caption{font:10px var(--mono)}
+.creator-form{gap:17px}
+.creator-form label,.creator-form legend{font-size:12px}
+.creator-form fieldset legend{padding:0}
+.photo-drop b{font:13px var(--mono)}
+.privacy-note{margin-top:10px;line-height:1.5}
+@media(min-width:721px) and (max-height:750px){.atlas-menu{top:7%}.atlas-menu h1{font-size:48px}.atlas-stage{min-height:550px}.zone-progress{margin-bottom:17px}.selected-art{aspect-ratio:16/7}}
+@media(min-width:721px) and (max-height:600px){.topbar{height:56px}.atlas-stage{height:calc(100dvh - 56px);min-height:480px}.atlas-menu{top:4%}.atlas-menu h1{font-size:38px;margin:10px 0 12px}.zone-progress{margin-bottom:12px}.selected-art{aspect-ratio:16/6}.selected-info{padding:9px 12px}.menu-actions .button{min-height:40px}}
+@media(max-width:1000px) and (min-width:721px){.atlas-menu{width:300px}.atlas-menu h1{font-size:48px}.journey-drawer{width:300px}.selected-info h2{font-size:17px}}
+@media(max-width:720px){
+ .topbar{height:56px}.topbar nav{gap:18px}.portfolio-link{display:flex;font-size:10px}.brand{font-size:10px;letter-spacing:1px}
+ .atlas-stage{height:calc(100dvh - 56px);min-height:680px}.atlas-menu{top:25px;bottom:36px;left:5%;right:5%;width:auto}
+ .atlas-menu>.eyebrow{font-size:8px;letter-spacing:1px;margin-bottom:8px}.atlas-menu h1{font-size:38px;margin:0 0 12px;letter-spacing:-1px}.atlas-menu h1 span{display:inline}.atlas-menu h1 span+span::before{content:" "}
+ .zone-progress{font-size:9px;margin:0}.selected-level{bottom:99px}.selected-art{aspect-ratio:16/6}.selected-info{padding:11px 12px}.selected-info h2{font-size:17px}
+ .difficulty-choice{bottom:50px;margin:0}.menu-actions{bottom:0}.menu-actions .button{min-height:44px;font-size:12px}
+ .globe-hint{bottom:310px;left:0;right:0;font-size:9px}.journey-drawer{top:126px;width:min(330px,90vw);right:5%}.journey-drawer>summary{font-size:11px}.journey-content{max-height:420px}
+ .duel-exits{gap:9px;flex-direction:column;align-items:flex-start;justify-content:center}.duel-exits .text-button{padding:0;font-size:9px}.duel-top h1{font-size:13px;letter-spacing:0}.duel-top .eyebrow{font-size:7px;letter-spacing:.5px}
+ .duel-bottom .muted{font-size:9px}.touch-controls button{font-size:9px}.creator-dialog{padding:18px}.creator-grid{gap:18px}.dialog-top h2{font-size:24px}
 }

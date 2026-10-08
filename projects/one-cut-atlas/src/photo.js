@@ -5,10 +5,10 @@ export const MAX_IMAGE_PIXELS = 40_000_000;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function validatePhotoFile(file) {
-  if (!file || typeof file.arrayBuffer !== 'function') throw new Error('请选择一张照片。');
-  if (!ALLOWED_TYPES.includes(file.type)) throw new Error('仅支持 JPEG、PNG 或 WebP。请先转换 HEIC 等其他格式。');
-  if (!Number.isFinite(file.size) || file.size <= 0) throw new Error('这张照片是空文件。');
-  if (file.size > MAX_PHOTO_BYTES) throw new Error('照片不能超过 12 MB。请先缩小后重试。');
+  if (!file || typeof file.arrayBuffer !== 'function') throw new Error('Choose a photo first.');
+  if (!ALLOWED_TYPES.includes(file.type)) throw new Error('Use JPEG, PNG or WebP. Convert HEIC first.');
+  if (!Number.isFinite(file.size) || file.size <= 0) throw new Error('This photo is empty.');
+  if (file.size > MAX_PHOTO_BYTES) throw new Error('Use a photo under 12 MB.');
 }
 
 export function detectImageMime(input) {
@@ -134,7 +134,7 @@ function canvasFor(image,maxEdge) {
   const canvas=document.createElement('canvas');
   canvas.width=Math.max(1,Math.round(width*scale)); canvas.height=Math.max(1,Math.round(height*scale));
   const ctx=canvas.getContext('2d',{willReadFrequently:true});
-  if (!ctx) throw new Error('浏览器无法处理图片。请换一个浏览器重试。');
+  if (!ctx) throw new Error('This browser cannot process photos. Try another browser.');
   ctx.fillStyle='#ece9df'; ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(image,0,0,canvas.width,canvas.height);
   return {canvas,ctx};
@@ -146,9 +146,9 @@ async function decode(file) {
   }
   return new Promise((resolve,reject) => {
     const url=URL.createObjectURL(file), image=new Image();
-    const timer=setTimeout(()=>{ image.src=''; URL.revokeObjectURL(url); reject(new Error('图片解码超时，请缩小照片后重试。')); },15000);
+    const timer=setTimeout(()=>{ image.src=''; URL.revokeObjectURL(url); reject(new Error('Photo loading timed out. Try a smaller image.')); },15000);
     image.onload=()=>{ clearTimeout(timer); URL.revokeObjectURL(url); resolve(image); };
-    image.onerror=()=>{ clearTimeout(timer); URL.revokeObjectURL(url); reject(new Error('无法读取这张照片。请使用有效的 JPEG、PNG 或 WebP。')); };
+    image.onerror=()=>{ clearTimeout(timer); URL.revokeObjectURL(url); reject(new Error('Could not read this photo. Use JPEG, PNG or WebP.')); };
     image.src=url;
   });
 }
@@ -157,14 +157,14 @@ export async function preparePhoto(file) {
   validatePhotoFile(file);
   const bytes=new Uint8Array(await file.arrayBuffer());
   const mime=detectImageMime(bytes);
-  if (mime !== file.type) throw new Error('图片内容与文件格式不一致，请重新导出照片。');
+  if (mime !== file.type) throw new Error('Photo format mismatch. Export it again.');
   const dimensions=readImageDimensions(bytes,mime);
-  if (dimensions && (dimensions.width < 1 || dimensions.height < 1 || dimensions.width*dimensions.height > MAX_IMAGE_PIXELS)) throw new Error('图片分辨率过大（最多 4000 万像素），请缩小后重试。');
+  if (dimensions && (dimensions.width < 1 || dimensions.height < 1 || dimensions.width*dimensions.height > MAX_IMAGE_PIXELS)) throw new Error('Use a photo under 40 megapixels.');
   const gps=mime === 'image/jpeg' ? readExifGPS(bytes) : null;
   const image=await decode(file);
   try {
     const width=image.width || image.naturalWidth, height=image.height || image.naturalHeight;
-    if (!width || !height || width*height > MAX_IMAGE_PIXELS) throw new Error('图片分辨率不受支持，请缩小照片后重试。');
+    if (!width || !height || width*height > MAX_IMAGE_PIXELS) throw new Error('Unsupported resolution. Try a smaller photo.');
     const main=canvasFor(image,960), thumb=canvasFor(main.canvas,360), sample=canvasFor(main.canvas,64);
     const palette=extractPalette(sample.ctx.getImageData(0,0,sample.canvas.width,sample.canvas.height).data,sample.canvas.width,sample.canvas.height);
     return { dataUrl:main.canvas.toDataURL('image/jpeg',.84), thumbnail:thumb.canvas.toDataURL('image/jpeg',.76), palette, gps };
@@ -176,19 +176,19 @@ function isScene(value) {
 }
 
 export async function requestScene(dataUrl) {
-  if (typeof dataUrl !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(dataUrl) || dataUrl.length > 2_800_000) throw new Error('图片数据不受支持。请重新选择照片。');
+  if (typeof dataUrl !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(dataUrl) || dataUrl.length > 2_800_000) throw new Error('Unsupported photo. Choose it again.');
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),28000);
   try {
     const response=await fetch('/api/analyze',{ method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image:dataUrl}), signal:controller.signal });
     let body;
-    try { body=await response.json(); } catch { throw new Error('AI 接口不可用。你可以继续手动配置场景。'); }
-    if (!response.ok) throw new Error(typeof body.error === 'string' ? body.error.slice(0,240) : 'AI 分析失败。你可以继续手动配置场景。');
+    try { body=await response.json(); } catch { throw new Error('AI is unavailable. Manual settings still work.'); }
+    if (!response.ok) throw new Error(typeof body.error === 'string' ? body.error.slice(0,240) : 'AI failed. Manual settings still work.');
     const scene=body.scene || body;
-    if (!isScene(scene)) throw new Error('AI 返回了不支持的场景配置。请使用手动模式。');
+    if (!isScene(scene)) throw new Error('AI returned an unsupported scene. Use manual settings.');
     return validateScene({...scene,source:'ai'});
   } catch (error) {
-    if (error.name === 'AbortError') throw new Error('AI 分析超时。你可以继续手动配置场景。');
-    if (error instanceof TypeError) throw new Error('无法连接 AI 接口。你可以继续手动配置场景。');
+    if (error.name === 'AbortError') throw new Error('AI timed out. Manual settings still work.');
+    if (error instanceof TypeError) throw new Error('Could not connect to AI. Manual settings still work.');
     throw error;
   } finally { clearTimeout(timer); }
 }

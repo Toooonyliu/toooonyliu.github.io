@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {avatarFromPalette,validateAvatar,requestAvatar,DEFAULT_AVATAR} from '../src/avatar.js';
+import {avatarFromPalette,validateAvatar,requestAvatar,hasAvatarApi,DEFAULT_AVATAR} from '../src/avatar.js';
 import {sceneForZone,zoneForCoordinates,createZoneLevels} from '../src/region-presets.js';
 import {validateScene} from '../src/shared.js';
 
@@ -26,9 +26,28 @@ test('avatar boundary keeps invalid data out and failed AI leaves local config u
  const before=structuredClone(local),originalFetch=globalThis.fetch;
  try{
   globalThis.fetch=async()=>({ok:false,json:async()=>({error:'AI service unavailable'})});
-  await assert.rejects(requestAvatar('data:image/png;base64,test'),/unavailable/);
+  await assert.rejects(requestAvatar('data:image/png;base64,test',{endpoint:'/test/avatar'}),/unavailable/);
   assert.deepEqual(local,before);
   globalThis.fetch=async()=>({ok:true,json:async()=>({avatar:{palette:DEFAULT_AVATAR,style:'invented'}})});
-  await assert.rejects(requestAvatar('data:image/png;base64,test'),/无法使用/);
+  await assert.rejects(requestAvatar('data:image/png;base64,test',{endpoint:'/test/avatar'}),/unsupported fighter/);
  }finally{globalThis.fetch=originalFetch;}
+});
+test('AI controls stay unavailable until an API base is explicitly configured',async()=>{
+ const originalBase=globalThis.ONE_CUT_API_BASE,originalDocument=globalThis.document,originalFetch=globalThis.fetch;
+ try{
+  delete globalThis.ONE_CUT_API_BASE;delete globalThis.document;
+  globalThis.fetch=()=>assert.fail('Unconfigured AI must not send a photo');
+  assert.equal(hasAvatarApi(),false);
+  await assert.rejects(requestAvatar('data:image/png;base64,test'),/not connected/);
+  globalThis.document={querySelector:()=>({content:'   '})};
+  assert.equal(hasAvatarApi(),false);
+  globalThis.document={querySelector:()=>({content:'https://avatar.example.test/'})};
+  assert.equal(hasAvatarApi(),true);
+  globalThis.ONE_CUT_API_BASE='https://other.example.test';
+  assert.equal(hasAvatarApi(),true);
+ }finally{
+  if(originalBase===undefined)delete globalThis.ONE_CUT_API_BASE;else globalThis.ONE_CUT_API_BASE=originalBase;
+  if(originalDocument===undefined)delete globalThis.document;else globalThis.document=originalDocument;
+  globalThis.fetch=originalFetch;
+ }
 });
