@@ -5,6 +5,5 @@ await copyFile('presentation.html','dist/presentation.html');
 await copyFile('README.md','dist/README.md');
 await copyFile('prompt_log.md','dist/prompt_log.md');
 await copyFile('submission-checklist.md','dist/submission-checklist.md');
-await copyFile('submission-answers.md','dist/submission-answers.md');
 await cp('src','dist/src',{recursive:true});await cp('assets','dist/assets',{recursive:true,filter:source=>!source.endsWith('.png')});
 console.log('Static browser build ready in dist/. Real AI requires the server endpoint.');

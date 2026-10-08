@@ -418,7 +418,7 @@ how should I answer these; here is the markdown file from another chat, combine 
 I supplied the other chat's Markdown and four screenshots of the submission
 form. Codex initially merged the seven imported messages with this chat's ten messages,
 kept the actual wording, and drafted first-person form answers separately in
-[submission-answers.md](./submission-answers.md). The annotations and answers
+`submission-answers.md` (later removed from the public repository). The annotations and answers
 are AI-assisted drafts. They do not prove that I wrote the implementation or
 the required README myself.
 

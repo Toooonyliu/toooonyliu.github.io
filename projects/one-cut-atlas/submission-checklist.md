@@ -84,9 +84,7 @@ The backend repository can remain a separate public repository. API credentials
 belong in the backend host's environment variables, never in GitHub Pages code
 or the prompt log.
 
-Updated October 8, 2026. [submission-answers.md](./submission-answers.md) provides
-first-person draft answers, verified feature choices, public links and the
-remaining student-only fields. The backend is live and its real provider call
+Updated October 8, 2026. The backend is live and its real provider call
 passed; the latest connected frontend still needs its public-game check. No
 recorded video, student-authored code edit or form submission is claimed.
 The assignment's listed October 7 deadline has passed
