@@ -67,6 +67,8 @@ game embed. Use arrows to move, N for notes and F for fullscreen. It supports
 screen recording; it is not itself a recorded video. `prompt_log.md` preserves
 the available prompts and art provenance. `submission-checklist.md` identifies
 remaining student-authored README, actual code edits and recording work.
+`submission-answers.md` contains first-person form drafts and an evidence-based
+gap check; unresolved personal-work and video fields are not completed claims.
 This technical README was updated with AI assistance and must not be presented
 as the student's independently written assignment README.
 

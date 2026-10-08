@@ -57,11 +57,15 @@ approval of AI-generated code is different from personally modifying it.
 
 ## Before publishing and submitting
 
-- [ ] Check the public game link on desktop and phone.
-- [ ] Put the frontend in a clearly named folder in the public portfolio repo.
-- [ ] Link the project from the portfolio's work section.
+- [x] Check the public game link on desktop. Phone/touch behavior still needs
+      a final check and an accurate README limitation.
+- [x] Put the frontend in a clearly named folder in the public portfolio repo.
+- [x] Link the project from the portfolio's work section.
 - [ ] Finish the student-authored README.
-- [ ] Add the earlier development transcript to prompt_log.md.
+- [x] Merge the supplied earlier development transcript into prompt_log.md:
+      17 actual human messages across two chats, with original wording retained.
+- [ ] Confirm any other missing chats and exact model labels. Short check-ins
+      are identified, not presented as extra substantial development prompts.
 - [ ] Add actual code edits and elapsed work. Review the documented ImageGen
       size error and record your own response to it.
 - [ ] Record and upload the short demonstration video.
@@ -70,3 +74,9 @@ approval of AI-generated code is different from personally modifying it.
 The backend repository can remain a separate public repository. API credentials
 belong in the backend host's environment variables, never in GitHub Pages code
 or the prompt log.
+
+Updated October 8, 2026. [submission-answers.md](./submission-answers.md) provides
+first-person draft answers, verified feature choices, public links and the
+remaining student-only fields. No live backend, recorded video or form
+submission is claimed. The assignment's listed October 7 deadline has passed
+as of this update; check actual submission status and course instructions.
