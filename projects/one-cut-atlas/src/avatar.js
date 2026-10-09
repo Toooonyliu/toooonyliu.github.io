@@ -12,7 +12,7 @@ export function avatarFromPalette(palette,target='opponent',style='traveler'){
  const darkest=[...colors].sort((a,b)=>rgb(a).reduce((s,v)=>s+v,0)-rgb(b).reduce((s,v)=>s+v,0))[0]||DEFAULT_AVATAR.hair;
  return validateAvatar({target,style,palette:{hair:mix(darkest,'#151821',.4),skin:DEFAULT_AVATAR.skin,outfit:mix(palette.sky||DEFAULT_AVATAR.outfit,palette.accent||DEFAULT_AVATAR.accent,.3),accent:palette.accent},source:'local',summary:'Photo colors applied. Tune your fighter.'});
 }
-function avatarApiBase(){
+export function apiBase(){
  const value=globalThis.ONE_CUT_API_BASE||globalThis.document?.querySelector('meta[name="one-cut-api-base"]')?.content;
  if(typeof value!=='string'||!value.trim())return '';
  try{
@@ -23,7 +23,7 @@ function avatarApiBase(){
  }catch{return '';}
 }
 /** A static build must not advertise an API that has not been connected. */
-export function hasAvatarApi(){return Boolean(avatarApiBase());}
+export function hasAvatarApi(){return Boolean(apiBase());}
 const timeoutValue=(value,fallback)=>Number.isFinite(value)&&value>0?Math.min(value,120000):fallback;
 const publicError=(data,fallback)=>typeof data?.error==='string'&&data.error.trim()?data.error.slice(0,240):fallback;
 const canceled=()=>Object.assign(new Error('AI canceled. Your fighter is kept.'),{name:'AbortError'});
@@ -32,7 +32,7 @@ const canceled=()=>Object.assign(new Error('AI canceled. Your fighter is kept.')
  * Timeouts/fetcher are injectable for tests; no provider credential belongs here.
  */
 export async function requestAvatar(image,{endpoint,healthEndpoint,signal,onStatus,fetcher=globalThis.fetch,startupTimeoutMs=85000,analysisTimeoutMs=30000}={}){
- const base=avatarApiBase();
+ const base=apiBase();
  if(!endpoint&&!base)throw new Error('AI is not connected. Photo colors still work.');
  if(signal?.aborted)throw canceled();
  const controller=new AbortController();

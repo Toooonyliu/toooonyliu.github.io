@@ -3,7 +3,7 @@
 A pixel-art travel and sword-duel prototype. Run `npm start` and open
 the printed localhost URL (default 4173; set `PORT` for another port).
 `npm test` runs the tests included with this checkout; `npm run build` produces
-`dist/`. The published frontend includes combat, avatar/region and save tests. The
+`dist/`. The published frontend includes combat, avatar/region, photo-arena client, pixelization and save tests. The
 separate backend repository contains its HTTP and model-boundary tests.
 
 ## Explore
@@ -73,6 +73,30 @@ Private setup is described in the
 If AI is unavailable, existing local colors and manual customization remain
 playable. This version has no accounts or cross-device cloud history.
 Photos, destinations and victory progress are saved locally in IndexedDB.
+
+## Photo arenas
+
+The fighter workshop can also turn a travel photo into the duel's stage. After
+adding a photo, **Find this place on the globe** sends the compressed photo to the
+backend's `/api/recognize-place` route. The vision model describes only the
+environment: a landmark or place type, city and country when distinctive,
+interior or exterior, lighting and one short scene description. People are
+ignored and never identified. The globe then turns to the recognized travel
+zone and pulses it, and a card beside it asks whether to challenge there. The
+recognition is a suggestion: in testing it matched a Guatemalan volcano to
+Mount Fuji, so the zone can be changed before anything is painted.
+
+**Paint arena** creates one AI image through `/api/scenes` (the exact brief used
+for the shipped zone stages, plus the validated scene description and the
+confirmed region), polls the job, then `src/pixelize.js` reduces the 1536×864
+result to the 480×270 grid with a 32-color palette so it reads like the shipped
+stages. The painted backdrop is saved with the duel in IndexedDB; rematches and
+reloads never paint again. **Preset arena** skips painting and uses the zone's
+shipped stage with the photo's colors. Painting runs with the backend's `low`
+quality setting, which measured about $0.02 per arena on October 8, 2026 and
+was indistinguishable from `medium` after pixelization. Each day's paintings are
+capped by the backend; when the cap, the key or the network is unavailable the
+preset arena remains playable.
 
 ## Walkthrough and submission
 

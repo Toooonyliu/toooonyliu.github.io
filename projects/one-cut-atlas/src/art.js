@@ -31,6 +31,33 @@ function loadImage(file) {
   });
 }
 
+const customBackdrops = new Map();
+function loadDataUrl(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const timeout = setTimeout(() => { image.onload = image.onerror = null; reject(new Error('Backdrop decode timed out')); }, 15000);
+    image.onload = () => { clearTimeout(timeout); resolve(image); };
+    image.onerror = () => { clearTimeout(timeout); reject(new Error('Backdrop unavailable')); };
+    image.src = dataUrl;
+  });
+}
+/** Decodes a painted arena once; drawScene then uses it synchronously like a shipped stage. */
+export async function registerBackdrop(dataUrl) {
+  if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return null;
+  if (customBackdrops.has(dataUrl)) return customBackdrops.get(dataUrl);
+  const image = await loadDataUrl(dataUrl);
+  const output = canvas(480, 270), ctx = output.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(image, 0, 0, 480, 270);
+  if (customBackdrops.size >= 24) customBackdrops.delete(customBackdrops.keys().next().value);
+  customBackdrops.set(dataUrl, output);
+  return output;
+}
+export function preloadBackdrops(dataUrls = []) {
+  return Promise.allSettled([...new Set(dataUrls.filter(Boolean))].map(registerBackdrop));
+}
+export const hasBackdrop = dataUrl => customBackdrops.has(dataUrl);
+
 function canvas(width, height) {
   const output = document.createElement('canvas');
   output.width = width;
@@ -214,6 +241,7 @@ export function preloadArt() {
 }
 
 function backgroundVariant(scene) {
+  if (scene?.backdrop && customBackdrops.has(scene.backdrop)) return customBackdrops.get(scene.backdrop);
   const image = backgrounds.get(scene.stageId)||backgrounds.get(scene.environment);
   if (!image) return null;
   const key = JSON.stringify([scene.stageId,scene.environment, scene.lighting, scene.palette]);

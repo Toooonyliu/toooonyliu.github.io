@@ -1,6 +1,7 @@
 /** Small, explicit contracts shared by UI, renderer, storage and API. */
 import { TRAVEL_ZONES } from './region-presets.js';
 export const WORLD = { width: 960, height: 540, ground: 422 };
+export const BACKDROP_MAX_LENGTH = 400_000;
 export const ENVIRONMENTS = ['traditional_street', 'modern_city', 'wilderness', 'forest'];
 export const LIGHTINGS = ['day', 'sunset', 'night'];
 export const STYLES = ['kendo', 'suit', 'cowboy', 'traveler'];
@@ -42,7 +43,10 @@ export function validateScene(value = {}) {
   palette:{sky:color(value.palette?.sky,fallback.palette.sky),accent:color(value.palette?.accent,fallback.palette.accent),ambient:color(value.palette?.ambient,fallback.palette.ambient)},
   opponentStyle: STYLES.includes(value.opponentStyle) ? value.opponentStyle : 'kendo',
   summary:typeof value.summary === 'string' ? value.summary.slice(0,240) : fallback.summary,
-  source:value.source === 'ai' ? 'ai' : 'manual'
+  source:value.source === 'ai' ? 'ai' : 'manual',
+  // A painted photo arena: a small 480×270 data URL prepared in the browser, or null for preset art.
+  backdrop:typeof value.backdrop === 'string' && value.backdrop.length <= BACKDROP_MAX_LENGTH && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+=*$/.test(value.backdrop) ? value.backdrop : null,
+  placeName:typeof value.placeName === 'string' && value.placeName.trim() ? value.placeName.trim().slice(0,80) : null
  };
 }
 /** @typedef {{id:string,name:string,location:{name:string,lat:number,lon:number},scene:object,photo:string|null,cleared:boolean,createdAt:string}} Level */

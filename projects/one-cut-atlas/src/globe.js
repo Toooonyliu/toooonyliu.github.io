@@ -19,6 +19,8 @@ export class Globe {
     this.onCreate = onCreate;
     this.levels = [];
     this.selectedId = null;
+    this.clearedZones = new Set();
+    this.highlightZone = null;
     this.yaw = 128 * RAD;
     this.pitch = 20 * RAD;
     this.zoom = 1;
@@ -101,6 +103,13 @@ export class Globe {
   setLevels(levels, selectedId) {
     this.levels = (levels || []).filter(level => Number.isFinite(level.location?.lat) && Number.isFinite(level.location?.lon));
     this.selectedId = selectedId;
+    this.clearedZones = new Set(this.levels.filter(level => level.cleared && level.scene?.travelZone).map(level => level.scene.travelZone));
+    this.wake();
+  }
+
+  /** Pulses one travel zone while the player decides; null clears it. */
+  setHighlight(zoneId) {
+    this.highlightZone = zoneId || null;
     this.wake();
   }
 
@@ -224,6 +233,7 @@ export class Globe {
     data.fill(0);
     const cosYaw = Math.cos(this.yaw), sinYaw = Math.sin(this.yaw), cosPitch = Math.cos(this.pitch), sinPitch = Math.sin(this.pitch);
     const selectedZone=this.levels.find(level=>level.id===this.selectedId)?.scene.travelZone;
+    const pulse = this.highlightZone ? (this.reduceMotion.matches ? 1 : .55 + .45 * Math.sin(time * 4.2)) : 0;
     for (const [x, y, nx, ny, nz, offset] of this.normals) {
       const forward = nz * cosPitch - ny * sinPitch;
       const wx = nx * cosYaw + forward * sinYaw;
@@ -240,11 +250,14 @@ export class Globe {
       if (land) {
         const zone=zoneForCoordinates(lat/RAD,lon/RAD);
         const zoneColor=[1,3,5].map(index=>parseInt(zone.color.slice(index,index+2),16));
-        const active=selectedZone===zone.id;
-        const boost=active?19:0;
-        r = (zoneColor[0] + broad * 7 + noise * 9 + coast + boost) * light;
-        g = (zoneColor[1] + broad * 7 + noise * 9 + coast * .6 + boost) * light;
-        b = (zoneColor[2] + broad * 7 + noise * 9 + coast * .4 + boost) * light;
+        const active=selectedZone===zone.id, cleared=this.clearedZones.has(zone.id), lit=this.highlightZone===zone.id;
+        // Unlit zones sit back as dusty grey-green; cleared zones carry their full color and a warm lift.
+        const grey = (zoneColor[0] * .3 + zoneColor[1] * .5 + zoneColor[2] * .2);
+        const keep = cleared || lit ? 1 : .42, tint = cleared ? 1.08 : 1;
+        const boost=(active?14:0)+(cleared?16:-6)+(lit?34*pulse:0);
+        r = ((zoneColor[0] * keep + grey * (1 - keep) * .86) * tint + broad * 7 + noise * 9 + coast + boost) * light;
+        g = ((zoneColor[1] * keep + grey * (1 - keep) * .9) * tint + broad * 7 + noise * 9 + coast * .6 + boost * (lit ? .8 : 1)) * light;
+        b = ((zoneColor[2] * keep + grey * (1 - keep) * .82) * tint + broad * 7 + noise * 9 + coast * .4 + boost * (lit ? .45 : 1)) * light;
       } else {
         const wave = Math.sin(tx * .28 + ty * .16) * 2 + noise * 5;
         r = (43 + wave) * light;

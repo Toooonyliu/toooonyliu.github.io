@@ -1,6 +1,6 @@
 import { WORLD } from './shared.js';
 import { drawBackdrop, drawSprite } from './art.js';
-export { preloadArt } from './art.js';
+export { preloadArt, registerBackdrop, preloadBackdrops, hasBackdrop } from './art.js';
 
 /* Original, resolution-independent pixel art. All geometry is painted on a
  * two-pixel grid; the renderer never mutates a scene or the duel engine. */

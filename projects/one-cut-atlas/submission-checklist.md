@@ -73,6 +73,10 @@ approval of AI-generated code is different from personally modifying it.
 - [ ] Publish that connected frontend release and verify upload → AI Colors →
       preview → save/fight → reload in the deployed browser game. Only then
       claim live frontend-backend communication and secure third-party API use.
+- [ ] Deploy the photo-arena backend update, then verify in the deployed game:
+      photo → Find this place → zone highlight → Paint arena → duel in the
+      painted stage → reload keeps it. The browser walkthrough with a mocked
+      backend passed locally on October 8; the live check is still open.
 - [ ] Confirm any other missing chats and exact model labels. Short check-ins
       are identified, not presented as extra substantial development prompts.
 - [ ] Add actual code edits and elapsed work. Review the documented ImageGen
