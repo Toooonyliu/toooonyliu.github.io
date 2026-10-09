@@ -13,7 +13,9 @@ let gate={busy:false,controller:null,pending:null,photo:null,apiImage:null,gps:n
 let engine=null,currentLevel=null,raf=0,previousTime=0,accumulator=0,resultHandled=false,toastTimer=0,firstLitId=null,audio=null,heard=new Set(),duelGeneration=0;
 let bloodDecals=[],bloodSeen=new Set();
 const keys={left:false,right:false,attack:false,parry:false,dodge:false,duck:false,counter:false,shove:false};
-let aim='mid';
+let aim='mid',mouseLine=null,playerFree=true;
+const FREE_STATES=['idle','walk','charge','parry'];
+function applyMouseLine(){if(mouseLine&&playerFree&&mouseLine!==aim)setAim(mouseLine);}
 const stanceLabels={high:'High',mid:'Mid',low:'Low'};
 const STAMP_NAMES={'east-asia':'E. Asia','south-asia':'S. Asia','southeast-asia':'SE Asia','west-central-asia':'C. Asia',europe:'Europe',africa:'Africa','north-america':'N. Amer','south-america':'S. Amer',oceania:'Oceania',arctic:'Arctic',antarctic:'Antarc.'};
 function setAim(value){if(!stanceLabels[value])return;aim=value;document.querySelectorAll('[data-stance]').forEach(button=>{const active=button.dataset.stance===aim;button.setAttribute('aria-pressed',String(active));button.classList.toggle('active',active);});}
@@ -195,7 +197,7 @@ async function forgeAndFight(level){
  globe.clearReveal();renderAtlas();startDuel(ready);
 }
 function clearKeys(){Object.keys(keys).forEach(k=>keys[k]=false);document.querySelectorAll('[data-control]').forEach(b=>b.classList.remove('pressed'));}
-function stopDuel(){duelGeneration++;cancelAnimationFrame(raf);raf=0;engine=null;currentLevel=null;clearKeys();previousTime=0;accumulator=0;$('result-panel').hidden=true;$('duel-status').textContent='';}
+function stopDuel(){mouseLine=null;playerFree=true;duelGeneration++;cancelAnimationFrame(raf);raf=0;engine=null;currentLevel=null;clearKeys();previousTime=0;accumulator=0;$('result-panel').hidden=true;$('duel-status').textContent='';}
 function returnToMap(){stopDuel();document.body.classList.remove('is-dueling');$('duel-screen').hidden=true;$('atlas-screen').hidden=false;globe.setVisible(true);globe.resize();renderAtlas();$('world-map').focus({preventScroll:true});if(firstLitId){setTimeout(()=>{firstLitId=null;},1600);}}
 function initAudio(){try{audio ||= new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();}catch{/* Audio is decorative; the duel remains playable. */}}
 function sound(type){if(!audio||audio.state!=='running')return;const oscillator=audio.createOscillator(),gain=audio.createGain(),now=audio.currentTime;oscillator.type=type==='slash'?'sawtooth':'triangle';const freq={slash:280,parry:1100,clash:850,hit:100,evade:190,shove:80}[type]||250;oscillator.frequency.setValueAtTime(freq,now);oscillator.frequency.exponentialRampToValueAtTime(Math.max(35,freq*.3),now+.1);gain.gain.setValueAtTime(.035,now);gain.gain.exponentialRampToValueAtTime(.0001,now+.13);oscillator.connect(gain);gain.connect(audio.destination);oscillator.start(now);oscillator.stop(now+.14);}
@@ -210,6 +212,7 @@ function drawDuel(snapshot){
  const avatar=currentLevel.avatar;
  modules.drawFighter(ctx,snapshot.player,avatar?.target==='player'?avatar.style:'traveler',true,snapshot.time,{wet:currentLevel.scene.environment!=='wilderness',palette:avatar?.target==='player'?avatar.palette:null});modules.drawFighter(ctx,snapshot.opponent,avatar?.target==='opponent'?avatar.style:currentLevel.scene.opponentStyle,false,snapshot.time,{wet:currentLevel.scene.environment!=='wilderness',palette:avatar?.target==='opponent'?avatar.palette:null});modules.drawEffects(ctx,snapshot.effects,snapshot.time);ctx.restore();
  const meter=$('charge-meter');if(meter){meter.value=snapshot.player.charge||0;meter.hidden=snapshot.player.state!=='charge';}
+ playerFree=FREE_STATES.includes(snapshot.player.state);applyMouseLine();
  const rival=$('rival-stance');if(rival)rival.textContent=stanceLabels[snapshot.opponent.stance]||'Mid';
  $('player-stance').textContent=snapshot.player.counterReady?'Counter · J / L':`${stanceLabels[snapshot.player.stance]||'Mid'}${snapshot.player.guarding?' · Guard':''}`;
  document.querySelectorAll('[data-stance]').forEach(button=>{const active=button.dataset.stance===aim;if(button.getAttribute('aria-pressed')!==String(active)){button.setAttribute('aria-pressed',String(active));button.classList.toggle('active',active);}});
@@ -242,8 +245,12 @@ const keyMap={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyJ:
 const stanceKeys={KeyW:'high',ArrowUp:'high',Digit1:'high',KeyX:'mid',Digit2:'mid',KeyS:'low',ArrowDown:'low',Digit3:'low'};
 document.querySelectorAll('[data-stance]').forEach(button=>button.onclick=()=>{setAim(button.dataset.stance);$('duel-canvas').focus({preventScroll:true});});
 /* Mouse: height over the arena sets the blade line, left button charges and strikes, right button evades. */
-{const canvas=$('duel-canvas');const lineAt=event=>{const rect=canvas.getBoundingClientRect();const y=(event.clientY-rect.top)/rect.height*WORLD.height;return y<WORLD.ground-108?'high':y>WORLD.ground-52?'low':'mid';};
- canvas.addEventListener('pointermove',event=>{if(!engine||event.pointerType!=='mouse')return;const line=lineAt(event);if(line!==aim)setAim(line);});
+// The mouse line has hysteresis, and it only changes the stance while the fighter is free to: a hand drifting
+// during a cut must not withdraw it as a feint. Keyboard line changes still feint on purpose.
+{const canvas=$('duel-canvas');const HIGH=WORLD.ground-118,LOW=WORLD.ground-46,PAD=12;
+ const lineAt=event=>{const rect=canvas.getBoundingClientRect();const y=(event.clientY-rect.top)/rect.height*WORLD.height;const current=mouseLine||'mid';
+  if(current==='high')return y<HIGH+PAD?'high':y>LOW+PAD?'low':'mid';if(current==='low')return y>LOW-PAD?'low':y<HIGH-PAD?'high':'mid';return y<HIGH-PAD?'high':y>LOW+PAD?'low':'mid';};
+ canvas.addEventListener('pointermove',event=>{if(!engine||event.pointerType!=='mouse')return;mouseLine=lineAt(event);applyMouseLine();});
  canvas.addEventListener('pointerdown',event=>{if(!engine||event.pointerType!=='mouse')return;event.preventDefault();canvas.focus({preventScroll:true});initAudio();if(event.button===0)keys.attack=true;else if(event.button===2)keys.dodge=true;});
  const releaseMouse=event=>{if(event.pointerType!=='mouse')return;if(event.button===0)keys.attack=false;else if(event.button===2)keys.dodge=false;};
  canvas.addEventListener('pointerup',releaseMouse);canvas.addEventListener('pointercancel',releaseMouse);canvas.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse'){keys.attack=false;keys.dodge=false;}});
@@ -264,4 +271,6 @@ $('zone-select').onchange=()=>{const zone=getZone($('zone-select').value);draft.
 $('avatar-target').onchange=()=>{draft.avatar.target=$('avatar-target').value;updateCreator();};
 for(const key of Object.keys(DEFAULT_AVATAR))$(`avatar-${key}`).oninput=()=>{draft.avatar.palette[key]=$(`avatar-${key}`).value;draft.avatar.source='local';updatePhotoPreview();drawPreview($('creator-preview'),draft.scene,draft.avatar);};
 window.addEventListener('pagehide',()=>globe.destroy(),{once:true});
+// ?debug exposes the live duel for automated playtests; it changes nothing else.
+if(new URLSearchParams(location.search).has('debug'))window.__duel={get engine(){return engine;},get aim(){return aim;},get keys(){return {...keys};}};
 setupChoices();setBusy();renderAtlas();for(const id of ['play-demo','challenge-selected','upload-open','edit-selected'])$(id).disabled=true;registerTools();init();

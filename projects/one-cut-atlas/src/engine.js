@@ -3,6 +3,7 @@ import { WORLD } from './shared.js';
 // Original duel rules inspired by directional swordplay. Art never determines
 // collision: all durations are seconds and all geometry uses WORLD coordinates.
 const BODY_HALF = 18;
+const MIN_GAP = 64;
 const MIN_X = 54;
 const MAX_X = WORLD.width - MIN_X;
 const STEP = 1 / 120;
@@ -437,7 +438,8 @@ export class DuelEngine {
       const comfortable = this._aiTemperament === 'aggressive' ? 138 : 164;
       if (distance > comfortable) this._aiMove = -1;
       else if (distance < 73) {
-        if (this._random() < 0.38 && this._shove(enemy)) this._aiMove = 0;
+        // Shoves are an occasional reset, not a habit: frequent stuns felt like getting stuck.
+        if (this._random() < 0.16 && this._shove(enemy)) this._aiMove = 0;
         else this._aiMove = 1;
       } else {
         const choice = this._random();
@@ -495,10 +497,11 @@ export class DuelEngine {
   _constrainBodies(playerDelta = 0, enemyDelta = 0) {
     let px = clamp(this._player.x + playerDelta, MIN_X, MAX_X);
     let ex = clamp(this._opponent.x + enemyDelta, MIN_X, MAX_X);
-    if (ex - px < BODY_HALF * 2) {
-      const middle = clamp((px + ex) / 2, MIN_X + BODY_HALF, MAX_X - BODY_HALF);
-      px = middle - BODY_HALF;
-      ex = middle + BODY_HALF;
+    // Bodies keep a sprite-sized gap: fighters press against each other instead of overlapping.
+    if (ex - px < MIN_GAP) {
+      const middle = clamp((px + ex) / 2, MIN_X + MIN_GAP / 2, MAX_X - MIN_GAP / 2);
+      px = middle - MIN_GAP / 2;
+      ex = middle + MIN_GAP / 2;
     }
     this._player.x = px;
     this._opponent.x = ex;
@@ -597,7 +600,7 @@ export class DuelEngine {
     defender.fatigue = clamp(defender.fatigue + 0.20, 0, 1);
     defender.knockback = attacker.facing * (attacker.shoveKind === 'pull' ? -340 : 495);
     if (attacker.shoveKind === 'pull') attacker.knockback = -attacker.facing * 95;
-    this._setState(defender, 'stunned', 0.26);
+    this._setState(defender, 'stunned', 0.2);
     this._effect('shove', (attacker.x + defender.x) / 2, WORLD.ground - 62, attacker.facing, 0.30,
       { direction: 'mid', shoveKind: attacker.shoveKind, strength: 0.7 });
     this._impact(0.025, 0.25);

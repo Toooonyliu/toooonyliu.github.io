@@ -21,7 +21,8 @@ const rows = { kendo: 0, suit: 1, cowboy: 2, traveler: 3 };
 const attackMotions = ['high', 'mid', 'low', 'counter'];
 const defenseMotions = ['dodge', 'duck', 'charge', 'hit-high', 'hit-mid', 'hit-low'];
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
-const STEP_RATE = 8.2; // radians per second: about 2.6 steps per second at walking speed
+const STEP_SECONDS = .42; // one sliding step; about 2.4 steps per second at walking speed
+const walkClock = new Map();
 const TURN_SECONDS = .12;
 const turns = new Map();
 /** A facing change squashes through a thin silhouette instead of mirroring in one frame. */
@@ -331,10 +332,8 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   const direction = ['high', 'mid', 'low'].includes(fighter.attackDirection) ? fighter.attackDirection : 'mid';
   const progress = clamp((fighter.timer || 0) / (fighter.stateDuration || 1));
   let sequence = null, index = 0;
-  if ((state === 'idle' || state === 'walk' || state === 'move') && ['high', 'low'].includes(fighter.stance)) {
-    sequence = authored?.get(fighter.stance); index = 0;
-    if (fighter.stance === 'low' && contactFrames.has(style)) { sequence = contactFrames.get(style); index = 1; }
-  }
+  // Guards (idle, walking, recoil) all come from one atlas so a stance change never jumps in scale or
+  // baseline: mid guard, raised high guard (column 4), lowered blade (column 1).
   if (state === 'windup' || state === 'active' || (state === 'recovery' && (!fighter.recoveryKind || fighter.recoveryKind === 'attack'))) {
     sequence = authored?.get(fighter.attackKind === 'counter' ? 'counter' : direction);
     index = state === 'windup' ? (progress < .64 ? 0 : 1) : state === 'active' ? 2 : 3;
@@ -359,26 +358,31 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
     // Hold the impact pose for the first third (stagger), then ease through the fall frames.
     const fall = Math.max(0, (progress - .3) / .7);
     index = progress < .3 ? 0 : Math.min(3, 1 + Math.floor((1 - (1 - fall) * (1 - fall)) * 3));
-  } else if (state === 'stunned') {
-    sequence = authored?.get('hit-high'); index = progress < .55 ? 0 : 1;
   } else if (state === 'recovery' && ['dodge', 'duck'].includes(fighter.recoveryKind)) {
     sequence = authored?.get(fighter.recoveryKind); index = 3;
   }
   const guardDirection = fighter.guardDirection || fighter.stance || 'mid';
   let fallback = columns[state] ?? 0;
-  if (state === 'idle' || state === 'parry' || state === 'shove' || (state === 'recovery' && fighter.recoveryKind && fighter.recoveryKind !== 'attack')) {
-    fallback = guardDirection === 'high' ? 4 : guardDirection === 'low' ? 1 : 0;
+  if (state === 'idle' || walking || state === 'stunned' || state === 'parry' || state === 'shove' || (state === 'recovery' && fighter.recoveryKind && fighter.recoveryKind !== 'attack')) {
+    const line = state === 'parry' ? guardDirection : fighter.stance || guardDirection;
+    fallback = line === 'high' ? 4 : line === 'low' ? 1 : 0;
   }
   const frame = sequence?.[index] || spriteFrames[row][fallback];
   const facing = fighter.facing === -1 ? -1 : 1;
-  const stepWave = Math.sin(time * STEP_RATE);
-  // Two-pixel grid: a step bob while walking, a slow breath while standing. Neither moves the blade on its own.
-  const bob = walking ? (Math.abs(stepWave) > .5 ? 2 : 0) : (state === 'idle' || state === 'parry') ? Math.round(Math.sin(time * 4.4)) * 2 : 0;
+  // Suri-ashi stepping: each step slides the leading foot out and draws the trailing foot in, so the
+  // stance widens and narrows without the legs ever scissoring. The cycle starts when walking starts.
+  const walkKey = isPlayer ? 'player' : 'opponent';
+  if (walking && !walkClock.has(walkKey)) walkClock.set(walkKey, time);
+  if (!walking) walkClock.delete(walkKey);
+  const stepU = walking ? (((time - walkClock.get(walkKey)) / STEP_SECONDS) % 1 + 1) % 1 : 0;
+  const reach = Math.sin(Math.PI * stepU);
+  // Hips drop a grid step at the widest point of the step; standing breathes slowly.
+  const bob = walking ? -Math.round(reach) * 2 : (state === 'idle' || state === 'parry') ? Math.round(Math.sin(time * 2.6)) * 2 : 0;
   const chargeStrength = clamp(fighter.charge ?? 1);
   const attackRecovery = state === 'recovery' && (!fighter.recoveryKind || fighter.recoveryKind === 'attack');
   // Visual lunge only: a lean back in the wind-up, a surge through the cut, settling during recovery.
-  const lean = state === 'windup' ? -3 : state === 'active' ? 4 + 10 * (1 - (1 - progress) * (1 - progress)) + (fighter.attackKind === 'charged' ? 5 * chargeStrength : 0) : attackRecovery ? Math.round(14 * (1 - progress) * (1 - progress)) : state === 'stunned' ? -4 : state === 'shove' ? progress * 7 : 0;
-  const tremble = state === 'dead' && progress < .3 ? (Math.floor(time * 30) % 2 ? 2 : 0) : 0;
+  const lean = state === 'windup' ? -3 : state === 'active' ? 4 + 10 * (1 - (1 - progress) * (1 - progress)) + (fighter.attackKind === 'charged' ? 5 * chargeStrength : 0) : attackRecovery ? Math.round(14 * (1 - progress) * (1 - progress)) : state === 'stunned' ? -Math.round(8 * (1 - progress)) : state === 'shove' ? progress * 7 : 0;
+  const tremble = (state === 'dead' && progress < .3) || (state === 'stunned' && progress < .35) ? (Math.floor(time * 30) % 2 ? 2 : 0) : 0;
   const foot = WORLD.ground - (state === 'dead' ? 0 : Math.round(bob));
   const turn = turnScale(isPlayer, facing, time);
   const flash = state === 'dead' && (fighter.timer || 0) < .035 && 'filter' in ctx;
@@ -388,19 +392,26 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   // Walking, layered as in classic sprite duels: the torso, arms and blade come from the pose
   // unchanged, while the lower body swings from the hip as two legs that alternate and lift.
   const legs = walking && !fighter.dead;
-  const phase = time * STEP_RATE;
+  // Leading foot is the one on the side we are moving towards.
+  const towards = (fighter.moveDirection || facing) * facing >= 0 ? 1 : -1;
   const draw = () => {
     if (!legs) { ctx.drawImage(picture, dx, dy, dw, dh); return; }
     const sx = dw / picture.width, sy = dh / picture.height;
     const hip = Math.round(picture.height * .56), rows = picture.height - hip;
     const pivot = Math.max(2, Math.min(picture.width - 2, Math.round(frame.anchorX / frame.width * picture.width)));
-    const stride = 6, lift = 3, overlap = stride + 2, swing = Math.cos(phase);
+    const stride = 5, lift = 2, overlap = stride + 2;
+    // u < .5: the leading foot slides out (lifted slightly); u >= .5: the trailing foot slides up to it.
+    const out = stepU < .5 ? Math.sin(Math.PI * stepU) : 1, gather = stepU < .5 ? 0 : Math.sin(Math.PI * (stepU - .5));
+    const leadOff = towards * stride * (stepU < .5 ? out : 1 - gather) * .9, trailOff = -towards * stride * (stepU < .5 ? out * .5 : .5 - gather * .5);
+    const leadLift = stepU < .5 ? Math.sin(Math.PI * stepU * 2) : 0, trailLift = stepU >= .5 ? Math.sin(Math.PI * (stepU - .5) * 2) : 0;
     ctx.drawImage(picture, 0, 0, picture.width, hip, dx, dy, dw, hip * sy);
     // Back leg first, then the front leg over it; each half overlaps the seam so no gap opens.
-    for (const [x0, x1, side, raise] of [[0, Math.min(picture.width, pivot + overlap), -1, Math.max(0, -Math.sin(phase))], [Math.max(0, pivot - overlap), picture.width, 1, Math.max(0, Math.sin(phase))]]) {
+    // Back half first, front half over it; each half overlaps the seam so no gap opens.
+    for (const [x0, x1, side] of [[0, Math.min(picture.width, pivot + overlap), -1], [Math.max(0, pivot - overlap), picture.width, 1]]) {
+      const leading = side === towards, shift = leading ? leadOff : trailOff, raise = leading ? leadLift : trailLift;
       for (let y = hip; y < picture.height; y += 2) {
         const depth = (y - hip + 1) / rows;
-        const offX = Math.round(side * swing * stride * depth), offY = -Math.round(raise * lift * depth * depth);
+        const offX = Math.round(shift * depth), offY = -Math.round(raise * lift * depth * depth);
         ctx.drawImage(picture, x0, y, x1 - x0, Math.min(2, picture.height - y), dx + (x0 + offX) * sx, dy + (y + offY) * sy, (x1 - x0) * sx, Math.min(2, picture.height - y) * sy);
       }
     }

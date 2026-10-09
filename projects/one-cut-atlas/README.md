@@ -86,6 +86,8 @@ a face or generate sprites. Only use photos you own or may share.
 | V | Close shove; with backward movement, a pull |
 | Esc / R | Pause / rematch after the result |
 
+The mouse line has a little hysteresis and only changes while you are free to act, so a drifting hand never withdraws a cut; line changes on the keyboard can still feint on purpose. Add `?debug` to the URL to expose the live duel engine for automated playtests.
+
 One clean hit decides the duel. **Standing in the same line as an incoming cut
 blocks it**, so the duel is about reading which line the opponent leaves open.
 Matching simultaneous cuts clash. Misses, blocks and shoves build temporary
