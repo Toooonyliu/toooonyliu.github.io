@@ -13,6 +13,10 @@ const ACTIONS = ['attack', 'parry', 'dodge', 'duck', 'counter', 'shove'];
 // Contact sparks follow the authored head/chest/shin blade positions.
 const HEIGHT = { high: WORLD.ground - 104, mid: WORLD.ground - 89, low: WORLD.ground - 29 };
 const DIRECTION_NAME = { high: 'HIGH', mid: 'MID', low: 'LOW' };
+// A quick cut can be withdrawn by switching to an adjacent line this early in its wind-up.
+const FEINT_WINDOW = 0.13;
+// How often each difficulty aims at the line the player is not guarding.
+const OPEN_LINE = { beginner: 0.35, normal: 0.55, hard: 0.75 };
 const PROFILES = {
   beginner: { speed: 145, windup: 0.40, reaction: 0.28, attackChance: 0.47, parryChance: 0.18, evadeChance: 0.16 },
   normal: { speed: 172, windup: 0.30, reaction: 0.22, attackChance: 0.56, parryChance: 0.30, evadeChance: 0.25 },
@@ -40,7 +44,7 @@ function fighter(x, facing) {
     hitDirection: null, hitLevel: null,
     _contact: false, _evadedAttack: 0, _protectedAttack: 0,
     _buffer: null, _bufferTime: 0, _shoveResolved: false,
-    _aiChargeDuration: 0, _aiGuardDuration: 0, _guardArmed: false, _leaveDuck: false
+    _aiChargeDuration: 0, _aiGuardDuration: 0, _guardArmed: false, _leaveDuck: false, _feintUsed: false
   };
 }
 
@@ -96,6 +100,8 @@ export class DuelEngine {
     this._held = Object.fromEntries(ACTIONS.map(action => [action, false]));
     this._releaseRequired = { ...this._held };
     this._playerAttackSerial = 0;
+    this._playerFeintSerial = 0;
+    this._seenPlayerFeintSerial = 0;
     this._seenPlayerAttackSerial = 0;
     this._pendingThreatAt = Infinity;
     this._nextDecisionAt = 2.8;
@@ -236,6 +242,22 @@ export class DuelEngine {
     return true;
   }
 
+  /** Switching to an adjacent line early in a quick cut withdraws it: a feint. Once per committed swing. */
+  _feint(f, previous) {
+    if (f.state !== 'windup' || f.timer > FEINT_WINDOW || f._feintUsed || f.attackKind !== 'normal' ||
+        Math.abs(DIRECTIONS.indexOf(previous) - DIRECTIONS.indexOf(f.stance)) !== 1) return false;
+    f._feintUsed = true;
+    f.charge = f.chargeTime = 0;
+    this._setState(f, 'recovery', 0.15);
+    f.recoveryKind = 'feint';
+    if (f === this._player) {
+      this._playerFeintSerial++;
+      this.message = 'Feint · Read the reaction';
+    }
+    this._effect('feint', f.x, WORLD.ground - 150, f.facing, 0.4, { direction: f.stance, strength: 0.5 });
+    return true;
+  }
+
   _parry(f, aiDuration = 0.38) {
     if (!ready(f) && f.state !== 'charge' && f.state !== 'duck') return false;
     f.guardDirection = f.stance;
@@ -286,9 +308,11 @@ export class DuelEngine {
     const f = this._player;
     if (!input.parry) f._guardArmed = false;
     if (input.aim) {
+      const previous = f.stance;
       f.stance = input.aim;
       f.guardDirection = f.stance;
       if (f.state === 'charge') f.attackDirection = f.stance;
+      else if (previous !== f.stance) this._feint(f, previous);
     }
     const action = f._buffer;
     let accepted = false;
@@ -350,6 +374,7 @@ export class DuelEngine {
     const isPlayer = f === this._player;
     switch (f.state) {
       case 'windup': {
+        f._feintUsed = false;
         this._setState(f, 'active', f.attackDirection === 'mid' ? 0.13 : 0.15);
         this._effect('slash', f.x + f.facing * 70, HEIGHT[f.attackDirection], f.facing, 0.3,
           { direction: f.attackDirection, attackKind: f.attackKind, strength: 0.55 + f.charge * 0.45 });
@@ -378,6 +403,11 @@ export class DuelEngine {
     const enemy = this._opponent;
     const player = this._player;
     const distance = enemy.x - player.x;
+    if (this._seenPlayerFeintSerial !== this._playerFeintSerial) {
+      this._seenPlayerFeintSerial = this._playerFeintSerial;
+      // Weaker opponents bite on the feint; stronger ones sometimes hold.
+      if (this._random() < { beginner: 0.15, normal: 0.35, hard: 0.55 }[this.difficulty]) this._pendingThreatAt = Infinity;
+    }
     if (this._seenPlayerAttackSerial !== this._playerAttackSerial) {
       this._seenPlayerAttackSerial = this._playerAttackSerial;
       this._pendingThreatAt = this.time + this._profile.reaction + this._random() * 0.065;
@@ -413,6 +443,11 @@ export class DuelEngine {
         const choice = this._random();
         enemy.stance = enemy.guardDirection = this._pickDirection();
         if (choice < this._profile.attackChance) {
+          // Attack the line the player is not holding, more often at higher difficulty.
+          if (this._random() < OPEN_LINE[this.difficulty]) {
+            const open = DIRECTIONS.filter(line => line !== player.stance);
+            enemy.stance = enemy.guardDirection = open[Math.floor(this._random() * open.length)];
+          }
           if (this._random() < 0.30) this._startCharge(enemy, 0.24 + this._random() * 0.34);
           else this._attack(enemy);
           this._aiMove = 0;
@@ -507,11 +542,30 @@ export class DuelEngine {
   }
 
   _deflect(attacker, defender) {
-    if (attacker.state !== 'active' || !(defender.state === 'parry' || defender.state === 'duck' && defender.guarding) ||
-        attacker.attackDirection !== defender.guardDirection) return false;
+    // A held guard (K) parries hard. Simply standing in the matching line is a passive guard:
+    // the cut is stopped, but with a smaller opening, as in classic one-hit duels.
+    const active = defender.state === 'parry' || defender.state === 'duck' && defender.guarding;
+    const passive = !active && ready(defender) && !defender.dead && defender.stance === attacker.attackDirection;
+    if (attacker.state !== 'active' || !(active || passive) ||
+        attacker.attackDirection !== (active ? defender.guardDirection : defender.stance)) return false;
     const near = defender.x + defender.facing * BODY_HALF;
     const far = near + defender.facing * 42;
     if (!overlaps(this._blade(attacker), [Math.min(near, far), Math.max(near, far)])) return false;
+    if (passive) {
+      attacker._contact = true;
+      attacker.knockback = -attacker.facing * 190;
+      defender.knockback = -defender.facing * 110;
+      this._setState(attacker, 'stunned', 0.22);
+      this._setState(defender, 'recovery', 0.12);
+      defender.recoveryKind = 'parry';
+      defender.counterWindow = 0.2;
+      defender.counterReady = true;
+      this._effect('parry', defender.x + defender.facing * 37, this._bladeY(attacker), defender.facing, 0.3,
+        { direction: attacker.attackDirection, strength: 0.5, passive: true });
+      this._impact(0.04, 0.22);
+      this.message = defender === this._player ? 'Guarded · Your stance held the line' : 'Guarded · Strike the open line';
+      return true;
+    }
     const strong = attacker.charge >= 0.85;
     attacker._contact = true;
     defender.fatigue = clamp(defender.fatigue + 0.12 + attacker.charge * 0.10, 0, 1);
@@ -590,7 +644,7 @@ export class DuelEngine {
     }
     this._aiMove = 0;
     this._pendingThreatAt = Infinity;
-    this._impact(0.11, 1);
+    this._impact(0.16, 1);
     this.message = { victory: 'Victory · Keep moving', defeat: 'Defeat · Try again', draw: 'Double hit · Draw' }[this.result];
   }
 

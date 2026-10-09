@@ -7,7 +7,7 @@ let spriteFrames = [];
 const motionFrames = new Map();
 let contactFrames = new Map();
 let loading;
-// Stages are baked from the PNG originals onto the 960×540 grid with 48 colors by rebake-stages.mjs.
+// Stages are baked from the PNG originals onto the 960×540 grid with 48 colors by tools/rebake-stages.mjs.
 const files = {
   'east-asia': 'zone-east-asia-v1-960.png',
   'africa': 'zone-africa-v1-960.png',
@@ -324,8 +324,8 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   if (!spriteAtlas) return false;
   const state = fighter.dead ? 'dead' : fighter.state || 'idle';
   const walking = state === 'walk' || state === 'move';
-  // One authored walking pose; stepping is conveyed by the bob and hem swing below, so the blade stays steady.
-  const columns = { idle: 0, walk: 1, move: 1, windup: 2, active: 3, recovery: 3, parry: 4, stunned: 0, dead: 5 };
+  // Walking keeps the guard pose: the legs are animated below, the arms and blade stay put.
+  const columns = { idle: 0, walk: 0, move: 0, windup: 2, active: 3, recovery: 3, parry: 4, stunned: 0, dead: 5 };
   const row = rows[style] ?? rows.kendo;
   const authored = motionFrames.get(style) || motionFrames.get('kendo');
   const direction = ['high', 'mid', 'low'].includes(fighter.attackDirection) ? fighter.attackDirection : 'mid';
@@ -385,14 +385,25 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   const chargedStretch = fighter.attackKind === 'charged' && state === 'active' ? 1 + .14 * chargeStrength : 1;
   const picture=recolorFrame(frame,options.palette);
   const dx = -frame.anchorX * chargedStretch, dy = -frame.height + (sequence ? 0 : frame.scale), dw = frame.width * chargedStretch, dh = frame.height;
-  // While walking the hem and legs swing against the torso by one grid step; the upper body and blade stay put.
-  const hem = walking && !fighter.dead ? (stepWave > 0 ? 2 : -2) : 0;
-  const split = Math.round(picture.height * .58);
+  // Walking, layered as in classic sprite duels: the torso, arms and blade come from the pose
+  // unchanged, while the lower body swings from the hip as two legs that alternate and lift.
+  const legs = walking && !fighter.dead;
+  const phase = time * STEP_RATE;
   const draw = () => {
-    if (!hem) { ctx.drawImage(picture, dx, dy, dw, dh); return; }
-    const upper = split * dh / picture.height;
-    ctx.drawImage(picture, 0, 0, picture.width, split, dx, dy, dw, upper);
-    ctx.drawImage(picture, 0, split, picture.width, picture.height - split, dx + hem, dy + upper, dw, dh - upper);
+    if (!legs) { ctx.drawImage(picture, dx, dy, dw, dh); return; }
+    const sx = dw / picture.width, sy = dh / picture.height;
+    const hip = Math.round(picture.height * .56), rows = picture.height - hip;
+    const pivot = Math.max(2, Math.min(picture.width - 2, Math.round(frame.anchorX / frame.width * picture.width)));
+    const stride = 6, lift = 3, overlap = stride + 2, swing = Math.cos(phase);
+    ctx.drawImage(picture, 0, 0, picture.width, hip, dx, dy, dw, hip * sy);
+    // Back leg first, then the front leg over it; each half overlaps the seam so no gap opens.
+    for (const [x0, x1, side, raise] of [[0, Math.min(picture.width, pivot + overlap), -1, Math.max(0, -Math.sin(phase))], [Math.max(0, pivot - overlap), picture.width, 1, Math.max(0, Math.sin(phase))]]) {
+      for (let y = hip; y < picture.height; y += 2) {
+        const depth = (y - hip + 1) / rows;
+        const offX = Math.round(side * swing * stride * depth), offY = -Math.round(raise * lift * depth * depth);
+        ctx.drawImage(picture, x0, y, x1 - x0, Math.min(2, picture.height - y), dx + (x0 + offX) * sx, dy + (y + offY) * sy, (x1 - x0) * sx, Math.min(2, picture.height - y) * sy);
+      }
+    }
   };
   ctx.save();
   ctx.imageSmoothingEnabled = false;

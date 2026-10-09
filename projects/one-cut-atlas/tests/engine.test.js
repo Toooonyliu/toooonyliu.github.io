@@ -192,7 +192,7 @@ test('one clean hit starts a five-second aftermath and the defeated body finishe
     assert.equal(dead.deathTimer, 0);
     const x = [snapshot.player.x, snapshot.opponent.x];
     // The fall now takes 1.3 s: a held stagger, then the eased collapse.
-    const later = advance(engine, 1.45);
+    const later = advance(engine, 1.6);
     const corpse = expected === 'victory' ? later.opponent : later.player;
     assert.equal(corpse.stateDuration, 1.3);
     assert.equal(corpse.deathTimer, corpse.stateDuration);
@@ -603,4 +603,64 @@ test('seeded AI varies high/mid/low attacks, charges, guards and both evasions',
   assert.deepEqual([...directions].sort(), ['high', 'low', 'mid']);
   for (const action of ['charge', 'parry', 'dodge', 'duck']) assert.ok(actions.has(action), action);
   assert.equal(temperaments.size, 3);
+});
+
+test('standing in the matching line is a passive guard; an open line is a clean hit', () => {
+  let engine = closeDuel();
+  engine._opponent.stance = 'high';
+  active(engine, engine._player, 'high');
+  let snapshot = engine.tick(FRAME);
+  assert.equal(snapshot.result, null);
+  assert.equal(snapshot.player.state, 'stunned');
+  assert.equal(snapshot.opponent.state, 'recovery');
+  assert.equal(snapshot.opponent.counterReady, true);
+  assert.ok(snapshot.effects.some(effect => effect.type === 'parry' && effect.passive === true));
+
+  engine = closeDuel();
+  engine._opponent.stance = 'mid';
+  active(engine, engine._player, 'low');
+  snapshot = engine.tick(FRAME);
+  assert.equal(snapshot.result, 'victory');
+});
+
+test('a held guard still parries harder than a passive guard', () => {
+  const engine = closeDuel();
+  engine._opponent.stance = engine._opponent.guardDirection = 'mid';
+  engine._parry(engine._opponent);
+  active(engine, engine._player, 'mid');
+  const snapshot = engine.tick(FRAME);
+  assert.equal(snapshot.result, null);
+  const parry = snapshot.effects.find(effect => effect.type === 'parry');
+  assert.ok(parry && !parry.passive);
+  assert.ok(snapshot.opponent.counterWindow > 0.2);
+});
+
+test('switching to an adjacent line early in a quick cut is a feint, once per committed swing', () => {
+  const engine = closeDuel(260);
+  tap(engine, { aim: 'mid' });
+  assert.equal(engine.snapshot().player.state, 'windup');
+  let snapshot = engine.tick(FRAME, { aim: 'high' });
+  assert.equal(snapshot.player.state, 'recovery');
+  assert.equal(snapshot.player.recoveryKind, 'feint');
+  assert.ok(snapshot.effects.some(effect => effect.type === 'feint'));
+  advance(engine, 0.3, { aim: 'high' });
+  tap(engine, { aim: 'high' });
+  snapshot = engine.tick(FRAME, { aim: 'mid' });
+  assert.equal(snapshot.player.state, 'windup', 'a second feint before a real swing is refused');
+  advance(engine, 0.6, { aim: 'mid' });
+  tap(engine, { aim: 'mid' });
+  snapshot = engine.tick(FRAME, { aim: 'high' });
+  assert.equal(snapshot.player.recoveryKind, 'feint', 'a completed swing restores the feint');
+});
+
+test('a late or non-adjacent line change does not feint', () => {
+  let engine = closeDuel(260);
+  tap(engine, { aim: 'high' });
+  let snapshot = engine.tick(FRAME, { aim: 'low' });
+  assert.equal(snapshot.player.state, 'windup');
+  engine = closeDuel(260);
+  tap(engine, { aim: 'mid' });
+  advance(engine, 0.14, { aim: 'mid' });
+  snapshot = engine.tick(FRAME, { aim: 'high' });
+  assert.notEqual(snapshot.player.recoveryKind, 'feint');
 });

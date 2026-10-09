@@ -646,6 +646,11 @@ export function drawEffects(ctx, effects = [], time = 0) {
       rect(ctx,tip[0]-2,tip[1]-2,4,4,'#fff8e9');
       if (charged) { ctx.globalAlpha = fade * .22; pixelLine(ctx,24,4,tip[0],tip[1],'#f4d89c',2); }
       ctx.restore();
+    } else if (e.type === 'feint') {
+      // Feint: a quick double tick above the head.
+      const lift = (e.age || 0) * 30;
+      rect(ctx, snap(x - 6), snap(y - lift), 4, 10, '#f0c77f'); rect(ctx, snap(x - 6), snap(y + 12 - lift), 4, 4, '#f0c77f');
+      rect(ctx, snap(x + 4), snap(y - lift), 4, 10, '#f0c77f'); rect(ctx, snap(x + 4), snap(y + 12 - lift), 4, 4, '#f0c77f');
     } else if(e.type==='parry'||e.type==='clash') {
       const col=e.type==='parry'?'#a7e9d0':'#ffe0a1';
       drawDebris(ctx, x, y, e.age || 0, e.duration || .42, e.id || 0);
@@ -657,12 +662,15 @@ export function drawEffects(ctx, effects = [], time = 0) {
       }
       ctx.globalAlpha=fade*.1;disk(ctx,x,y,28+(1-fade)*24,col);
     } else if(e.type==='hit') {
-      for (let i = 0; i < 16; i++) {
+      // The decisive cut: a white flash, then a heavy spray that arcs and falls.
+      if ((e.age || 0) < .09) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = .55 * (1 - (e.age || 0) / .09); ctx.fillStyle = '#fff6dc'; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); }
+      for (let i = 0; i < 46; i++) {
         const h = hash((e.id || 0) * 13 + i), v = hash((e.id || 0) * 29 + i * 5);
-        const vx = facing * (30 + h * 120) + (v - .5) * 40, vy = -(50 + v * 150), life = .35 + h * .35, age = e.age || 0;
+        const vx = facing * (40 + h * 300) + (v - .5) * 60, vy = -(40 + v * 190), life = .4 + h * .6, age = e.age || 0;
         if (age > life) continue;
         ctx.globalAlpha = (1 - age / life) * .95;
-        rect(ctx, snap(x + vx * age), snap(y + vy * age + 460 * age * age), i % 3 ? 2 : 4, i % 4 ? 2 : 4, i % 2 ? '#b4262b' : '#e04a46');
+        const size = i % 5 === 0 ? 6 : i % 3 ? 2 : 4;
+        rect(ctx, snap(x + vx * age), snap(y + vy * age + 520 * age * age), size, i % 4 ? 2 : size, i % 7 === 0 ? '#2a1418' : i % 2 ? '#b4262b' : '#e04a46');
       }
       ctx.globalAlpha = fade;
       if ((e.age || 0) < .055) {

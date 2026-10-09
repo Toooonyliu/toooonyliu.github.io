@@ -241,6 +241,13 @@ async function finishDuel(result){
 const keyMap={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyJ:'attack',KeyK:'parry',Space:'dodge',KeyC:'duck',KeyL:'counter',KeyV:'shove'};
 const stanceKeys={KeyW:'high',ArrowUp:'high',Digit1:'high',KeyX:'mid',Digit2:'mid',KeyS:'low',ArrowDown:'low',Digit3:'low'};
 document.querySelectorAll('[data-stance]').forEach(button=>button.onclick=()=>{setAim(button.dataset.stance);$('duel-canvas').focus({preventScroll:true});});
+/* Mouse: height over the arena sets the blade line, left button charges and strikes, right button evades. */
+{const canvas=$('duel-canvas');const lineAt=event=>{const rect=canvas.getBoundingClientRect();const y=(event.clientY-rect.top)/rect.height*WORLD.height;return y<WORLD.ground-108?'high':y>WORLD.ground-52?'low':'mid';};
+ canvas.addEventListener('pointermove',event=>{if(!engine||event.pointerType!=='mouse')return;const line=lineAt(event);if(line!==aim)setAim(line);});
+ canvas.addEventListener('pointerdown',event=>{if(!engine||event.pointerType!=='mouse')return;event.preventDefault();canvas.focus({preventScroll:true});initAudio();if(event.button===0)keys.attack=true;else if(event.button===2)keys.dodge=true;});
+ const releaseMouse=event=>{if(event.pointerType!=='mouse')return;if(event.button===0)keys.attack=false;else if(event.button===2)keys.dodge=false;};
+ canvas.addEventListener('pointerup',releaseMouse);canvas.addEventListener('pointercancel',releaseMouse);canvas.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse'){keys.attack=false;keys.dodge=false;}});
+ canvas.addEventListener('contextmenu',event=>event.preventDefault());}
 window.addEventListener('keydown',event=>{if(!engine||$('creator').open||$('help-dialog').open)return;if(stanceKeys[event.code]){event.preventDefault();if(!event.repeat)setAim(stanceKeys[event.code]);}if(keyMap[event.code]){event.preventDefault();if(!event.repeat)keys[keyMap[event.code]]=true;}if(event.code==='Escape'&&!event.repeat){event.preventDefault();togglePause();}if(event.code==='KeyR'&&!event.repeat&&engine.snapshot().phase==='result'){event.preventDefault();retry();}});
 window.addEventListener('keyup',event=>{if(keyMap[event.code]){keys[keyMap[event.code]]=false;if(engine)event.preventDefault();}});
 window.addEventListener('blur',()=>{clearKeys();if(engine)togglePause(true);});document.addEventListener('visibilitychange',()=>{if(document.hidden){clearKeys();if(engine)togglePause(true);}});

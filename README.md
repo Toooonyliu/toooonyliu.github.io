@@ -8,9 +8,9 @@ Built for CMU 15-113 (Effective Coding with AI), Project 1.
 
 [Play the game](https://toooonyliu.github.io/projects/one-cut-atlas/) · [Project README](projects/one-cut-atlas/README.md) · [English walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) · [AI prompt log](projects/one-cut-atlas/prompt_log.md)
 
-One Cut Atlas is a browser-based pixel-art sword-dueling game where players explore an interactive globe, choose regional arenas, and use photos to customize their fighter or rival. Directional attacks, guards and evasions shape each one-hit duel, followed by a short playable victory aftermath.
+One Cut Atlas is a browser-based pixel-art sword-dueling game set on a traveller's desk. Players send a travel photo as a postcard: a Render-hosted Node backend asks an OpenAI vision model to recognize the place from visible clues (people are ignored), the pixel desk globe turns to it and unlocks its zone, and an OpenAI image model paints an original pixel-art arena of that place for the duel. Each one-hit duel turns on reading the open line: standing in the same line as a cut blocks it, with quick cuts, charged lunges, feints, evasions and a short playable victory aftermath.
 
-The optional **AI Colors** feature calls a separate Render-hosted Node backend using the OpenAI Responses API to suggest a color palette and an existing outfit—not a recreated face or new sprite sheet. The API key stays server-side, while custom duels, photos and progress are saved locally in IndexedDB.
+The API key stays server-side with hourly and daily painting caps. Stages, painted arenas, photos and progress are saved locally in IndexedDB. The optional **AI Colors** feature suggests a fighter palette and one of the existing outfits.
 
 [Backend source](https://github.com/Toooonyliu/OneCutAtlas_Backend) · [Live backend](https://one-cut-atlas-api.onrender.com)
 

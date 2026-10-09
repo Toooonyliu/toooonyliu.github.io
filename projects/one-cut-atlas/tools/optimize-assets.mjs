@@ -2,7 +2,7 @@
 // Keep original generated PNGs in the workspace for provenance and iteration.
 import { readdir,stat } from 'node:fs/promises';
 const {default:sharp}=await import(process.env.SHARP_MODULE || 'sharp');
-const directory=new URL('./assets/art/',import.meta.url);
+const directory=new URL('../assets/art/',import.meta.url);
 for(const file of await readdir(directory)){
  if(!file.endsWith('.png'))continue;
  const input=new URL(file,directory),output=new URL(file.replace(/\.png$/,'.webp'),directory);

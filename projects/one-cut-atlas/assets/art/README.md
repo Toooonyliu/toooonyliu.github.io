@@ -7,17 +7,17 @@ and `zone-north-america-v1.png`. They were generated with the built-in ImageGen
 tool; the exact final prompts are in `zone-v1-provenance.json`.
 The game ships derivatives: stage backgrounds are baked onto the renderer's
 960×540 world grid with nearest sampling and a 48-color per-image palette as
-indexed PNGs named `*-960.png` (`rebake-stages.mjs`, which decodes through
+indexed PNGs named `*-960.png` (`tools/rebake-stages.mjs`, which decodes through
 headless Chrome so the repository needs no native image modules), while sprite
 sheets ship as lossless `.webp` with their original dimensions and decoded
-pixels (`optimize-assets.mjs`). Earlier releases baked stages at 480×270; the
+pixels (`tools/optimize-assets.mjs`). Earlier releases baked stages at 480×270; the
 larger grid was adopted on October 9 after painted photo arenas looked soft.
 Original PNGs remain in the local workspace.
 
 The interface fonts are Silkscreen, Pixelify Sans and VT323 from Google Fonts,
 self-hosted in `assets/fonts/` under the SIL Open Font License 1.1 (license texts
 included). The desk, paper, stamp-perforation, torn-edge and ink-mask textures in
-`assets/ui/` are generated procedurally by `ui-textures.mjs`. The travel-journal
+`assets/ui/` are generated procedurally by `tools/ui-textures.mjs`. The travel-journal
 layout takes its cue from diegetic desk menus in indie pixel games; no third-party
 images or UI assets are used.
 

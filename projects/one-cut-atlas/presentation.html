@@ -46,10 +46,10 @@
     </div>
   </section>
 
-  <section class="slide demo-slide" data-chapter="LIVE DEMO" data-notes="For the recording, I can show three actions here. First, rotate the globe and select a Travel Zone. Then open the portrait editor and preview a visible change to the fighter. Finally, enter a duel and show the short aftermath before the result overlay. The same app also opens in a full browser tab.">
-    <div class="demo-heading"><div><p class="kicker">The working app</p><h2>Explore. Personalize. Duel.</h2></div><a href="./index.html" target="_blank" rel="noopener">Open full game ↗</a></div>
-    <div class="demo-frame" id="demo-frame"><iframe id="demo" title="Playable One Cut Atlas demo" loading="lazy" tabindex="-1" data-src="./index.html"></iframe><div class="demo-cover"><button id="demo-play" type="button">PLAY THE LIVE DEMO</button><p class="tiny">The game uses its own keyboard controls.</p></div><button id="demo-return" class="demo-return" type="button">Return to walkthrough</button></div>
-    <p class="demo-instructions">Rotate the globe, choose a zone, then challenge it. Use the return button to resume the slides.</p>
+  <section class="slide demo-slide" data-chapter="LIVE DEMO" data-notes="For the recording, I can show three actions here. First, send a travel photo and watch the globe unlock its place. Then challenge it and wait while the arena is painted. Finally, fight in that arena and show the short aftermath before the result. The same app also opens in a full browser tab.">
+    <div class="demo-heading"><div><p class="kicker">The working app</p><h2>Send. Unlock. Duel.</h2></div><a href="./index.html" target="_blank" rel="noopener">Open full game ↗</a></div>
+    <div class="demo-frame" id="demo-frame"><iframe id="demo" title="Playable One Cut Atlas demo" loading="lazy" tabindex="-1" data-src="./index.html"></iframe><div class="demo-cover"><button id="demo-play" type="button">PLAY THE LIVE DEMO</button><p class="tiny">The game uses its own keyboard and mouse controls.</p></div><button id="demo-return" class="demo-return" type="button">Return to walkthrough</button></div>
+    <p class="demo-instructions">Send a travel photo or choose a zone, then challenge it. Use the return button to resume the slides.</p>
   </section>
 
   <section class="slide" data-chapter="THE ATLAS" data-notes="The first idea was a country-by-country map with provinces for larger countries. That scope would require too many unique scenes for this version. I kept the whole globe and chose eleven broad Travel Zones. They are artistic navigation regions. They do not claim to represent exact political or cultural boundaries. Every zone remains selectable, while three places receive the most detailed visual treatment first.">
@@ -69,24 +69,25 @@
     </div>
   </section>
 
-  <section class="slide" data-chapter="PHOTO PERSONALIZATION" data-notes="The photo path first extracts colors in the browser and applies them to an existing fighter. AI Colors can then send a compressed, authorized photo to my live Render backend. The server uses the OpenAI Responses API with gpt-6-luna and returns four palette colors plus a choice among the existing outfits. A real provider request passed on October 8. The preview uses the same tested sprites, not a recreated face or a new animation sheet. Local colors and manual settings remain available if the service is unavailable. The connected frontend release needs its final published-game browser check.">
+  <section class="slide" data-chapter="PHOTO STAGES" data-notes="A travel photo now unlocks a new stage. In the browser the photo is compressed; my Render backend asks a vision model to read the place from visible clues such as architecture and the script on signs, and people in the photo are ignored. The globe turns to the place, the zone lights up, and a rubber stamp names it. When I challenge it, the backend paints one original pixel-art backdrop of that place with gpt-image-2, using the game's own stages as style references, and the browser snaps it to the game's pixel grid. On nine of my own photos, eight were placed in the right city. The fighter's colors can still come from a photo through AI Colors.">
     <p class="kicker">Visible feedback from an upload</p>
-    <h2>A portrait changes the fighter</h2>
-    <div class="flow"><div class="step"><span>01</span><strong>Upload a photo</strong></div><div class="step"><span>02</span><strong>Choose AI Colors</strong></div><div class="step"><span>03</span><strong>Preview the fighter</strong></div></div>
-    <div class="two-col" style="margin-top:1.5%"><div><p class="body">GPT returns a palette and existing outfit. Local colors remain the fallback; the regional stage stays consistent.</p><div class="swatches" aria-label="Illustrative portrait colors"><i style="--swatch:#283f45"></i><i style="--swatch:#bd896b"></i><i style="--swatch:#547c78"></i><i style="--swatch:#d5b787"></i></div><p class="tiny">Illustrative palette. AI changes colors and outfit, not identity or sprite geometry.</p></div><div><h3 class="accent">Live: GPT appearance analysis</h3><pre class="code">{
-  "style": "traveler",
-  "palette": {
-    "hair": "#283f45", "skin": "#bd896b",
-    "outfit": "#547c78", "accent": "#d5b787"
-  },
-  "summary": "Dark hair and a muted teal outfit."
-}</pre><p class="tiny" style="margin-top:.7em">Illustrative rendered fields · OpenAI Responses / gpt-6-luna · key stays server-side.</p></div></div>
+    <h2>A travel photo becomes a stage</h2>
+    <div class="flow"><div class="step"><span>01</span><strong>Send a postcard</strong></div><div class="step"><span>02</span><strong>The globe unlocks the place</strong></div><div class="step"><span>03</span><strong>Duel in a painted arena</strong></div></div>
+    <div class="two-col" style="margin-top:1.5%"><div><p class="body">A vision model reads the place from visible clues; an image model paints one original backdrop of it; the browser snaps the painting to the game's 960×540 grid with 48 colors.</p><p class="tiny">People are ignored and never identified. The key stays on the server. If painting is unavailable, the region's stage is used.</p></div><div><h3 class="accent">Live: place recognition</h3><pre class="code">{
+  "name": "Susukino Crossing",
+  "city": "Sapporo", "country": "Japan",
+  "zone": "east-asia", "confidence": 0.98,
+  "evidence": [
+    "Japanese kana and kanji appear on many illuminated commercial signs.",
+    "Snow piled beside wet pavement suggests a cold, snowy climate."
+  ]
+}</pre><p class="tiny" style="margin-top:.7em">Abridged from a real response · gpt-6-luna recognition · gpt-image-2 painting · 8 of 9 test photos placed in the right city.</p></div></div>
   </section>
 
-  <section class="slide" data-chapter="COMBAT FEEL" data-notes="The duel uses three blade lanes, charging and matching guards. A clear hit ends the fight. I also wanted the final moment to feel physical, so the result waits through a short aftermath. After a victory, the player can keep moving and swinging, and the scene retains marks of the fight. The reference was the public First Cut instructions and the screenshots I supplied, rather than its source code.">
+  <section class="slide" data-chapter="COMBAT FEEL" data-notes="The duel uses three blade lines. As in First Cut, simply standing in the same line as an incoming cut blocks it, so the real question is which line the opponent is leaving open. A tap is a quick cut, a hold charges a longer lunge, and switching to a neighbouring line right after a tap is a feint. The mouse can aim the blade by height. A clear hit ends the fight with a flash, a heavy spray and a slow fall, and the winner keeps control for a short aftermath. The animation keeps the blade steady while the legs step from the hip.">
     <p class="kicker">The fight needs readable choices</p>
-    <h2>One hit, with an aftermath</h2>
-    <div class="two-col"><div><dl class="control-list"><dt>A / D</dt><dd>Adjust distance</dd><dt>W / X / S</dt><dd>Select the blade lane</dd><dt>Hold J, release J</dt><dd>Charge, then strike</dd><dt>Hold K</dt><dd>Guard the selected lane</dd><dt>Space / C</dt><dd>Evade back or duck</dd><dt>L / V</dt><dd>Counter or shove</dd></dl></div><div class="aftermath"><strong>5 seconds</strong>to move and strike after a victory.<div class="rule"></div><p class="body">Persistent marks make the background feel involved in the fight. The result appears after the final motion has time to finish.</p></div></div>
+    <h2>Read the open line</h2>
+    <div class="two-col"><div><dl class="control-list"><dt>Mouse / W X S</dt><dd>Set the blade line; standing in a cut's line blocks it</dd><dt>Tap / hold J</dt><dd>Quick cut, or charge a lunge</dd><dt>Tap, then switch</dt><dd>Feint</dd><dt>Hold K</dt><dd>Firm guard, longer counter</dd><dt>Space / C</dt><dd>Evade back or duck</dd><dt>L / V</dt><dd>Counter or shove</dd></dl></div><div class="aftermath"><strong>One hit</strong>decides the duel.<div class="rule"></div><p class="body">A white flash, a heavy spray and a slow fall mark the decisive cut; the winner keeps control for a short aftermath.</p></div></div>
   </section>
 
   <section class="slide" data-chapter="ITERATION" data-notes="My feedback on the earlier demo was specific. The home page still felt rough. The detailed scenery competed with the action. Uploading a photo did not make the promised visual change. The result overlay also interrupted the finish. That feedback became separate changes to the map, regional presets, portrait preview and combat state. Each change can be checked in the running game.">
@@ -102,10 +103,10 @@
     <p class="process-note">AI assisted code and original game art. My input defined the direction, references and scope. The prompt log preserves the important prompts and records which tools handled each job.</p>
   </section>
 
-  <section class="slide" data-chapter="NEXT ITERATION" data-notes="The Render backend is now live at one-cut-atlas-api.onrender.com, and a real OpenAI analysis of an authorized fictional JPEG returned HTTP 200 in about 4.4 seconds. The game uses its public URL, while the key remains server-side. This connected frontend release still needs its final public-game check. Further game work could add more specific regional stages, photo-based scenery, or cross-device saves; those are not current features. I still need to make and record an actual personal code edit, finish my own README and focused work record, and record and upload the required video walkthrough.">
+  <section class="slide" data-chapter="NEXT ITERATION" data-notes="The Render backend recognizes places and paints arenas with OpenAI models; the key stays server-side. A free Qwen painter through ModelScope is built in but needs a mainland China phone number to register, so it is not active. Next, I would add more authored animation frames, more regional stages and saved journeys across devices. I still need to make and record an actual personal code edit, finish my own README and focused work record, and record and upload the required video walkthrough.">
     <p class="kicker">Where the project can go next</p>
-    <h2>More places, more personal fighters</h2>
-    <div class="next-steps"><div><h3>Live backend, bounded AI</h3><p>A real GPT analysis now returns colors and an existing outfit through Render. First use can take longer while the free service wakes.</p><p class="tiny" style="margin-top:1em"><a href="https://one-cut-atlas-api.onrender.com" target="_blank" rel="noopener">one-cut-atlas-api.onrender.com ↗</a><br>OpenAI provider test: HTTP 200 · October 8</p></div><div><h3>Further game development</h3><p>Add more distinct regional stages. Tune combat through playtesting. Later explore photo-based scenery and saved journeys across devices.</p></div></div>
+    <h2>More places, more motion</h2>
+    <div class="next-steps"><div><h3>Live backend, bounded AI</h3><p>Place recognition and arena painting run through Render with daily caps and a cache; first use can take longer while the free service wakes.</p><p class="tiny" style="margin-top:1em"><a href="https://one-cut-atlas-api.onrender.com" target="_blank" rel="noopener">one-cut-atlas-api.onrender.com ↗</a></p></div><div><h3>Further game development</h3><p>Add more authored animation frames and regional stages, tune combat through playtesting, and later explore saved journeys across devices.</p></div></div>
     <p class="closing">The next destination is a new duel.<br><a href="./index.html" target="_blank" rel="noopener">Play One Cut Atlas ↗</a></p>
   </section>
 

@@ -1,118 +1,128 @@
 # One Cut Atlas
 
-A pixel-art travel and sword-duel prototype. Run `npm start` and open
-the printed localhost URL (default 4173; set `PORT` for another port).
-`npm test` runs the tests included with this checkout; `npm run build` produces
-`dist/`. The published frontend includes combat, avatar/region, photo-arena client, pixelization and save tests. The
-separate backend repository contains its HTTP and model-boundary tests.
+A pixel-art travel and sword-duel game for the browser. Send a postcard from
+your travels, watch the globe unlock that place, and settle it with one clean
+cut in a pixel arena painted from your photo.
 
-## Explore
+[Play](https://toooonyliu.github.io/projects/one-cut-atlas/) ·
+[Walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) ·
+[Backend](https://github.com/Toooonyliu/OneCutAtlas_Backend) ·
+[Prompt log](prompt_log.md)
 
-Drag the shaded pixel globe to rotate it; use the wheel or pinch to zoom.
-Choose a colored land region, or open **Destinations** for eleven Travel Zones.
-**My duels** holds saved custom arenas. The game interface is English, with
-controls in **Help** and an exit to the portfolio on the menu and duel screens.
-Three original flagship stages are
-Kyoto Rain, Cairo River Dusk and New York Underpass; eight more zones use
-playable foundation presets. The approximate zones are artistic navigation,
-not political boundaries. Keyboard users
-can focus the globe and use arrows, plus/minus, Home and Enter. Double-clicking
-an empty point opens the fighter workshop for the corresponding region.
-Geography is bundled Natural Earth data, with no network/API dependency.
+> This technical README was written with AI assistance and must not be
+> presented as the student's independently written assignment README.
 
-## Duel
+## Run it
 
-- A / D or left / right arrows: move.
-- W / X / S or 1 / 2 / 3: overhead, horizontal and rising blade lanes.
-- Hold J to charge; release to strike. Matching simultaneous blade lanes clash.
-- Hold K to guard the selected lane. A successful block earns a short counter.
-- Space: backward evade, useful against vertical cuts.
-- Hold C: forward duck, useful against horizontal cuts. Vertical cuts remain
-  dangerous; a directional guard can cover them while ducking.
-- L: quick backslash during an earned block/evade counter window.
-- V: close shove; combine with backward movement to pull instead of push.
-- Esc: pause. R: retry after the result.
+Node 22 or newer, no dependencies.
 
-A clean hit decides the duel. A five-second aftermath allows the victorious
-player to move, turn and swing before the result screen. Hits and post-victory
-swings leave persistent pixel blood on the wall and ground until retry.
-Misses, blocks and shoves build temporary fatigue;
-resting recovers it. The AI varies blade lanes, charging, guarding and evasion.
-All four costumes use authored attack, evade, charge and hit animation frames.
+```sh
+npm start      # static preview at http://127.0.0.1:4173 (PORT to change)
+npm test       # combat, photo-stage, storage and pixelization tests
+npm run build  # copies the static game into dist/
+```
 
-The mechanics were independently rebuilt from the developer's public
-[First Cut instructions](https://drasnus.itch.io/first-cut) and the user's
-requested actions. No First Cut source code was supplied in this workspace;
-this is not an exact reproduction of that game's code or animation timing.
-Original generated asset provenance is recorded in `assets/art/README.md`.
+The frontend works without the backend: preset stages, duels and saves are
+local. Photo stages and AI Colors call the public backend set in the
+`one-cut-api-base` meta tag of `index.html`; no key is ever in the browser.
 
-## Photos
+## The desk
 
-The fighter workshop maps local photo colors onto the player's or rival's
-authored sprite frames. Choose a silhouette and adjust hair, skin, outfit and
-accent colors in the live preview. Local color sampling does not recognize a
-face or produce a photorealistic likeness. Regional stage art keeps its preset
-palette. **AI Colors** adds GPT-assisted appearance analysis through the live
-[Render backend](https://one-cut-atlas-api.onrender.com). It uses the OpenAI
-Responses API with `gpt-6-luna` to return four colors and a choice among existing
-outfit silhouettes. It does not generate sprite images, reconstruct a face,
-identify a person or create new animation frames. The backend returned HTTP 200
-for a real provider analysis of an authorized fictional test image on October 8.
+The home screen is a traveller's desk. The title menu is bare pixel text:
+**Fight**, **Send a postcard**, **Fighter**, **Destinations** and
+**Difficulty**. The selected stage is a postcard; the photo upload is a blank
+postcard; progress is a row of eleven passport stamps that ink and cancel as
+zones are cleared; Destinations opens a typed traveller's log.
 
-The frontend's `one-cut-api-base` meta tag points to the public service URL;
-the OpenAI key stays in private server environment variables, never browser code.
-The connected frontend release still needs its final published-game browser check.
-The free Render service can sleep, so AI Colors wakes `/health` before sending
-one compressed photo to `/api/analyze-avatar`. Requests are not automatically
-retried. OpenAI API usage is separate from Render hosting and can consume API
-credits. Only use photos you own or have permission to send. The service is
-stateless and requests provider responses with `store: false`; this is not a
-promise that a third-party provider retains no data under its own policies.
-Private setup is described in the
-[backend repository](https://github.com/Toooonyliu/OneCutAtlas_Backend).
-If AI is unavailable, existing local colors and manual customization remain
-playable. This version has no accounts or cross-device cloud history.
-Photos, destinations and victory progress are saved locally in IndexedDB.
+The globe is a desk globe drawn pixel by pixel: ordered-dither light bands, a
+flat sea with glints, unexplored land as a fog checker, cleared zones in full
+color with a gold rim, a brass meridian ring and base, and flag pins. Drag or
+use the arrow keys to turn it, the wheel or pinch to zoom, and click land to
+choose that zone. The eleven zones are artistic navigation regions, not
+political boundaries. Geography is bundled Natural Earth data.
 
 ## Photo stages
 
-The home screen leads with **Drop a travel photo**. The photo is compressed in
-the browser, then the backend's `/api/recognize-place` route asks a vision model
-to work like a geolocation scout: it lists visible clues first (architecture,
-the script on signs, vegetation, road layout) and then names the place. People
-are ignored and never identified; sign text may be read as a clue but is never
-copied into the result. Photo GPS, when the file has it, is sent rounded to
-about 100 m and overrides the guess. While it works, the photo is shown as a
-coarse pixel mosaic with a scan line.
+1. **Send a postcard.** Drop a travel photo of a landmark, street or
+   landscape. It is compressed in the browser and shown as a pixel mosaic with
+   a scan line while the backend's scout reads it.
+2. **Unlock.** A vision model (`gpt-6-luna`, high image detail) lists visible
+   clues first, such as architecture, the script on signs and vegetation, then
+   names the place. People are ignored and never identified; sign text may be
+   read as a clue but is never copied into the result. Photo GPS, when
+   present, is sent rounded to about 100 m and wins. The globe turns to the
+   place, zooms in, the zone lifts with a glowing outline, and a rubber stamp
+   names the stage. **Not here? Scan again** re-asks while excluding earlier
+   answers.
+3. **Challenge.** The backend paints one original pixel-art backdrop of that
+   place with `gpt-image-2` at medium quality, attaching the game's own shipped
+   stages as style references. `src/pixelize.js` snaps it onto the 960×540
+   world grid with a per-image 48-color palette, and the duel starts. If
+   painting is unavailable, the region's preset stage is used.
 
-When the place is known, the globe turns to it, zooms in, and its travel zone
-lifts out with a glowing outline; a banner names the stage, for example
-SUSUKINO CROSSING · SAPPORO · JAPAN. **Not here? Scan again** re-asks the scout
-while excluding its previous answers. **Challenge** forges the arena: the
-backend paints one original backdrop of that place (the brief used for the
-shipped stages plus the confirmed region), `src/pixelize.js` snaps it onto the
-960×540 world grid with a 48-color palette, and the duel starts. If painting is
-unavailable the duel uses the region's stage. The new stage is saved in
-IndexedDB with its painted backdrop, so replays never paint again; a stage
-saved before painting succeeded is painted the next time it is chosen.
+The stage and its painted backdrop are saved in IndexedDB, so replays never
+paint again. Measured October 8–9, 2026: recognition placed eight of nine of
+the developer's own travel photos in the right city (a volcano without signage
+stayed unrecognized and becomes an uncharted stage); painting costs about
+$0.046 and 27 s per arena. The backend caps paintings per hour and per day and
+caches repeats.
 
-Recognition was measured on nine of the developer's own travel photos on
-October 9, 2026: with full-detail images, eight were placed in the right city
-(Sapporo had been misread as Osaka at low detail); a volcano without signage
-stayed unrecognized, which the game reports as an uncharted stage.
+**AI Colors** in the Fighter dialog is separate: it returns four colors and one
+of the four existing outfits for the player or rival. It does not reconstruct
+a face or generate sprites. Only use photos you own or may share.
 
-The backend paints with a free ModelScope (Qwen image) quota when its token is
-configured and falls back to OpenAI `gpt-image-2` at medium quality, about
-$0.046 per arena measured on October 8.
+## Duel
 
-## Walkthrough and submission
+| Input | Action |
+| --- | --- |
+| A / D or ← / → | Move |
+| Mouse height, W / X / S, or 1 / 2 / 3 | Set the blade line: high, mid or low |
+| Tap J or left mouse | Quick cut |
+| Hold J or left mouse, release | Charged cut with a longer lunge |
+| Tap, then switch to a neighbouring line | Feint (once per committed swing) |
+| Hold K | Firm guard in your line: harder parry, longer counter window |
+| Space or right mouse / hold C | Evade back (beats high and low cuts) / duck forward (beats mid cuts) |
+| L | Counter after a block or evade |
+| V | Close shove; with backward movement, a pull |
+| Esc / R | Pause / rematch after the result |
 
-`presentation.html` is a separate English, ten-slide walkthrough with a live
-game embed. Use arrows to move, N for notes and F for fullscreen. It supports
-screen recording; it is not itself a recorded video. `prompt_log.md` preserves
-19 selected actual user messages and art provenance. `submission-checklist.md` identifies
-remaining student-authored README, actual code edits and recording work.
-This technical README was updated with AI assistance and must not be presented
-as the student's independently written assignment README.
+One clean hit decides the duel. **Standing in the same line as an incoming cut
+blocks it**, so the duel is about reading which line the opponent leaves open.
+Matching simultaneous cuts clash. Misses, blocks and shoves build temporary
+fatigue. The computer opponent reacts to visible wind-ups after a human-like
+delay, aims at the open line more often on harder difficulties, and can be
+baited by a feint.
 
-The new scene prompts are saved in `assets/art/zone-v1-provenance.json`.
+The decisive cut freezes for a beat, flashes white, throws a heavy spray, and
+the loser staggers before falling over 1.3 s; the winner holds the
+follow-through and keeps control for a five-second aftermath. Walking keeps
+the blade steady in its guard while the lower body steps from the hip; idle
+fighters breathe, turns squash through a thin silhouette, and cuts lean back,
+surge forward and leave a lingering crescent.
+
+These rules were rebuilt from First Cut's public instructions and from
+studying how classic one-hit duels layer their animation and timing. No First
+Cut code, art or audio is included in this repository.
+
+## Project layout
+
+```
+index.html, src/style.css   Desk menu, dialogs, duel HUD
+src/app.js                  Screens, photo gate, input, duel loop
+src/engine.js               Deterministic fixed-step duel rules and AI
+src/art.js, src/render.js   Sprite preparation, animation, effects, stages
+src/globe.js                Pixel desk globe and zone highlighting
+src/scene-api.js            Recognition and painting client
+src/pixelize.js             Painting → 960×540, 48-color pixel grid
+src/avatar.js, photo.js     AI Colors client and local photo handling
+src/storage.js, shared.js   IndexedDB saves and validated data contracts
+assets/art                  Shipped sprite sheets and stage backgrounds
+assets/ui, assets/fonts     Generated textures; OFL pixel fonts
+tools/                      Asset build scripts (stages, sprites, textures)
+tests/                      node:test suites
+presentation.html           Ten-slide walkthrough with a live game embed
+```
+
+Asset provenance is recorded in `assets/art/README.md` and the provenance JSON
+files beside the art. `submission-checklist.md` lists the remaining
+student-authored work: the personal README, actual code edits and the video.

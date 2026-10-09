@@ -1,7 +1,7 @@
 // Bakes the PNG stage originals (kept outside the repository) onto the game's 960×540
 // grid with nearest sampling and a 48-color per-image palette, writing indexed PNGs.
 // Uses headless Chrome for decoding so the repository needs no native image modules.
-//   node rebake-stages.mjs --originals ../../../one-cut-atlas/assets/art --out assets/art
+//   node tools/rebake-stages.mjs --originals ../../../one-cut-atlas/assets/art --out assets/art   (run from the project folder)
 import { readFile, writeFile, mkdtemp, copyFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -18,7 +18,7 @@ const chromePath = option('chrome', '/Applications/Google Chrome.app/Contents/Ma
 const width = 960, height = 540, colors = 48;
 
 const work = await mkdtemp(path.join(tmpdir(), 'one-cut-rebake-'));
-await copyFile(new URL('./src/pixelize.js', import.meta.url), path.join(work, 'pixelize.js'));
+await copyFile(new URL('../src/pixelize.js', import.meta.url), path.join(work, 'pixelize.js'));
 for (const stage of STAGES) await copyFile(path.join(originals, `${stage}.png`), path.join(work, `${stage}.png`));
 const server = createServer(async (request, response) => {
   const file = path.join(work, path.basename(decodeURIComponent(new URL(request.url, 'http://x').pathname)) || 'index.html');
