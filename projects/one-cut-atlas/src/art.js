@@ -7,19 +7,32 @@ let spriteFrames = [];
 const motionFrames = new Map();
 let contactFrames = new Map();
 let loading;
+// Stages are baked from the PNG originals onto the 960×540 grid with 48 colors by rebake-stages.mjs.
 const files = {
-  'east-asia': 'zone-east-asia-v1.png',
-  'africa': 'zone-africa-v1.png',
-  'north-america': 'zone-north-america-v1.png',
-  forest: 'forest-v2.png',
-  traditional_street: 'street-v2.png',
-  modern_city: 'city-v2.png',
-  wilderness: 'wilderness-v2.png',
+  'east-asia': 'zone-east-asia-v1-960.png',
+  'africa': 'zone-africa-v1-960.png',
+  'north-america': 'zone-north-america-v1-960.png',
+  forest: 'forest-v2-960.png',
+  traditional_street: 'street-v2-960.png',
+  modern_city: 'city-v2-960.png',
+  wilderness: 'wilderness-v2-960.png',
 };
 const rows = { kendo: 0, suit: 1, cowboy: 2, traveler: 3 };
 const attackMotions = ['high', 'mid', 'low', 'counter'];
 const defenseMotions = ['dodge', 'duck', 'charge', 'hit-high', 'hit-mid', 'hit-low'];
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
+const STEP_RATE = 8.2; // radians per second: about 2.6 steps per second at walking speed
+const TURN_SECONDS = .12;
+const turns = new Map();
+/** A facing change squashes through a thin silhouette instead of mirroring in one frame. */
+export function turnScale(isPlayer, facing, time) {
+  if (!time) return facing;
+  const key = isPlayer ? 'player' : 'opponent', last = turns.get(key);
+  if (!last || last.facing !== facing) { turns.set(key, { facing, since: last ? time : -1 }); return last ? -facing * .75 : facing; }
+  const progress = (time - last.since) / TURN_SECONDS;
+  if (last.since < 0 || progress >= 1) return facing;
+  return (progress < .5 ? -facing : facing) * Math.max(.18, Math.abs(Math.cos(progress * Math.PI)));
+}
 
 function loadImage(file) {
   return new Promise((resolve, reject) => {
@@ -27,7 +40,7 @@ function loadImage(file) {
     const timeout = setTimeout(() => { image.onload = image.onerror = null; reject(new Error(`Art loading timed out: ${file}`)); }, 15000);
     image.onload = () => { clearTimeout(timeout); resolve(image); };
     image.onerror = () => { clearTimeout(timeout); reject(new Error(`Art unavailable: ${file}`)); };
-    image.src = new URL(`../assets/art/${file.replace(/\.png$/,'.webp')}`, import.meta.url).href;
+    image.src = new URL(`../assets/art/${file}`, import.meta.url).href;
   });
 }
 
@@ -46,9 +59,10 @@ export async function registerBackdrop(dataUrl) {
   if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return null;
   if (customBackdrops.has(dataUrl)) return customBackdrops.get(dataUrl);
   const image = await loadDataUrl(dataUrl);
-  const output = canvas(480, 270), ctx = output.getContext('2d');
+  // Keep the painted grid as saved (960×540 now, 480×270 for older saves); drawBackdrop scales it to the world.
+  const output = canvas(image.naturalWidth || 960, image.naturalHeight || 540), ctx = output.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(image, 0, 0, 480, 270);
+  ctx.drawImage(image, 0, 0, output.width, output.height);
   if (customBackdrops.size >= 24) customBackdrops.delete(customBackdrops.keys().next().value);
   customBackdrops.set(dataUrl, output);
   return output;
@@ -223,14 +237,14 @@ function fitContact(frame, reach) {
 export function preloadArt() {
   loading ||= Promise.all([
     ...Object.entries(files).map(async ([environment, file]) => backgrounds.set(environment, await loadImage(file))),
-    loadImage('fighters-v2.png').then(image => { spriteFrames = prepareFrames(image); spriteAtlas = image; }),
-    loadImage('fighters-v3-contact.png').then(image => {
+    loadImage('fighters-v2.webp').then(image => { spriteFrames = prepareFrames(image); spriteAtlas = image; }),
+    loadImage('fighters-v3-contact.webp').then(image => {
       contactFrames = prepareMotionFrames(image, Object.keys(rows), { columns: 2, scale: 137 / (image.naturalHeight / 4 * .72), anchorPerRow: true, reach: 106 });
     }),
     ...Object.keys(rows).map(async style => {
       const [attacks, defense] = await Promise.all([
-        loadImage(`fighters-v3-${style}-attacks.png`).then(image => prepareMotionFrames(image, attackMotions)),
-        loadImage(`fighters-v3-${style}-defense.png`).then(image => prepareMotionFrames(image, defenseMotions)),
+        loadImage(`fighters-v3-${style}-attacks.webp`).then(image => prepareMotionFrames(image, attackMotions)),
+        loadImage(`fighters-v3-${style}-defense.webp`).then(image => prepareMotionFrames(image, defenseMotions)),
       ]);
       const actions = new Map([...attacks, ...defense]);
       actions.set('contact-low', [fitContact(defense.get('duck')[2], 106)]);
@@ -246,10 +260,11 @@ function backgroundVariant(scene) {
   if (!image) return null;
   const key = JSON.stringify([scene.stageId,scene.environment, scene.lighting, scene.palette]);
   if (variants.has(key)) return variants.get(key);
-  const output = canvas(480, 270), ctx = output.getContext('2d');
+  const width = image.naturalWidth || 960, height = image.naturalHeight || 540;
+  const output = canvas(width, height), ctx = output.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   const zoom = ['east-asia','africa'].includes(scene.stageId)?1.06:scene.stageId?1:scene.environment === 'wilderness' ? 1.067 : 1;
-  ctx.drawImage(image, -(480 * zoom - 480) / 2, 0, 480 * zoom, 270 * zoom);
+  ctx.drawImage(image, -(width * zoom - width) / 2, 0, width * zoom, height * zoom);
   // Flagship stages keep their authored regional palette.
   if(scene.stageId){variants.set(key,output);return output;}
   // Retain the textured value structure while letting photo colors influence
@@ -257,16 +272,16 @@ function backgroundVariant(scene) {
   ctx.globalCompositeOperation = 'soft-light';
   ctx.globalAlpha = .22;
   ctx.fillStyle = scene.palette?.sky || '#da8496';
-  ctx.fillRect(0, 0, 480, 270);
+  ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = scene.palette?.accent || '#e6b66e';
   ctx.globalAlpha = .12;
-  ctx.fillRect(0, 80, 480, 130);
+  ctx.fillRect(0, Math.round(height * 80 / 270), width, Math.round(height * 130 / 270));
   ctx.globalCompositeOperation = 'source-over';
   if (scene.lighting === 'night' && scene.environment !== 'modern_city') {
-    ctx.fillStyle = '#11192c'; ctx.globalAlpha = .53; ctx.fillRect(0, 0, 480, 270);
+    ctx.fillStyle = '#11192c'; ctx.globalAlpha = .53; ctx.fillRect(0, 0, width, height);
   } else if (scene.lighting === 'day' && scene.environment === 'modern_city') {
     ctx.globalCompositeOperation = 'screen';
-    ctx.fillStyle = '#adc0be'; ctx.globalAlpha = .32; ctx.fillRect(0, 0, 480, 270);
+    ctx.fillStyle = '#adc0be'; ctx.globalAlpha = .32; ctx.fillRect(0, 0, width, height);
   }
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
@@ -309,8 +324,8 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   if (!spriteAtlas) return false;
   const state = fighter.dead ? 'dead' : fighter.state || 'idle';
   const walking = state === 'walk' || state === 'move';
-  const columns = { idle: 0, walk: Math.floor(time * 9) % 2, move: Math.floor(time * 9) % 2,
-    windup: 2, active: 3, recovery: 3, parry: 4, stunned: 0, dead: 5 };
+  // One authored walking pose; stepping is conveyed by the bob and hem swing below, so the blade stays steady.
+  const columns = { idle: 0, walk: 1, move: 1, windup: 2, active: 3, recovery: 3, parry: 4, stunned: 0, dead: 5 };
   const row = rows[style] ?? rows.kendo;
   const authored = motionFrames.get(style) || motionFrames.get('kendo');
   const direction = ['high', 'mid', 'low'].includes(fighter.attackDirection) ? fighter.attackDirection : 'mid';
@@ -341,7 +356,9 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   } else if (state === 'dead') {
     const hitDirection = fighter.hitDirection || fighter.hitLevel || 'mid';
     sequence = authored?.get(`hit-${hitDirection}`) || authored?.get('hit-mid');
-    index = Math.min(3, Math.floor(progress * 4));
+    // Hold the impact pose for the first third (stagger), then ease through the fall frames.
+    const fall = Math.max(0, (progress - .3) / .7);
+    index = progress < .3 ? 0 : Math.min(3, 1 + Math.floor((1 - (1 - fall) * (1 - fall)) * 3));
   } else if (state === 'stunned') {
     sequence = authored?.get('hit-high'); index = progress < .55 ? 0 : 1;
   } else if (state === 'recovery' && ['dodge', 'duck'].includes(fighter.recoveryKind)) {
@@ -354,22 +371,38 @@ export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}
   }
   const frame = sequence?.[index] || spriteFrames[row][fallback];
   const facing = fighter.facing === -1 ? -1 : 1;
-  const bob = walking ? Math.abs(Math.sin(time * 12)) * 2 : Math.sin(time * 2.2) * .5;
+  const stepWave = Math.sin(time * STEP_RATE);
+  // Two-pixel grid: a step bob while walking, a slow breath while standing. Neither moves the blade on its own.
+  const bob = walking ? (Math.abs(stepWave) > .5 ? 2 : 0) : (state === 'idle' || state === 'parry') ? Math.round(Math.sin(time * 4.4)) * 2 : 0;
   const chargeStrength = clamp(fighter.charge ?? 1);
-  const lean = state === 'active' ? (fighter.attackKind === 'charged' ? 4 + 5 * chargeStrength : 4) : state === 'stunned' ? -4 : state === 'shove' ? progress * 7 : 0;
-  const foot = WORLD.ground - (state === 'dead' || sequence ? 0 : Math.round(bob));
+  const attackRecovery = state === 'recovery' && (!fighter.recoveryKind || fighter.recoveryKind === 'attack');
+  // Visual lunge only: a lean back in the wind-up, a surge through the cut, settling during recovery.
+  const lean = state === 'windup' ? -3 : state === 'active' ? 4 + 10 * (1 - (1 - progress) * (1 - progress)) + (fighter.attackKind === 'charged' ? 5 * chargeStrength : 0) : attackRecovery ? Math.round(14 * (1 - progress) * (1 - progress)) : state === 'stunned' ? -4 : state === 'shove' ? progress * 7 : 0;
+  const tremble = state === 'dead' && progress < .3 ? (Math.floor(time * 30) % 2 ? 2 : 0) : 0;
+  const foot = WORLD.ground - (state === 'dead' ? 0 : Math.round(bob));
+  const turn = turnScale(isPlayer, facing, time);
+  const flash = state === 'dead' && (fighter.timer || 0) < .035 && 'filter' in ctx;
   const chargedStretch = fighter.attackKind === 'charged' && state === 'active' ? 1 + .14 * chargeStrength : 1;
   const picture=recolorFrame(frame,options.palette);
-  const draw = () => ctx.drawImage(picture,
-    -frame.anchorX * chargedStretch, -frame.height + (sequence ? 0 : frame.scale),
-    frame.width * chargedStretch, frame.height);
+  const dx = -frame.anchorX * chargedStretch, dy = -frame.height + (sequence ? 0 : frame.scale), dw = frame.width * chargedStretch, dh = frame.height;
+  // While walking the hem and legs swing against the torso by one grid step; the upper body and blade stay put.
+  const hem = walking && !fighter.dead ? (stepWave > 0 ? 2 : -2) : 0;
+  const split = Math.round(picture.height * .58);
+  const draw = () => {
+    if (!hem) { ctx.drawImage(picture, dx, dy, dw, dh); return; }
+    const upper = split * dh / picture.height;
+    ctx.drawImage(picture, 0, 0, picture.width, split, dx, dy, dw, upper);
+    ctx.drawImage(picture, 0, split, picture.width, picture.height - split, dx + hem, dy + upper, dw, dh - upper);
+  };
   ctx.save();
   ctx.imageSmoothingEnabled = false;
-  ctx.translate(Math.round(fighter.x + facing * lean), foot);
+  ctx.translate(Math.round(fighter.x + facing * lean + tremble), foot);
   // Faint wet-ground reflection places the silhouette inside the scene.
-  if(options.wet!==false){ctx.save(); ctx.translate(0, 10); ctx.scale(facing, -.40); ctx.globalAlpha = .17; draw(); ctx.restore();}
-  ctx.scale(facing, 1);
+  if(options.wet!==false){ctx.save(); ctx.translate(0, 10); ctx.scale(turn, -.40); ctx.globalAlpha = .17; draw(); ctx.restore();}
+  ctx.scale(turn, 1);
+  if (flash) ctx.filter = 'brightness(3.2) saturate(.2)';
   draw();
+  if (flash) ctx.filter = 'none';
   ctx.restore();
   return true;
 }

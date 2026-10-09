@@ -1,7 +1,7 @@
 /** Small, explicit contracts shared by UI, renderer, storage and API. */
 import { TRAVEL_ZONES } from './region-presets.js';
 export const WORLD = { width: 960, height: 540, ground: 422 };
-export const BACKDROP_MAX_LENGTH = 400_000;
+export const BACKDROP_MAX_LENGTH = 1_200_000;
 export const ENVIRONMENTS = ['traditional_street', 'modern_city', 'wilderness', 'forest'];
 export const LIGHTINGS = ['day', 'sunset', 'night'];
 export const STYLES = ['kendo', 'suit', 'cowboy', 'traveler'];
@@ -48,6 +48,15 @@ export function validateScene(value = {}) {
   backdrop:typeof value.backdrop === 'string' && value.backdrop.length <= BACKDROP_MAX_LENGTH && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+=*$/.test(value.backdrop) ? value.backdrop : null,
   placeName:typeof value.placeName === 'string' && value.placeName.trim() ? value.placeName.trim().slice(0,80) : null
  };
+}
+/** A photo stage remembers what the scout saw, so its arena can be painted later. Anything unusable becomes null. */
+export function validatePlaceRecord(value) {
+ if (!value || typeof value !== 'object') return null;
+ const text = (x, max) => typeof x === 'string' && x.trim() ? x.trim().slice(0, max) : null;
+ if (typeof value.scenePrompt !== 'string' || !/^[A-Za-z0-9 ,.;:'()\-]{20,300}$/.test(value.scenePrompt.trim())) return null;
+ if (!['exterior', 'interior'].includes(value.setting) || !LIGHTINGS.includes(value.lighting) || !TRAVEL_ZONES.some(zone => zone.id === value.zone)) return null;
+ const name = text(value.name, 80);
+ return { name: name && /^[A-Za-z0-9 ,.'()\-]{2,80}$/.test(name) ? name : null, scenePrompt: value.scenePrompt.trim(), setting: value.setting, lighting: value.lighting, zone: value.zone, environment: ENVIRONMENTS.includes(value.environment) ? value.environment : 'traditional_street' };
 }
 /** @typedef {{id:string,name:string,location:{name:string,lat:number,lon:number},scene:object,photo:string|null,cleared:boolean,createdAt:string}} Level */
 /** Engine contract: new DuelEngine({seed,difficulty}); tick(seconds,{left,right,attack,parry}); snapshot(); reset(seed?); setPaused(boolean).

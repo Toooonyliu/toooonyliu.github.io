@@ -5,10 +5,17 @@
 The three new PNG originals are `zone-east-asia-v1.png`, `zone-africa-v1.png`
 and `zone-north-america-v1.png`. They were generated with the built-in ImageGen
 tool; the exact final prompts are in `zone-v1-provenance.json`.
-The game ships `.webp` derivatives: backgrounds are baked onto the same
-480×270 logical grid used by the renderer, while sprite sheets retain their
-original dimensions and decoded pixels. `optimize-assets.mjs` performs this
-repeatable asset build. Original PNGs remain in the local workspace.
+The game ships derivatives: stage backgrounds are baked onto the renderer's
+960×540 world grid with nearest sampling and a 48-color per-image palette as
+indexed PNGs named `*-960.png` (`rebake-stages.mjs`, which decodes through
+headless Chrome so the repository needs no native image modules), while sprite
+sheets ship as lossless `.webp` with their original dimensions and decoded
+pixels (`optimize-assets.mjs`). Earlier releases baked stages at 480×270; the
+larger grid was adopted on October 9 after painted photo arenas looked soft.
+Original PNGs remain in the local workspace.
+
+The interface fonts are Silkscreen and Pixelify Sans from Google Fonts, self-hosted
+in `assets/fonts/` under the SIL Open Font License 1.1 (license texts included).
 
 
 These original assets were generated with the built-in ImageGen tool for this

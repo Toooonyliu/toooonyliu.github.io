@@ -24,7 +24,10 @@ export function validatePlace(value) {
   if (!['sky', 'accent', 'ambient'].every(key => hex(value.palette?.[key]))) throw bad();
   const recognized = value.recognized === true && typeof value.name === 'string' && value.name.trim() !== '';
   return {
+    evidence: Array.isArray(value.evidence) ? value.evidence.filter(item => typeof item === 'string').map(item => item.trim().slice(0, 100)).filter(Boolean).slice(0, 6) : [],
     recognized, name: recognized ? text(value.name, 80) : null, city: recognized ? text(value.city, 60) : null, country: recognized ? text(value.country, 60) : null,
+    latitude: recognized && Number.isFinite(value.latitude) && Number.isFinite(value.longitude) && Math.abs(value.latitude) <= 90 && Math.abs(value.longitude) <= 180 ? value.latitude : null,
+    longitude: recognized && Number.isFinite(value.latitude) && Number.isFinite(value.longitude) && Math.abs(value.latitude) <= 90 && Math.abs(value.longitude) <= 180 ? value.longitude : null,
     zone: value.zone, setting: value.setting, lighting: value.lighting, environment: value.environment, opponentStyle: value.opponentStyle,
     confidence: Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0,
     elements: Array.isArray(value.elements) ? value.elements.filter(item => typeof item === 'string').map(item => item.trim().slice(0, 40)).filter(Boolean).slice(0, 5) : [],
@@ -49,10 +52,13 @@ function bounded(signal) {
 const readJson = async response => { try { return await response.json(); } catch { throw new Error('AI is unavailable. Preset arenas still work.'); } };
 
 /** Wakes the host, then sends one compressed photo for place recognition. */
-export async function recognizePlace(image, { zone, endpoint, healthEndpoint, signal, onStatus, fetcher = globalThis.fetch, startupTimeoutMs = 85000, analysisTimeoutMs = 30000 } = {}) {
+export async function recognizePlace(image, { zone, gps, exclude, endpoint, healthEndpoint, signal, onStatus, fetcher = globalThis.fetch, startupTimeoutMs = 85000, analysisTimeoutMs = 30000 } = {}) {
   const base = apiBase();
   if (!endpoint && !base) throw new Error('AI is not connected. Preset arenas still work.');
   if (zone !== undefined && !zoneIds.includes(zone)) throw new Error('Choose a valid travel zone.');
+  // Photo GPS is sent rounded to about 100 m; it is the strongest clue the recognizer can get.
+  const coordinates = gps && Number.isFinite(gps.lat) && Number.isFinite(gps.lon) && Math.abs(gps.lat) <= 90 && Math.abs(gps.lon) <= 180 ? { lat: Math.round(gps.lat * 1000) / 1000, lon: Math.round(gps.lon * 1000) / 1000 } : undefined;
+  const excluded = Array.isArray(exclude) ? exclude.filter(item => typeof item === 'string' && PLACE_NAME_PATTERN.test(item.trim())).map(item => item.trim()).slice(0, 3) : [];
   if (signal?.aborted) throw canceled();
   const guard = bounded(signal);
   let phase = 'startup';
@@ -66,7 +72,7 @@ export async function recognizePlace(image, { zone, endpoint, healthEndpoint, si
     }
     if (guard.signal.aborted) throw canceled();
     phase = 'analysis'; onStatus?.('recognizing'); guard.start(timeoutValue(analysisTimeoutMs, 30000));
-    const response = await fetcher(endpoint || `${base}/api/recognize-place`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(zone ? { image, zone } : { image }), signal: guard.signal });
+    const response = await fetcher(endpoint || `${base}/api/recognize-place`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image, ...(zone ? { zone } : {}), ...(coordinates ? { gps: coordinates } : {}), ...(excluded.length ? { exclude: excluded } : {}) }), signal: guard.signal });
     const data = await readJson(response);
     if (!response.ok) throw new Error(publicError(data, 'AI is unavailable. Preset arenas still work.'));
     return validatePlace(data?.place);

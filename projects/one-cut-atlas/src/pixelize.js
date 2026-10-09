@@ -1,6 +1,17 @@
 /** Turns a painted 16:9 image into the game's 480×270 grid with a small per-image palette.
  * Pure functions take {width,height,data} so they run in tests without a browser. */
-export const BACKDROP_WIDTH = 480, BACKDROP_HEIGHT = 270, BACKDROP_COLORS = 32;
+export const BACKDROP_WIDTH = 960, BACKDROP_HEIGHT = 540, BACKDROP_COLORS = 48;
+
+/** Nearest sampling at cell centers keeps the painted pixels crisp; box averaging is kept for tests and soft sources. */
+export function nearestCenter(image, width = BACKDROP_WIDTH, height = BACKDROP_HEIGHT) {
+  const out = new Uint8ClampedArray(width * height * 4), sx = image.width / width, sy = image.height / height;
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    const xx = Math.min(image.width - 1, Math.floor((x + .5) * sx)), yy = Math.min(image.height - 1, Math.floor((y + .5) * sy));
+    const i = (yy * image.width + xx) * 4, o = (y * width + x) * 4;
+    out[o] = image.data[i]; out[o + 1] = image.data[i + 1]; out[o + 2] = image.data[i + 2]; out[o + 3] = 255;
+  }
+  return { width, height, data: out };
+}
 
 /** Box-average each target cell; the palette snap afterwards restores hard pixel edges. */
 export function downsample(image, width = BACKDROP_WIDTH, height = BACKDROP_HEIGHT) {
@@ -54,8 +65,8 @@ export function quantize(image, palette) {
   return { width: image.width, height: image.height, data: out };
 }
 
-export function pixelize(image, { width = BACKDROP_WIDTH, height = BACKDROP_HEIGHT, colors = BACKDROP_COLORS } = {}) {
-  const small = downsample(image, width, height);
+export function pixelize(image, { width = BACKDROP_WIDTH, height = BACKDROP_HEIGHT, colors = BACKDROP_COLORS, sampling = 'nearest' } = {}) {
+  const small = (sampling === 'box' ? downsample : nearestCenter)(image, width, height);
   return quantize(small, extractPalette([small], colors));
 }
 
@@ -82,7 +93,7 @@ export async function pixelizeBackdrop(dataUrl, options = {}) {
   const target = document.createElement('canvas');
   target.width = result.width; target.height = result.height;
   target.getContext('2d').putImageData(new ImageData(result.data, result.width, result.height), 0, 0);
-  let encoded = target.toDataURL('image/webp', .92);
+  let encoded = target.toDataURL('image/webp', .95);
   if (!encoded.startsWith('data:image/webp')) encoded = target.toDataURL('image/png');
   return encoded;
 }

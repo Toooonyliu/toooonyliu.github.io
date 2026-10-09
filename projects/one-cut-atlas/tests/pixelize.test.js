@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {downsample,extractPalette,quantize,pixelize} from '../src/pixelize.js';
+import {downsample,nearestCenter,extractPalette,quantize,pixelize,BACKDROP_WIDTH,BACKDROP_HEIGHT,BACKDROP_COLORS} from '../src/pixelize.js';
 
 function gradient(width,height){
  const data=new Uint8ClampedArray(width*height*4);
@@ -14,6 +14,15 @@ test('downsample averages whole source blocks onto the target grid',()=>{
  assert.ok(small.data[0]<8);assert.ok(small.data[(27*48-1)*4+1]>247);
  const flat={width:4,height:2,data:new Uint8ClampedArray([10,20,30,255,10,20,30,255,50,60,70,255,50,60,70,255,10,20,30,255,10,20,30,255,50,60,70,255,50,60,70,255])};
  assert.deepEqual([...downsample(flat,2,1).data],[10,20,30,255,50,60,70,255]);
+});
+
+test('nearest-center sampling keeps source pixels instead of averaging them',()=>{
+ const flat={width:4,height:2,data:new Uint8ClampedArray([10,20,30,255,10,20,30,255,50,60,70,255,50,60,70,255,10,20,30,255,10,20,30,255,50,60,70,255,50,60,70,255])};
+ assert.deepEqual([...nearestCenter(flat,2,1).data],[10,20,30,255,50,60,70,255]);
+ const alternating={width:4,height:1,data:new Uint8ClampedArray([0,0,0,255,255,255,255,255,0,0,0,255,255,255,255,255])};
+ assert.deepEqual([...nearestCenter(alternating,2,1).data],[255,255,255,255,255,255,255,255]);
+ assert.deepEqual([...downsample(alternating,2,1).data],[128,128,128,255,128,128,128,255]);
+ assert.deepEqual([BACKDROP_WIDTH,BACKDROP_HEIGHT,BACKDROP_COLORS],[960,540,48]);
 });
 
 test('median cut returns a bounded palette and quantize snaps every pixel onto it',()=>{

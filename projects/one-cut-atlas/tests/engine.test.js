@@ -191,8 +191,10 @@ test('one clean hit starts a five-second aftermath and the defeated body finishe
     assert.equal(dead.hitDirection, 'low');
     assert.equal(dead.deathTimer, 0);
     const x = [snapshot.player.x, snapshot.opponent.x];
-    const later = advance(engine, 0.85);
+    // The fall now takes 1.3 s: a held stagger, then the eased collapse.
+    const later = advance(engine, 1.45);
     const corpse = expected === 'victory' ? later.opponent : later.player;
+    assert.equal(corpse.stateDuration, 1.3);
     assert.equal(corpse.deathTimer, corpse.stateDuration);
     assert.deepEqual([later.player.x, later.opponent.x], x);
     assert.equal(later.result, expected);

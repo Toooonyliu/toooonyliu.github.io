@@ -25,6 +25,15 @@ test('recognition wakes the host, requires the recognition flag and sends one PO
  assert.equal(calls[0].method,'GET');assert.equal(calls[1].method,'POST');
  assert.deepEqual(JSON.parse(calls[1].body),{image,zone:'east-asia'});assert.equal(calls[1].headers.Authorization,undefined);
  assert.equal(result.city,'Beijing');
+ let body;
+ await recognizePlace(image,{...endpoints,gps:{lat:43.06183,lon:141.35449},exclude:['Dotonbori, Osaka','<b>bad</b>'],fetcher:async(url,options)=>{if(options.method==='POST')body=JSON.parse(options.body);return json(options.method==='GET'?{placeRecognitionConfigured:true}:{place:place()});}});
+ assert.deepEqual(body,{image,gps:{lat:43.062,lon:141.354},exclude:['Dotonbori, Osaka']});
+ await recognizePlace(image,{...endpoints,gps:{lat:99,lon:0},fetcher:async(url,options)=>{if(options.method==='POST')body=JSON.parse(options.body);return json(options.method==='GET'?{placeRecognitionConfigured:true}:{place:place()});}});
+ assert.deepEqual(body,{image});
+ assert.deepEqual(validatePlace({...place(),evidence:['red walls',7,'']}).evidence,['red walls']);
+ assert.deepEqual([validatePlace({...place(),latitude:43.06,longitude:141.35}).latitude,validatePlace({...place(),latitude:43.06,longitude:141.35}).longitude],[43.06,141.35]);
+ assert.equal(validatePlace({...place(),latitude:120,longitude:141.35}).latitude,null);
+ assert.equal(validatePlace({...place(),recognized:false,name:null,latitude:43,longitude:141}).latitude,null);
  let posts=0;
  await assert.rejects(recognizePlace(image,{...endpoints,fetcher:async(url,options)=>options.method==='GET'?json({avatarAnalysisConfigured:true}):(posts++,json({place:place()}))}),/not configured/);
  assert.equal(posts,0);

@@ -1,4 +1,4 @@
-import { CITIES, validateScene } from './shared.js';
+import { CITIES, validateScene, validatePlaceRecord } from './shared.js';
 import { validateAvatar } from './avatar.js';
 
 const DB_NAME='one-cut-atlas', STORE='levels';
@@ -42,7 +42,8 @@ function normalizeLevel(level) {
   const city=CITIES.find(city=>city.name===location.name && Math.abs(city.lat-location.lat)<.001 && Math.abs(city.lon-location.lon)<.001);
   const country=typeof location.country==='string' ? location.country.slice(0,100) : city?.country;
   if (level.photo != null && (typeof level.photo !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(level.photo) || level.photo.length > 3_000_000)) throw storageError('This photo could not be saved. Choose it again.');
-  return { id:level.id, name:String(level.name || location.name).slice(0,100), location:{name:location.name.slice(0,100),lat:location.lat,lon:location.lon,...(country?{country}:{})}, ...(typeof level.isDemo==='boolean'?{isDemo:level.isDemo}:{}), scene:validateScene(level.scene || {}), ...(level.avatar&&typeof level.avatar==='object'?{avatar:validateAvatar(level.avatar)}:{}), photo:level.photo || null, cleared:level.cleared === true, createdAt:Number.isFinite(Date.parse(level.createdAt)) ? level.createdAt : new Date().toISOString() };
+  const place = validatePlaceRecord(level.place);
+  return { id:level.id, name:String(level.name || location.name).slice(0,100), ...(place ? { place } : {}), location:{name:location.name.slice(0,100),lat:location.lat,lon:location.lon,...(country?{country}:{})}, ...(typeof level.isDemo==='boolean'?{isDemo:level.isDemo}:{}), scene:validateScene(level.scene || {}), ...(level.avatar&&typeof level.avatar==='object'?{avatar:validateAvatar(level.avatar)}:{}), photo:level.photo || null, cleared:level.cleared === true, createdAt:Number.isFinite(Date.parse(level.createdAt)) ? level.createdAt : new Date().toISOString() };
 }
 
 export async function loadLevels() {

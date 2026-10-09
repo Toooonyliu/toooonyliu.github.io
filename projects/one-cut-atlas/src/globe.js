@@ -1,6 +1,8 @@
 // Original software-rendered globe. Geography is rasterized once from the
 // bundled Natural Earth outline; the sphere is shaded on a two-pixel grid.
-import { zoneForCoordinates } from './region-presets.js';
+import { zoneForCoordinates, TRAVEL_ZONES } from './region-presets.js';
+const ZONE_RGB = TRAVEL_ZONES.map(zone => [1, 3, 5].map(index => parseInt(zone.color.slice(index, index + 2), 16)));
+const zoneIndex = id => TRAVEL_ZONES.findIndex(zone => zone.id === id) + 1;
 const TAU = Math.PI * 2;
 const RAD = Math.PI / 180;
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -21,6 +23,8 @@ export class Globe {
     this.selectedId = null;
     this.clearedZones = new Set();
     this.highlightZone = null;
+    this.zoomTarget = null;
+    this.revealSince = 0;
     this.yaw = 128 * RAD;
     this.pitch = 20 * RAD;
     this.zoom = 1;
@@ -50,7 +54,8 @@ export class Globe {
     canvas.addEventListener('lostpointercapture', event => this.pointerUp(event, true), { signal });
     canvas.addEventListener('wheel', event => {
       event.preventDefault();
-      this.zoom = clamp(this.zoom * Math.exp(-event.deltaY * .0012), .8, 1.25);
+      this.zoomTarget = null;
+      this.zoom = clamp(this.zoom * Math.exp(-event.deltaY * .0012), .8, 2.2);
       this.geometryDirty = true;
       this.wake();
     }, { signal, passive: false });
@@ -92,6 +97,12 @@ export class Globe {
     const pixels = context.getImageData(0, 0, 720, 360).data;
     this.landMask = new Uint8Array(720 * 360);
     for (let index = 0; index < this.landMask.length; index++) this.landMask[index] = pixels[index * 4 + 3] > 120 ? 1 : 0;
+    // Travel zone per texel, computed once: drawing then needs no per-pixel zone lookup.
+    this.zoneMask = new Uint8Array(this.landMask.length);
+    for (let y = 0; y < 360; y++) for (let x = 0; x < 720; x++) {
+      const index = y * 720 + x;
+      if (this.landMask[index]) this.zoneMask[index] = zoneIndex(zoneForCoordinates(90 - (y + .5) / 2, (x + .5) / 2 - 180).id);
+    }
     this.coastMask = new Uint8Array(this.landMask.length);
     for (let y = 1; y < 359; y++) for (let x = 0; x < 720; x++) {
       const index = y * 720 + x;
@@ -110,6 +121,24 @@ export class Globe {
   /** Pulses one travel zone while the player decides; null clears it. */
   setHighlight(zoneId) {
     this.highlightZone = zoneId || null;
+    this.wake();
+  }
+
+  /** Unlock moment: turn to the place, zoom in, and lift the zone with a glowing outline. */
+  reveal(zoneId, location) {
+    this.highlightZone = zoneId || null;
+    this.revealSince = performance.now();
+    this.focusLocation(location);
+    this.zoomTarget = 1.85;
+    this.keyboardStillUntil = performance.now() + 120000;
+    this.wake();
+  }
+
+  clearReveal() {
+    if (!this.highlightZone && this.zoomTarget === null && this.zoom <= 1.25) return;
+    this.highlightZone = null;
+    this.zoomTarget = 1;
+    this.keyboardStillUntil = 0;
     this.wake();
   }
 
@@ -170,6 +199,12 @@ export class Globe {
     if (this.destroyed || !this.active || document.hidden) { this.lastFrame = 0; return; }
     const elapsed = this.lastFrame ? Math.min(.05, (time - this.lastFrame) / 1000) : 0;
     this.lastFrame = time;
+    if (this.zoomTarget !== null) {
+      const amount = this.reduceMotion.matches ? 1 : 1 - Math.exp(-elapsed * 3.2);
+      this.zoom += (this.zoomTarget - this.zoom) * amount;
+      if (Math.abs(this.zoomTarget - this.zoom) < .004) { this.zoom = this.zoomTarget; this.zoomTarget = null; }
+      this.geometryDirty = true;
+    }
     if (!this.pointers.size) {
       if (this.target) {
         const amount = this.reduceMotion.matches ? 1 : 1 - Math.exp(-elapsed * 5.5);
@@ -232,8 +267,13 @@ export class Globe {
     const data = this.image.data;
     data.fill(0);
     const cosYaw = Math.cos(this.yaw), sinYaw = Math.sin(this.yaw), cosPitch = Math.cos(this.pitch), sinPitch = Math.sin(this.pitch);
-    const selectedZone=this.levels.find(level=>level.id===this.selectedId)?.scene.travelZone;
-    const pulse = this.highlightZone ? (this.reduceMotion.matches ? 1 : .55 + .45 * Math.sin(time * 4.2)) : 0;
+    const selectedZone=zoneIndex(this.levels.find(level=>level.id===this.selectedId)?.scene.travelZone);
+    const lit = zoneIndex(this.highlightZone);
+    const cleared = new Set([...this.clearedZones].map(zoneIndex));
+    const pulse = lit ? (this.reduceMotion.matches ? 1 : .6 + .4 * Math.sin(time * 4.2)) : 0;
+    // The outline draws itself in over the first second of a reveal.
+    const rise = lit ? clamp((performance.now() - this.revealSince) / 900, 0, 1) : 0;
+    const zoneMask = this.zoneMask;
     for (const [x, y, nx, ny, nz, offset] of this.normals) {
       const forward = nz * cosPitch - ny * sinPitch;
       const wx = nx * cosYaw + forward * sinYaw;
@@ -243,26 +283,48 @@ export class Globe {
       const tx = clamp(Math.floor((lon / Math.PI + 1) * 360), 0, 719);
       const ty = clamp(Math.floor((.5 - lat / Math.PI) * 360), 0, 359);
       const index = ty * 720 + tx, land = this.landMask?.[index];
+      const zoneHere = zoneMask ? zoneMask[index] : 0;
       const noise = grain(tx, ty), broad = (Math.sin(lon * 9 + Math.cos(lat * 13)) + Math.cos(lat * 17 - lon * 6)) * .5;
       const light = .30 + .70 * Math.max(0, nx * -.5 + ny * .52 + nz * .69);
       const coast = this.coastMask?.[index] ? 13 : 0;
       let r, g, b;
-      if (land) {
-        const zone=zoneForCoordinates(lat/RAD,lon/RAD);
-        const zoneColor=[1,3,5].map(index=>parseInt(zone.color.slice(index,index+2),16));
-        const active=selectedZone===zone.id, cleared=this.clearedZones.has(zone.id), lit=this.highlightZone===zone.id;
+      // Neighbouring texels decide outlines: the lit zone's border glows, its surroundings catch the light.
+      const left = zoneMask ? zoneMask[ty * 720 + (tx + 719) % 720] : 0, right = zoneMask ? zoneMask[ty * 720 + (tx + 1) % 720] : 0;
+      const up = zoneMask && ty > 0 ? zoneMask[index - 720] : 0, down = zoneMask && ty < 359 ? zoneMask[index + 720] : 0;
+      const shadowSource = zoneMask && ty > 1 ? zoneMask[(ty - 2) * 720 + (tx + 718) % 720] : 0;
+      if (land && zoneHere) {
+        const zoneColor=ZONE_RGB[zoneHere - 1];
+        const active=selectedZone===zoneHere, isCleared=cleared.has(zoneHere), isLit=lit===zoneHere;
+        const edge = left !== zoneHere || right !== zoneHere || up !== zoneHere || down !== zoneHere;
         // Unlit zones sit back as dusty grey-green; cleared zones carry their full color and a warm lift.
         const grey = (zoneColor[0] * .3 + zoneColor[1] * .5 + zoneColor[2] * .2);
-        const keep = cleared || lit ? 1 : .42, tint = cleared ? 1.08 : 1;
-        const boost=(active?14:0)+(cleared?16:-6)+(lit?34*pulse:0);
+        const keep = isCleared || isLit ? 1 : .42, tint = isCleared ? 1.08 : isLit ? 1.12 : 1;
+        const boost=(active?14:0)+(isCleared?16:-6)+(isLit?(18+26*pulse)*rise:0);
         r = ((zoneColor[0] * keep + grey * (1 - keep) * .86) * tint + broad * 7 + noise * 9 + coast + boost) * light;
-        g = ((zoneColor[1] * keep + grey * (1 - keep) * .9) * tint + broad * 7 + noise * 9 + coast * .6 + boost * (lit ? .8 : 1)) * light;
-        b = ((zoneColor[2] * keep + grey * (1 - keep) * .82) * tint + broad * 7 + noise * 9 + coast * .4 + boost * (lit ? .45 : 1)) * light;
+        g = ((zoneColor[1] * keep + grey * (1 - keep) * .9) * tint + broad * 7 + noise * 9 + coast * .6 + boost * (isLit ? .82 : 1)) * light;
+        b = ((zoneColor[2] * keep + grey * (1 - keep) * .82) * tint + broad * 7 + noise * 9 + coast * .4 + boost * (isLit ? .5 : 1)) * light;
+        if (edge && isLit) {
+          // A bright rim that brightens with the pulse once the reveal has drawn in.
+          const glow = rise * (.72 + .28 * pulse);
+          r = r * (1 - glow) + 255 * glow; g = g * (1 - glow) + 236 * glow; b = b * (1 - glow) + 178 * glow;
+        } else if (edge && isCleared) {
+          r = r * .62 + 236 * .38; g = g * .62 + 196 * .38; b = b * .62 + 130 * .38;
+        }
       } else {
         const wave = Math.sin(tx * .28 + ty * .16) * 2 + noise * 5;
         r = (43 + wave) * light;
         g = (70 + wave) * light;
         b = (76 + wave) * light;
+      }
+      if (lit && zoneHere !== lit) {
+        if (left === lit || right === lit || up === lit || down === lit) {
+          // Light spilling past the rim.
+          const halo = rise * (.35 + .25 * pulse);
+          r = r * (1 - halo) + 250 * halo; g = g * (1 - halo) + 214 * halo; b = b * (1 - halo) + 150 * halo;
+        } else if (shadowSource === lit) {
+          // A drop shadow down and to the right makes the zone sit above the globe.
+          r *= 1 - .45 * rise; g *= 1 - .45 * rise; b *= 1 - .4 * rise;
+        }
       }
       // Sunset strikes the upper-left limb, rather than outlining every coast.
       const rim = Math.pow(1 - nz, 3.3) * clamp((-nx + ny) * .65, 0, 1);

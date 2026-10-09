@@ -409,6 +409,16 @@ function movementAccent(ctx, fighter, time) {
       rect(ctx, fighter.x + facing * 8, WORLD.ground - 105, 10, 2, '#eaf7df');
     }
   }
+  if (fighter.dead && progress < .36 && fighter.timer > .06) {
+    // Blood keeps dripping from the wound while the fighter staggers.
+    const level = { high: 104, mid: 89, low: 29 }[fighter.hitDirection || fighter.hitLevel || 'mid'];
+    for (let i = 0; i < 6; i++) {
+      const start = .06 + i * .045, age = fighter.timer - start;
+      if (age < 0 || age > .32) continue;
+      ctx.globalAlpha = .9;
+      rect(ctx, fighter.x - facing * 6 + Math.round((hash(i + 97) - .5) * 14), WORLD.ground - level + 8 + 400 * age * age, 2, i % 2 ? 4 : 2, i % 3 ? '#b4262b' : '#e04a46');
+    }
+  }
   if (fighter.counterReady && !fighter.dead) {
     ctx.globalAlpha = .5 + Math.sin(time * 14) * .18;
     rect(ctx, fighter.x - facing * 4, WORLD.ground - 151, 4, 4, '#b6e5d2');
@@ -559,6 +569,49 @@ export function drawFighter(ctx, fighter, style = 'kendo', isPlayer = true, time
   ctx.restore();
 }
 
+const crescentBuffer = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+/** A broad arc that sweeps with the blade and lingers as it fades, drawn on the two-pixel grid. */
+function drawCrescent(ctx, x, y, facing, direction, phase, fade, charged, counter) {
+  if (!crescentBuffer) return;
+  const size = 240; // half-resolution buffer: 480 world pixels
+  if (crescentBuffer.width !== size) { crescentBuffer.width = size; crescentBuffer.height = size; }
+  const b = crescentBuffer.getContext('2d');
+  b.clearRect(0, 0, size, size);
+  // Radii in half-resolution pixels: a broad, nearly solid arc as tall as the fighter, like the reference cut.
+  const outer = charged ? 100 : 90, inner = outer - (charged ? 44 : 36);
+  const arcs = { high: [-2.35, .85], mid: [-1.45, 1.45], low: [2.35, -.85] };
+  let [from, to] = arcs[direction] || arcs.mid;
+  if (counter) [from, to] = [to, from];
+  const sweep = Math.min(1, phase / .55), lead = from + (to - from) * sweep, trail = from + (to - from) * Math.max(0, sweep - .62);
+  const cx = size / 2 - 40, cy = size / 2;
+  b.save(); b.translate(cx, cy); if (direction === 'mid') b.scale(1, .66);
+  const band = (r0, r1, alpha, color) => {
+    b.globalAlpha = alpha; b.fillStyle = color; b.beginPath();
+    b.arc(0, 0, r1, Math.min(trail, lead), Math.max(trail, lead), to < from); b.arc(0, 0, r0, Math.max(trail, lead), Math.min(trail, lead), !(to < from)); b.closePath(); b.fill();
+  };
+  const linger = Math.pow(fade, .6);
+  band(inner, outer, .42 * linger, '#d9e2dc');
+  band(inner + 7, outer - 5, .72 * linger, '#f1f2e6');
+  band(inner + 15, outer - 11, .96 * linger, '#fffdf3');
+  // Speed lines trail the leading edge.
+  b.globalAlpha = .55 * linger; b.strokeStyle = '#fffbee'; b.lineWidth = 2;
+  for (let i = 1; i <= 3; i++) { const a = lead - (to > from ? 1 : -1) * i * .12, r = inner - 6 - i * 5; b.beginPath(); b.moveTo(Math.cos(a) * (r - 10), Math.sin(a) * (r - 10)); b.lineTo(Math.cos(a) * r, Math.sin(a) * r); b.stroke(); }
+  b.restore();
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  ctx.translate(snap(x - facing * 70), snap(y)); ctx.scale(facing, 1);
+  ctx.drawImage(crescentBuffer, -cx * 2, -cy * 2, size * 2, size * 2);
+  ctx.restore();
+}
+/** Dark flakes thrown from a clash, falling under gravity. */
+function drawDebris(ctx, x, y, age, duration, seed) {
+  for (let i = 0; i < 10; i++) {
+    const h = hash(seed * 31 + i), v = hash(seed * 17 + i * 7);
+    const vx = (h - .5) * 260, vy = -90 - v * 150, life = .25 + h * .3;
+    if (age > life) continue;
+    ctx.globalAlpha = 1 - age / life;
+    rect(ctx, snap(x + vx * age), snap(y + vy * age + 430 * age * age), i % 3 ? 2 : 4, 2, i % 2 ? '#1a1d22' : '#3a3f44');
+  }
+}
 export function drawEffects(ctx, effects = [], time = 0) {
   ctx.save(); ctx.imageSmoothingEnabled=false;
   for(const e of effects) {
@@ -567,6 +620,10 @@ export function drawEffects(ctx, effects = [], time = 0) {
     const x=Number(e.x)||0,y=Number(e.y)||365,facing=e.facing===-1?-1:1;
     ctx.globalAlpha=fade;
     if(e.type==='slash') {
+      const direction = e.direction || 'mid', charged = e.attackKind === 'charged', counter = e.attackKind === 'counter';
+      drawCrescent(ctx, x, y, facing, direction, clamp((e.age || 0) / (e.duration || .23)), fade, charged, counter);
+      continue;
+    } else if (e.type === 'slash-lines') {
       const direction = e.direction || 'mid', charged = e.attackKind === 'charged', counter = e.attackKind === 'counter';
       const paths = {
         high: [[10,-84],[44,-78],[82,-54],[108,-24],[118,12],[108,46]],
@@ -591,6 +648,7 @@ export function drawEffects(ctx, effects = [], time = 0) {
       ctx.restore();
     } else if(e.type==='parry'||e.type==='clash') {
       const col=e.type==='parry'?'#a7e9d0':'#ffe0a1';
+      drawDebris(ctx, x, y, e.age || 0, e.duration || .42, e.id || 0);
       rect(ctx,x-4,y-16,8,32,'#fff6d6');rect(ctx,x-16,y-4,32,8,'#fff6d6');
       for(let i=0;i<12;i++) {
         const angle=i*Math.PI/6, dist=8+(1-fade)*46;
@@ -599,6 +657,14 @@ export function drawEffects(ctx, effects = [], time = 0) {
       }
       ctx.globalAlpha=fade*.1;disk(ctx,x,y,28+(1-fade)*24,col);
     } else if(e.type==='hit') {
+      for (let i = 0; i < 16; i++) {
+        const h = hash((e.id || 0) * 13 + i), v = hash((e.id || 0) * 29 + i * 5);
+        const vx = facing * (30 + h * 120) + (v - .5) * 40, vy = -(50 + v * 150), life = .35 + h * .35, age = e.age || 0;
+        if (age > life) continue;
+        ctx.globalAlpha = (1 - age / life) * .95;
+        rect(ctx, snap(x + vx * age), snap(y + vy * age + 460 * age * age), i % 3 ? 2 : 4, i % 4 ? 2 : 4, i % 2 ? '#b4262b' : '#e04a46');
+      }
+      ctx.globalAlpha = fade;
       if ((e.age || 0) < .055) {
         ctx.globalAlpha = .055 * fade; rect(ctx,0,0,WORLD.width,WORLD.height,'#fff1cf');
         ctx.globalAlpha = fade; rect(ctx,x-4,y-14,8,28,'#fff8e0'); rect(ctx,x-14,y-4,28,8,'#fff8e0');

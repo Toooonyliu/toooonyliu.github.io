@@ -9,7 +9,7 @@ const globe = new Globe($('world-map'), {onSelect:id=>selectLevel(id), onCreate:
 const demos = createZoneLevels();
 let levels=structuredClone(demos),selectedId=levels[0].id,modules=null,gameReady=false,land=null,draft=null,photoVersion=0,photoBusy=false,analysisBusy=false;
 let analysisController=null,analysisPhase='waking';
-let arena=null,arenaBusy=false,arenaController=null,arenaTimer=0;
+let gate={busy:false,controller:null,pending:null,photo:null,apiImage:null,gps:null,excluded:[],image:null,scanRaf:0},forgeController=null,forgeTimer=0,forgeSkipped=false;
 let engine=null,currentLevel=null,raf=0,previousTime=0,accumulator=0,resultHandled=false,toastTimer=0,firstLitId=null,audio=null,heard=new Set(),duelGeneration=0;
 let bloodDecals=[],bloodSeen=new Set();
 const keys={left:false,right:false,attack:false,parry:false,dodge:false,duck:false,counter:false,shove:false};
@@ -36,7 +36,7 @@ function drawPreview(canvas,scene,avatar=null){
  modules.drawFighter(ctx,{x:360,facing:1,state:'idle',timer:0,stateDuration:1,dead:false},avatar?.target==='player'?avatar.style:'traveler',true,0,{wet:scene.environment!=='wilderness',palette:avatar?.target==='player'?avatar.palette:null});
  modules.drawFighter(ctx,{x:600,facing:-1,state:'idle',timer:0,stateDuration:1,dead:false},avatar?.target==='opponent'?avatar.style:scene.opponentStyle,false,0,{wet:scene.environment!=='wilderness',palette:avatar?.target==='opponent'?avatar.palette:null});
 }
-function renderSelected(){const l=selected();if(!l)return;const zone=getZone(l.scene.travelZone);$('selected-title').textContent=l.name;$('selected-region').textContent=`${zone.name.toUpperCase()} / ${l.location.name}`;$('selected-description').textContent=l.scene.summary;$('selected-source').textContent=l.avatar?'Custom fighter':zone.flagship?'Signature arena':'Arena';$('selected-tags').innerHTML=[zone.label,l.cleared?'Cleared':'Ready'].map(t=>`<span>${escape(t)}</span>`).join('');$('challenge-selected').textContent=l.cleared?'Play Again':'Fight';drawPreview($('selected-preview'),l.scene,l.avatar);}
+function renderSelected(){const l=selected();if(!l)return;const zone=getZone(l.scene.travelZone);$('selected-title').textContent=l.name;$('selected-region').textContent=`${zone.name.toUpperCase()} / ${l.location.name}`;$('selected-description').textContent=l.scene.summary;$('selected-source').textContent=l.scene.backdrop?'Painted stage':l.place?'Photo stage':l.avatar?'Custom fighter':zone.flagship?'Signature arena':'Arena';$('selected-source').hidden=false;$('selected-tags').innerHTML=[zone.label,l.cleared?'Cleared':'Ready'].map(t=>`<span>${escape(t)}</span>`).join('');$('challenge-selected').textContent=l.cleared?'Play Again':'Fight';drawPreview($('selected-preview'),l.scene,l.avatar);}
 function selectLevel(id){selectedId=id;renderAtlas();globe.focusLocation(selected().location);const drawer=$('journey-drawer');if(drawer)drawer.open=false;}
 function ensureReady(){if(modules&&gameReady)return true;toast('Loading the arena…');return false;}
 function restoreSavedLevel(level){
@@ -52,7 +52,6 @@ async function init(){
 }
 function setupChoices(){
  $('zone-select').innerHTML=TRAVEL_ZONES.map(zone=>`<option value="${zone.id}">${zone.label} · ${zone.stage}</option>`).join('');
- $('arena-zone').innerHTML=TRAVEL_ZONES.map(zone=>`<option value="${zone.id}">${zone.label} · ${zone.place}</option>`).join('');
  $('location-select').innerHTML=CITIES.map(c=>`<option value="${c.id}">${escape(c.name)} · ${escape(c.country)}</option>`).join('')+'<option value="custom">Custom location / Photo GPS</option>';
  $('lighting-select').innerHTML=LIGHTINGS.map(x=>`<option value="${x}">${LABELS[x]}</option>`).join('');$('style-select').innerHTML=STYLES.map(x=>`<option value="${x}">${LABELS[x]}</option>`).join('');
  $('environment-options').innerHTML=ENVIRONMENTS.map(x=>`<button type="button" data-environment="${x}" aria-pressed="false">${LABELS[x]}</button>`).join('');
@@ -67,7 +66,7 @@ function openCreator({level=null,point=null}={}){
  photoVersion++;draft=level?structuredClone(level):{id:crypto.randomUUID(),name:`${zone.stage} · Custom`,location:{name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon},scene:sceneForZone(zone.id),photo:null,cleared:false,createdAt:new Date().toISOString()};
  draft.avatar=validateAvatar(draft.avatar||{style:draft.scene.opponentStyle});draft.editing=Boolean(level);$('creator-title').textContent='Choose Your Fighter';$('level-name').value=draft.name;$('creator-error').hidden=true;$('gps-note').textContent='Regional arena. Your fighter.';$('photo-message').textContent=draft.photo?'Saved on this device.':'Use a photo to choose your colors.';
  const city=CITIES.find(c=>Math.abs(c.lat-draft.location.lat)<.001&&Math.abs(c.lon-draft.location.lon)<.001);$('location-select').value=city?city.id:'custom';$('custom-name').value=draft.location.name;$('custom-lat').value=draft.location.lat;$('custom-lon').value=draft.location.lon;updateLocationFields();
- $('photo-input').value='';photoBusy=false;analysisBusy=false;setArenaStatus($('arena-status'),'');setBusy();updatePhotoPreview();updateCreator();$('creator').showModal();
+ $('photo-input').value='';photoBusy=false;analysisBusy=false;setBusy();updatePhotoPreview();updateCreator();$('creator').showModal();
 }
 function updatePhotoPreview(){const has=Boolean(draft.photo);$('photo-image').hidden=!has;$('photo-placeholder').hidden=has;$('photo-change').hidden=!has;if(has)$('photo-image').src=draft.photo;else $('photo-image').removeAttribute('src');$('palette-swatches').innerHTML=Object.values(draft.avatar.palette).map(x=>`<span style="background:${x}"></span>`).join('');}
 function updateCreator(){
@@ -79,11 +78,11 @@ function updateCreator(){
 }
 function markManual(){draft.scene.source='manual';draft.scene.summary=`${LABELS[draft.scene.environment]} · ${LABELS[draft.scene.lighting]}.`;}
 function updateLocationFields(){const custom=$('location-select').value==='custom';$('custom-location-fields').hidden=!custom;['custom-name','custom-lat','custom-lon'].forEach(id=>$(id).required=custom);}
-function setBusy(){const busy=photoBusy||analysisBusy||arenaBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('arena-section').hidden=!hasArenaApi();$('arena-recognize').disabled=busy||!hasArenaApi()||!draft?.photo;$('arena-recognize').textContent=arenaBusy?'Finding the place…':'Find this place on the globe';$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=analysisBusy?(analysisPhase==='waking'?'Waking AI…':'Analyzing…'):'AI Colors';const privacy=$('photo-privacy');if(privacy)privacy.textContent=apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.';}
+function setBusy(){const busy=photoBusy||analysisBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=analysisBusy?(analysisPhase==='waking'?'Waking AI…':'Analyzing…'):'AI Colors';const privacy=$('photo-privacy');if(privacy)privacy.textContent=apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.';}
 function creatorError(message){$('creator-error').textContent=message;$('creator-error').hidden=false;}
 async function pickPhoto(file){
  if(!file||!draft)return;analysisController?.abort();analysisController=null;const version=++photoVersion;analysisBusy=false;photoBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Reading photo…';
- try{const result=await modules.preparePhoto(file);if(version!==photoVersion)return;draft.photo=result.thumbnail;draft.apiImage=result.dataUrl;draft.gps=result.gps||null;setArenaStatus($('arena-status'),'');draft.avatar=avatarFromPalette(result.palette,draft.avatar.target,draft.avatar.style);updatePhotoPreview();updateCreator();$('photo-message').textContent='Colors applied. Tune your fighter.';}
+ try{const result=await modules.preparePhoto(file);if(version!==photoVersion)return;draft.photo=result.thumbnail;draft.apiImage=result.dataUrl;draft.gps=result.gps||null;draft.avatar=avatarFromPalette(result.palette,draft.avatar.target,draft.avatar.style);updatePhotoPreview();updateCreator();$('photo-message').textContent='Colors applied. Tune your fighter.';}
  catch(error){if(version!==photoVersion)return;creatorError(error.message||'Could not read this photo. Try another.');$('photo-message').textContent=draft.photo?'Your previous photo is kept.':'Choose JPEG, PNG or WebP.';}
  finally{if(version===photoVersion){photoBusy=false;setBusy();}}
 }
@@ -106,68 +105,90 @@ async function saveAndPlay(event){
  catch(error){creatorError(`Not saved: ${error.message||'Device storage is unavailable.'} Your photo is kept.`);}
  finally{$('save-start').disabled=false;}
 }
-/* Photo arenas: recognize in the fighter dialog, decide beside the globe, paint once, then fight. */
-function setArenaStatus(node,message='',state=''){node.textContent=message;node.classList.toggle('is-error',state==='error');node.classList.toggle('is-busy',state==='busy');}
-async function recognizeArena(){
- if(!draft?.photo){creatorError('Choose a photo first.');return;}
- if(photoBusy||analysisBusy||arenaBusy)return;
- if(!hasArenaApi()){creatorError('AI is not connected. Preset arenas still work.');return;}
- const version=photoVersion,controller=new AbortController();analysisController?.abort();analysisController=controller;arenaBusy=true;setBusy();$('creator-error').hidden=true;
- const hint=draft.gps?zoneForCoordinates(draft.gps.lat,draft.gps.lon).id:undefined;
- setArenaStatus($('arena-status'),'Waking AI… First use can take a minute.','busy');
+/* Photo gate: a travel photo becomes a new stage. Scan → reveal on the globe → challenge → forge the arena → duel. */
+function gateStatus(message='',state=''){const node=$('gate-status');node.textContent=message;node.dataset.state=state;}
+function setGateBusy(busy){gate.busy=busy;$('photo-gate').classList.toggle('is-busy',busy);$('gate-input').disabled=busy;}
+function loadPicture(src){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Could not show this photo.'));image.src=src;});}
+function drawGate(block,scan){
+ const canvas=$('gate-canvas'),ctx=canvas.getContext('2d'),image=gate.image;if(!image)return;
+ const w=canvas.width,h=canvas.height,scale=Math.max(w/image.naturalWidth,h/image.naturalHeight),sw=w/scale,sh=h/scale,sx=(image.naturalWidth-sw)/2,sy=(image.naturalHeight-sh)/2;
+ if(!image.naturalWidth||!image.naturalHeight||!(block>0))return;
+ const small=document.createElement('canvas');small.width=Math.max(1,Math.round(w/block));small.height=Math.max(1,Math.round(h/block));
+ small.getContext('2d').drawImage(image,sx,sy,sw,sh,0,0,small.width,small.height);
+ ctx.imageSmoothingEnabled=false;ctx.drawImage(small,0,0,w,h);
+ if(scan!==undefined){const y=Math.round(scan*h/4)*4;ctx.fillStyle='#10181bb0';ctx.fillRect(0,0,w,y);ctx.fillStyle='#f6dca0';ctx.fillRect(0,y,w,4);ctx.fillStyle='#f6dca055';ctx.fillRect(0,y+4,w,4);}
+}
+function startScan(){
+ cancelAnimationFrame(gate.scanRaf);$('gate-canvas').hidden=false;$('photo-gate').classList.add('is-scanning');
+ const started=performance.now();
+ const step=now=>{const t=Math.max(0,(now-started)/1000);drawGate([20,14,10,7,5,7,10,14][Math.floor(t*5)%8]||10,(t*.7)%1);gate.scanRaf=requestAnimationFrame(step);};
+ gate.scanRaf=requestAnimationFrame(step);
+}
+function stopScan(){cancelAnimationFrame(gate.scanRaf);gate.scanRaf=0;$('photo-gate').classList.remove('is-scanning');drawGate(4);}
+async function gatePhoto(file){
+ if(!file||gate.busy)return;if(!ensureReady())return;
+ if(!hasArenaApi()){gateStatus('Photo stages need the online scout. Try again later.','error');return;}
+ setGateBusy(true);gate.excluded=[];gate.pending=null;hideReveal();gateStatus('Reading photo…','busy');
  try{
-  const place=await recognizePlace(draft.apiImage||draft.photo,{zone:hint,signal:controller.signal,onStatus:phase=>{if(version===photoVersion)setArenaStatus($('arena-status'),phase==='waking'?'Waking AI… First use can take a minute.':'Looking at your photo…','busy');}});
-  if(version!==photoVersion)return;
-  arena={draft:{photo:draft.photo,apiImage:draft.apiImage,avatar:validateAvatar(draft.avatar)},place,zone:place.zone,backdrop:null,status:'ready'};
-  arenaBusy=false;$('creator').close();showPlaceCard();
- }catch(error){if(version!==photoVersion)return;setArenaStatus($('arena-status'),error.message||'AI unavailable. Preset arenas still work.','error');}
- finally{if(analysisController===controller)analysisController=null;arenaBusy=false;setBusy();}
+  const result=await modules.preparePhoto(file);
+  gate.photo=result.thumbnail;gate.apiImage=result.dataUrl;gate.gps=result.gps||null;gate.image=await loadPicture(result.thumbnail);
+  $('photo-gate').classList.add('has-photo');
+  await scanPlace();
+ }catch(error){gateStatus(error.message||'Could not read this photo. Try another.','error');}
+ finally{setGateBusy(false);}
 }
-function arenaScene(){
- const zone=getZone(arena.zone),place=arena.place,preset=sceneForZone(zone.id);
- if(!arena.backdrop)return {...preset,summary:place.recognized?place.summary:preset.summary,placeName:place.name,source:'manual'};
- return {...preset,stageId:null,environment:place.environment,lighting:place.lighting,elements:defaultScene(place.environment).elements,palette:{...place.palette},opponentStyle:place.opponentStyle,summary:place.summary,source:'ai',backdrop:arena.backdrop,placeName:place.name};
-}
-function showPlaceCard(){if(!arena)return;$('arena-zone').value=arena.zone;$('selected-level').hidden=true;$('place-card').hidden=false;document.querySelector('.menu-actions').hidden=true;document.querySelector('.difficulty-choice').hidden=true;setArenaStatus($('place-status'),'Painting creates one AI image for this duel. Preset arenas are free.');updatePlaceCard();}
-function updatePlaceCard(){
- if(!arena)return;
- const zone=getZone(arena.zone),place=arena.place,painted=Boolean(arena.backdrop),painting=arena.status==='painting';
- $('place-region').textContent=`${zone.name.toUpperCase()} / ${(place.city||zone.place).toUpperCase()}`;
- $('place-title').textContent=place.recognized?place.summary.replace(/\.$/,''):`Somewhere in ${zone.name}`;
- $('place-meta').textContent=place.recognized?`Recognized ${place.name}${place.country?`, ${place.country}`:''} · ${Math.round(place.confidence*100)}% sure. Wrong place? Change the zone before painting.`:'The place was not recognized. Choose the zone yourself; the arena is painted from what is visible.';
- $('place-tag').textContent=painted?'PAINTED ARENA':'PHOTO ARENA';
- $('arena-zone').disabled=painted||painting;
- $('arena-paint').hidden=painted||painting;$('arena-paint').textContent=arena.status==='failed'?'Try painting again (uses AI)':'Paint arena (uses AI)';
- $('arena-fight').hidden=!painted;$('arena-preset').hidden=painting;$('arena-cancel').hidden=painting;
- globe.focusLocation({lat:zone.lat,lon:zone.lon});globe.setHighlight(zone.id);
- drawPreview($('place-preview'),validateScene(arenaScene()),arena.draft.avatar);
-}
-async function paintArenaNow(){
- if(!arena||arenaBusy||arena.backdrop)return;
- const controller=new AbortController(),started=Date.now();arenaController=controller;arenaBusy=true;arena.status='painting';updatePlaceCard();
- const tick=()=>setArenaStatus($('place-status'),`Painting your arena… ${Math.round((Date.now()-started)/1000)}s. Usually under a minute.`,'busy');tick();clearInterval(arenaTimer);arenaTimer=setInterval(tick,1000);
+async function scanPlace(){
+ if(!gate.apiImage&&!gate.photo)return;
+ const controller=new AbortController();gate.controller?.abort();gate.controller=controller;
+ hideReveal();setGateBusy(true);startScan();gateStatus('Waking the scout…','busy');
  try{
-  const {backdrop}=await paintArena({image:arena.draft.apiImage||arena.draft.photo,zone:arena.zone,scenePrompt:arena.place.scenePrompt,setting:arena.place.setting,lighting:arena.place.lighting,placeName:arena.place.name},{signal:controller.signal});
-  clearInterval(arenaTimer);setArenaStatus($('place-status'),'Pixelating…','busy');
-  const pixel=await pixelizeBackdrop(backdrop);
-  await modules.registerBackdrop(pixel);
-  if(arenaController!==controller||!arena)return;
-  arena.backdrop=pixel;arena.status='painted';arenaBusy=false;updatePlaceCard();setArenaStatus($('place-status'),'Arena ready. Save it and fight.');
- }catch(error){if(arenaController!==controller||!arena)return;arena.status='failed';arenaBusy=false;updatePlaceCard();setArenaStatus($('place-status'),error.message||'Arena painting failed. Preset arenas still work.','error');}
- finally{clearInterval(arenaTimer);if(arenaController===controller)arenaController=null;arenaBusy=false;}
+  const hint=gate.gps?zoneForCoordinates(gate.gps.lat,gate.gps.lon).id:undefined;
+  const place=await recognizePlace(gate.apiImage||gate.photo,{zone:hint,gps:gate.gps||undefined,exclude:gate.excluded,signal:controller.signal,onStatus:phase=>{if(gate.controller===controller)gateStatus(phase==='waking'?'Waking the scout… the first scan can take a minute.':'Reading the terrain…','busy');}});
+  if(gate.controller!==controller)return;
+  const coords=gate.gps||(Number.isFinite(place.latitude)&&Number.isFinite(place.longitude)?{lat:place.latitude,lon:place.longitude}:null);
+  const zone=coords?zoneForCoordinates(coords.lat,coords.lon):getZone(place.zone);
+  const location=coords?{name:(place.city||zone.place).slice(0,60),country:(place.country||zone.country).slice(0,60),lat:coords.lat,lon:coords.lon}:{name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon};
+  const preset=sceneForZone(zone.id);
+  const level={id:gate.pending?.id||crypto.randomUUID(),name:(place.recognized&&place.name?place.name:zone.stage).slice(0,60),isDemo:false,location,
+   scene:validateScene({...preset,palette:{...place.palette},opponentStyle:place.opponentStyle,summary:place.summary,placeName:place.name,source:'manual'}),
+   place:{name:place.name,scenePrompt:place.scenePrompt,setting:place.setting,lighting:place.lighting,zone:zone.id,environment:place.environment},
+   photo:gate.photo,cleared:false,createdAt:gate.pending?.createdAt||new Date().toISOString()};
+  const saved=await modules.saveLevel(level);
+  const index=levels.findIndex(l=>l.id===saved.id);if(index<0)levels.unshift(saved);else levels[index]=saved;
+  gate.pending=saved;if(place.recognized&&place.name&&!gate.excluded.includes(place.name))gate.excluded=[...gate.excluded,place.name].slice(-3);
+  selectedId=saved.id;renderAtlas();stopScan();gateStatus('');
+  globe.reveal(zone.id,location);showReveal(saved,place,zone);
+ }catch(error){if(gate.controller!==controller)return;stopScan();gateStatus(error.name==='AbortError'?'':error.message||'The scout lost the trail. Try again.','error');}
+ finally{if(gate.controller===controller){gate.controller=null;setGateBusy(false);}}
 }
-async function saveArena(withBackdrop){
- if(!arena||arenaBusy)return;
- const zone=getZone(arena.zone),place=arena.place;
- if(!withBackdrop)arena.backdrop=null;
- const title=place.recognized?(place.summary.split(',')[0].replace(/\.$/,'').trim()||zone.stage):zone.stage;
- const level={id:crypto.randomUUID(),name:`${title} · Photo`.slice(0,60),isDemo:false,location:{name:place.city||zone.place,country:place.country||zone.country,lat:zone.lat,lon:zone.lon},scene:validateScene(arenaScene()),avatar:validateAvatar(arena.draft.avatar),photo:arena.draft.photo,cleared:false,createdAt:new Date().toISOString()};
- $('arena-fight').disabled=$('arena-preset').disabled=true;
- try{await modules.saveLevel(level);levels.unshift(level);selectedId=level.id;cancelArena();renderAtlas();startDuel(level);}
- catch(error){setArenaStatus($('place-status'),`Not saved: ${error.message||'Device storage is unavailable.'}`,'error');}
- finally{$('arena-fight').disabled=$('arena-preset').disabled=false;}
+function stamp(node,text){node.textContent='';node.setAttribute('aria-label',text);[...text].forEach((ch,i)=>{const span=document.createElement('span');span.textContent=ch===' '?' ':ch;span.style.animationDelay=`${180+i*38}ms`;span.setAttribute('aria-hidden','true');node.append(span);});}
+function showReveal(level,place,zone){
+ $('reveal-eyebrow').textContent=place.recognized?'New stage unlocked':'Uncharted stage unlocked';
+ stamp($('reveal-title'),(place.recognized&&place.name?place.name:`Somewhere in ${zone.name}`).toUpperCase());
+ $('reveal-sub').textContent=[place.recognized?place.city:null,place.recognized?place.country:null,zone.name].filter(Boolean).join(' · ');
+ const panel=$('reveal');panel.hidden=false;panel.classList.remove('is-in');void panel.offsetWidth;panel.classList.add('is-in');
+ $('reveal-challenge').focus({preventScroll:true});
 }
-function cancelArena(){arenaController?.abort();arenaController=null;clearInterval(arenaTimer);arena=null;arenaBusy=false;globe.setHighlight(null);$('place-card').hidden=true;$('selected-level').hidden=false;document.querySelector('.menu-actions').hidden=false;document.querySelector('.difficulty-choice').hidden=false;renderSelected();}
+function hideReveal(){$('reveal').hidden=true;$('reveal').classList.remove('is-in');}
+async function forgeAndFight(level){
+ if(!level)return;if(!ensureReady())return;
+ if(level.scene?.backdrop||!level.place||!hasArenaApi()){globe.clearReveal();startDuel(level);return;}
+ const controller=new AbortController(),started=Date.now();forgeController=controller;forgeSkipped=false;
+ $('forge').hidden=false;$('challenge-selected').disabled=true;
+ const tick=()=>{$('forge-time').textContent=`${Math.round((Date.now()-started)/1000)}s · ${level.location.name.toUpperCase()}`;};tick();clearInterval(forgeTimer);forgeTimer=setInterval(tick,1000);
+ let ready=level;
+ try{
+  const image=gate.pending?.id===level.id&&gate.apiImage?gate.apiImage:level.photo;
+  const {backdrop}=await paintArena({image,zone:level.place.zone,scenePrompt:level.place.scenePrompt,setting:level.place.setting,lighting:level.place.lighting,placeName:level.place.name},{signal:controller.signal});
+  const pixel=await pixelizeBackdrop(backdrop);await modules.registerBackdrop(pixel);
+  const painted={...level,scene:validateScene({...level.scene,stageId:null,environment:level.place.environment,lighting:level.place.lighting,elements:defaultScene(level.place.environment).elements,backdrop:pixel,source:'ai'})};
+  ready=await modules.saveLevel(painted);
+  const index=levels.findIndex(l=>l.id===ready.id);if(index>=0)levels[index]=ready;
+ }catch(error){if(forgeController!==controller)return;if(!forgeSkipped)toast('The painter is resting. This duel uses the region’s stage.');}
+ finally{clearInterval(forgeTimer);if(forgeController===controller){forgeController=null;$('forge').hidden=true;$('challenge-selected').disabled=false;}}
+ if(forgeController!==null)return;
+ globe.clearReveal();renderAtlas();startDuel(ready);
+}
 function clearKeys(){Object.keys(keys).forEach(k=>keys[k]=false);document.querySelectorAll('[data-control]').forEach(b=>b.classList.remove('pressed'));}
 function stopDuel(){duelGeneration++;cancelAnimationFrame(raf);raf=0;engine=null;currentLevel=null;clearKeys();previousTime=0;accumulator=0;$('result-panel').hidden=true;$('duel-status').textContent='';}
 function returnToMap(){stopDuel();document.body.classList.remove('is-dueling');$('duel-screen').hidden=true;$('atlas-screen').hidden=false;globe.setVisible(true);globe.resize();renderAtlas();$('world-map').focus({preventScroll:true});if(firstLitId){setTimeout(()=>{firstLitId=null;},1600);}}
@@ -222,11 +243,11 @@ document.querySelectorAll('[data-control]').forEach(button=>{const control=butto
 function openHelp(){if(engine)togglePause(true);$('help-dialog').showModal();}
 function registerTools(){const context=document.modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();const tools=[{name:'read_atlas',description:'Read saved local levels and which stops have been cleared.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {levels:levels.map(l=>({id:l.id,name:l.name,location:l.location.name,cleared:l.cleared}))};}},{name:'start_duel',description:'Start the visible one-cut duel for an existing local level; winning requires gameplay.',inputSchema:{type:'object',properties:{levelId:{type:'string'}},required:['levelId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||Object.keys(input).some(k=>k!=='levelId')||typeof input.levelId!=='string')throw new Error('Expected a levelId string');const level=levels.find(l=>l.id===input.levelId);if(!level||!modules||!gameReady)throw new Error('Level unavailable');if($('creator').open||$('help-dialog').open)throw new Error('Close the open dialog first');startDuel(level);return {levelId:level.id,phase:engine.snapshot().phase};}}];for(const tool of tools){try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
 $('brand')?.addEventListener('click',returnToMap);document.querySelector('.brand').onclick=event=>{event.preventDefault();if(engine)returnToMap();};
-$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>startDuel(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-help').onclick=openHelp;
+$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>forgeAndFight(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-help').onclick=openHelp;
 $('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{analysisController?.abort();analysisController=null;photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('help-close').onclick=()=>$('help-dialog').close();$('help-play').onclick=()=>{$('help-dialog').close();startDuel(selected());};$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
 $('photo-input').onchange=event=>pickPhoto(event.target.files[0]);$('photo-drop').addEventListener('dragover',event=>{event.preventDefault();$('photo-drop').classList.add('dragover');});$('photo-drop').addEventListener('dragleave',()=>$('photo-drop').classList.remove('dragover'));$('photo-drop').addEventListener('drop',event=>{event.preventDefault();$('photo-drop').classList.remove('dragover');pickPhoto(event.dataTransfer.files[0]);});
 $('location-select').onchange=updateLocationFields;$('lighting-select').onchange=()=>{draft.scene.lighting=$('lighting-select').value;markManual();updateCreator();};$('style-select').onchange=()=>{draft.avatar.style=$('style-select').value;updateCreator();};$('ai-analyze').onclick=analyze;$('creator-form').onsubmit=saveAndPlay;
-$('arena-recognize').onclick=recognizeArena;$('arena-paint').onclick=paintArenaNow;$('arena-preset').onclick=()=>saveArena(false);$('arena-fight').onclick=()=>saveArena(true);$('arena-cancel').onclick=cancelArena;$('arena-zone').onchange=()=>{if(!arena||arena.backdrop||arena.status==='painting')return;arena.zone=$('arena-zone').value;updatePlaceCard();};
+$('gate-input').onchange=event=>{gatePhoto(event.target.files[0]);event.target.value='';};$('photo-gate').addEventListener('dragover',event=>{event.preventDefault();$('photo-gate').classList.add('dragover');});$('photo-gate').addEventListener('dragleave',()=>$('photo-gate').classList.remove('dragover'));$('photo-gate').addEventListener('drop',event=>{event.preventDefault();$('photo-gate').classList.remove('dragover');gatePhoto(event.dataTransfer.files[0]);});$('reveal-challenge').onclick=()=>{const level=gate.pending;hideReveal();if(level)forgeAndFight(level);};$('reveal-rescan').onclick=()=>scanPlace();$('reveal-close').onclick=()=>{hideReveal();globe.clearReveal();};$('forge-skip').onclick=()=>{forgeSkipped=true;forgeController?.abort();};
 $('zone-select').onchange=()=>{const zone=getZone($('zone-select').value);draft.scene=sceneForZone(zone.id);draft.location={name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon};$('level-name').value=`${zone.stage} · Custom`;const city=CITIES.find(city=>city.name===zone.place);$('location-select').value=city?.id||'custom';$('custom-name').value=zone.place;$('custom-lat').value=zone.lat;$('custom-lon').value=zone.lon;updateLocationFields();updateCreator();};
 $('avatar-target').onchange=()=>{draft.avatar.target=$('avatar-target').value;updateCreator();};
 for(const key of Object.keys(DEFAULT_AVATAR))$(`avatar-${key}`).oninput=()=>{draft.avatar.palette[key]=$(`avatar-${key}`).value;draft.avatar.source='local';updatePhotoPreview();drawPreview($('creator-preview'),draft.scene,draft.avatar);};

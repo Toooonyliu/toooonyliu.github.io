@@ -351,7 +351,7 @@ export class DuelEngine {
     switch (f.state) {
       case 'windup': {
         this._setState(f, 'active', f.attackDirection === 'mid' ? 0.13 : 0.15);
-        this._effect('slash', f.x + f.facing * 70, HEIGHT[f.attackDirection], f.facing, 0.23,
+        this._effect('slash', f.x + f.facing * 70, HEIGHT[f.attackDirection], f.facing, 0.3,
           { direction: f.attackDirection, attackKind: f.attackKind, strength: 0.55 + f.charge * 0.45 });
         break;
       }
@@ -579,8 +579,9 @@ export class DuelEngine {
     this.result = playerHit && enemyHit ? 'draw' : playerHit ? 'victory' : 'defeat';
     this.phase = this.result === 'draw' ? 'result' : 'postVictory';
     this.postVictoryRemaining = this.result === 'draw' ? 0 : POST_VICTORY_SECONDS;
-    if (!player.dead) this._setState(player, 'recovery', 0.38);
-    if (!enemy.dead) this._setState(enemy, 'recovery', 0.38);
+    // The winner holds the follow-through pose before relaxing, as in the reference duel.
+    if (!player.dead) this._setState(player, 'recovery', 0.72);
+    if (!enemy.dead) this._setState(enemy, 'recovery', 0.72);
     for (const f of [player, enemy]) {
       f.counterWindow = 0;
       f.counterReady = false;
@@ -589,7 +590,7 @@ export class DuelEngine {
     }
     this._aiMove = 0;
     this._pendingThreatAt = Infinity;
-    this._impact(0.085, 1);
+    this._impact(0.11, 1);
     this.message = { victory: 'Victory · Keep moving', defeat: 'Defeat · Try again', draw: 'Double hit · Draw' }[this.result];
   }
 
@@ -597,7 +598,8 @@ export class DuelEngine {
     attacker._contact = true;
     defender.hitDirection = defender.hitLevel = attacker.attackDirection;
     defender.knockback = attacker.facing * 160;
-    this._setState(defender, 'dead', 0.64);
+    // Stagger, then fall: the renderer holds the first hit frame for the opening third.
+    this._setState(defender, 'dead', 1.3);
     this._effect('hit', defender.x, HEIGHT[attacker.attackDirection], attacker.facing, 0.72,
       { direction: attacker.attackDirection, attackKind: attacker.attackKind, strength: 1 });
   }

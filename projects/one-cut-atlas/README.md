@@ -74,29 +74,36 @@ If AI is unavailable, existing local colors and manual customization remain
 playable. This version has no accounts or cross-device cloud history.
 Photos, destinations and victory progress are saved locally in IndexedDB.
 
-## Photo arenas
+## Photo stages
 
-The fighter workshop can also turn a travel photo into the duel's stage. After
-adding a photo, **Find this place on the globe** sends the compressed photo to the
-backend's `/api/recognize-place` route. The vision model describes only the
-environment: a landmark or place type, city and country when distinctive,
-interior or exterior, lighting and one short scene description. People are
-ignored and never identified. The globe then turns to the recognized travel
-zone and pulses it, and a card beside it asks whether to challenge there. The
-recognition is a suggestion: in testing it matched a Guatemalan volcano to
-Mount Fuji, so the zone can be changed before anything is painted.
+The home screen leads with **Drop a travel photo**. The photo is compressed in
+the browser, then the backend's `/api/recognize-place` route asks a vision model
+to work like a geolocation scout: it lists visible clues first (architecture,
+the script on signs, vegetation, road layout) and then names the place. People
+are ignored and never identified; sign text may be read as a clue but is never
+copied into the result. Photo GPS, when the file has it, is sent rounded to
+about 100 m and overrides the guess. While it works, the photo is shown as a
+coarse pixel mosaic with a scan line.
 
-**Paint arena** creates one AI image through `/api/scenes` (the exact brief used
-for the shipped zone stages, plus the validated scene description and the
-confirmed region), polls the job, then `src/pixelize.js` reduces the 1536×864
-result to the 480×270 grid with a 32-color palette so it reads like the shipped
-stages. The painted backdrop is saved with the duel in IndexedDB; rematches and
-reloads never paint again. **Preset arena** skips painting and uses the zone's
-shipped stage with the photo's colors. Painting runs with the backend's `low`
-quality setting, which measured about $0.02 per arena on October 8, 2026 and
-was indistinguishable from `medium` after pixelization. Each day's paintings are
-capped by the backend; when the cap, the key or the network is unavailable the
-preset arena remains playable.
+When the place is known, the globe turns to it, zooms in, and its travel zone
+lifts out with a glowing outline; a banner names the stage, for example
+SUSUKINO CROSSING · SAPPORO · JAPAN. **Not here? Scan again** re-asks the scout
+while excluding its previous answers. **Challenge** forges the arena: the
+backend paints one original backdrop of that place (the brief used for the
+shipped stages plus the confirmed region), `src/pixelize.js` snaps it onto the
+960×540 world grid with a 48-color palette, and the duel starts. If painting is
+unavailable the duel uses the region's stage. The new stage is saved in
+IndexedDB with its painted backdrop, so replays never paint again; a stage
+saved before painting succeeded is painted the next time it is chosen.
+
+Recognition was measured on nine of the developer's own travel photos on
+October 9, 2026: with full-detail images, eight were placed in the right city
+(Sapporo had been misread as Osaka at low detail); a volcano without signage
+stayed unrecognized, which the game reports as an uncharted stage.
+
+The backend paints with a free ModelScope (Qwen image) quota when its token is
+configured and falls back to OpenAI `gpt-image-2` at medium quality, about
+$0.046 per arena measured on October 8.
 
 ## Walkthrough and submission
 
