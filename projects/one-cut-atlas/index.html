@@ -23,9 +23,9 @@
    <section id="reveal" class="reveal" aria-live="assertive" aria-label="New stage" hidden>
     <button id="reveal-close" class="close-button reveal-close" aria-label="Close">×</button>
     <p id="reveal-eyebrow" class="reveal-eyebrow">New stage unlocked</p>
-    <h2 id="reveal-title" class="reveal-title"></h2>
-    <p id="reveal-sub" class="reveal-sub"></p>
-    <div class="reveal-actions"><button id="reveal-challenge" class="button primary">Challenge</button><button id="reveal-rescan" class="button secondary">Not here? Scan again</button></div>
+    <div class="rubber-stamp"><h2 id="reveal-title" class="reveal-title"></h2>
+    <p id="reveal-sub" class="reveal-sub"></p></div>
+    <div class="reveal-actions text-menu"><button id="reveal-challenge" class="menu-item">Challenge</button><button id="reveal-rescan" class="menu-item">Not here? Scan again</button></div>
    </section>
    <section id="forge" class="forge" aria-live="polite" aria-label="Preparing arena" hidden>
     <p class="forge-title">Forging arena</p>
@@ -34,28 +34,41 @@
     <button id="forge-skip" class="text-button forge-skip">Fight on the region's stage instead</button>
    </section>
    <section class="atlas-menu" aria-label="Start a duel">
-    <p class="eyebrow">CHOOSE YOUR DUEL</p>
-    <h1><span>One world.</span><span>One cut.</span></h1>
-    <p id="zone-progress" class="zone-progress">0 / 11 cleared</p>
-    <label id="photo-gate" class="photo-gate" for="gate-input">
-     <input id="gate-input" type="file" accept="image/jpeg,image/png,image/webp">
-     <canvas id="gate-canvas" width="320" height="180" aria-hidden="true" hidden></canvas>
-     <span class="gate-icon" aria-hidden="true"></span>
-     <span class="gate-title">Drop a travel photo</span>
-     <span class="gate-sub">A landmark, street or landscape from your trip unlocks its place as a duel. People are ignored; the photo goes to our AI scout.</span>
-    </label>
-    <p id="gate-status" class="gate-status" role="status" aria-live="polite"></p>
-    <section id="selected-level" class="selected-level" aria-label="Selected arena">
-     <div class="selected-art"><canvas id="selected-preview" width="960" height="540" aria-label="Pixel arena preview"></canvas><span id="selected-source" class="scene-tag" hidden></span></div>
-     <div class="selected-info"><p class="eyebrow" id="selected-region">EAST ASIA / KYOTO</p><h2 id="selected-title">Kyoto Rain</h2><p id="selected-description" hidden></p><div id="selected-tags" hidden></div></div>
-     <button id="edit-selected" class="text-button" hidden>Fighter</button>
-    </section>
-    <label class="difficulty-choice">Difficulty<select id="difficulty-select"><option value="beginner">Wanderer</option><option value="normal">Duelist</option><option value="hard">Master</option></select></label>
-    <div class="menu-actions"><button id="challenge-selected" class="button primary">Fight <span aria-hidden="true">→</span></button><button id="upload-open" class="button secondary">Fighter</button></div>
+    <h1 class="game-title"><span>One Cut</span><span>Atlas</span></h1>
+    <p class="tagline">One world. One cut.</p>
+    <nav class="text-menu" aria-label="Main menu">
+     <button id="challenge-selected" class="menu-item">Fight</button>
+     <label class="menu-item" for="gate-input">Send a postcard</label>
+     <button id="upload-open" class="menu-item">Fighter</button>
+     <button id="menu-destinations" class="menu-item" aria-controls="journey-drawer">Destinations</button>
+     <label class="menu-item menu-select">Difficulty<select id="difficulty-select"><option value="beginner">Wanderer</option><option value="normal">Duelist</option><option value="hard">Master</option></select></label>
+    </nav>
     <button id="play-demo" hidden>Fight</button>
    </section>
+   <section id="selected-level" class="postcard stage-card" aria-label="Selected arena">
+    <div class="selected-art"><canvas id="selected-preview" width="960" height="540" aria-label="Pixel arena preview"></canvas><span id="selected-source" class="scene-tag" hidden></span></div>
+    <div class="selected-info"><p class="eyebrow" id="selected-region">EAST ASIA / KYOTO</p><h2 id="selected-title">Kyoto Rain</h2><p id="selected-description" hidden></p><div id="selected-tags" hidden></div></div>
+    <span class="postmark" aria-hidden="true"></span>
+    <button id="edit-selected" class="text-button" hidden>Fighter</button>
+   </section>
+   <section class="gate-wrap" aria-label="Send a travel photo">
+    <label id="photo-gate" class="postcard photo-gate" for="gate-input">
+     <input id="gate-input" type="file" accept="image/jpeg,image/png,image/webp">
+     <canvas id="gate-canvas" width="320" height="180" aria-hidden="true" hidden></canvas>
+     <span class="gate-stamp" aria-hidden="true"><span>Place<br>photo<br>here</span></span>
+     <span class="gate-title">Send a postcard</span>
+     <span class="gate-sub">Drop a travel photo: a landmark, street or landscape. Its place becomes your next duel.</span>
+     <span class="gate-lines" aria-hidden="true"></span>
+     <span class="gate-fine">People are ignored. The photo goes to our AI scout.</span>
+    </label>
+    <p id="gate-status" class="gate-status" role="status" aria-live="polite"></p>
+   </section>
+   <section class="stamp-book" aria-label="Stamps collected">
+    <p id="zone-progress" class="zone-progress">0 / 11 stamps</p>
+    <div id="stamp-row" class="stamp-row" role="group" aria-label="Travel zones"></div>
+   </section>
    <details id="journey-drawer" class="journey-drawer">
-    <summary><span aria-hidden="true">◇</span> Destinations <span class="drawer-arrow" aria-hidden="true">＋</span></summary>
+    <summary><span aria-hidden="true">◇</span> Destinations <span class="drawer-arrow" aria-hidden="true">＋</span></summary><p class="log-heading">Traveller&#39;s log</p>
     <div class="journey-content"><div id="zone-list" class="zone-list" role="group" aria-label="Travel zones"></div><details class="saved-duels"><summary>My duels <span aria-hidden="true">＋</span></summary><div class="journey-counts"><span><strong id="cleared-count">00</strong> cleared</span><span><span id="level-count">11</span> duels</span></div><div id="level-list" class="level-list" aria-label="Saved duels"></div><p class="device-note">Saved on this device.</p></details><div class="progress-track" hidden><span id="progress-fill"></span></div><p id="progress-copy" hidden></p></div>
    </details>
    <footer class="site-footer"><a href="./presentation.html">Walkthrough ↗</a><a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Map: Natural Earth</a></footer>

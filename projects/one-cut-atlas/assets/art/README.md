@@ -14,8 +14,12 @@ pixels (`optimize-assets.mjs`). Earlier releases baked stages at 480×270; the
 larger grid was adopted on October 9 after painted photo arenas looked soft.
 Original PNGs remain in the local workspace.
 
-The interface fonts are Silkscreen and Pixelify Sans from Google Fonts, self-hosted
-in `assets/fonts/` under the SIL Open Font License 1.1 (license texts included).
+The interface fonts are Silkscreen, Pixelify Sans and VT323 from Google Fonts,
+self-hosted in `assets/fonts/` under the SIL Open Font License 1.1 (license texts
+included). The desk, paper, stamp-perforation, torn-edge and ink-mask textures in
+`assets/ui/` are generated procedurally by `ui-textures.mjs`. The travel-journal
+layout takes its cue from diegetic desk menus in indie pixel games; no third-party
+images or UI assets are used.
 
 
 These original assets were generated with the built-in ImageGen tool for this

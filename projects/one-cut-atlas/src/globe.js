@@ -7,6 +7,9 @@ const TAU = Math.PI * 2;
 const RAD = Math.PI / 180;
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const wrap = angle => ((angle + Math.PI) % TAU + TAU) % TAU - Math.PI;
+// 4×4 ordered dither: light falls off in hard pixel bands, like hand-shaded pixel art.
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+const band = (value, x, y, steps) => Math.min(1, Math.floor(value * steps + BAYER[(y & 3) * 4 + (x & 3)]) / steps);
 const grain = (x, y) => {
   let value = Math.imul(x ^ Math.imul(y, 374761393), 668265263);
   value = Math.imul(value ^ value >>> 13, 1274126177);
@@ -232,9 +235,9 @@ export class Globe {
   buildGeometry() {
     const width = this.canvas.width, height = this.canvas.height;
     const wide = width > 380;
-    this.cx = Math.round(width * (wide ? .68 : .5));
-    this.cy = Math.round(height * (wide ? .49 : .49));
-    this.radius = Math.min(height * .43, width * (wide ? .29 : .44)) * this.zoom;
+    this.cx = Math.round(width * (wide ? .59 : .5));
+    this.cy = Math.round(height * (wide ? .44 : .46));
+    this.radius = Math.min(height * .36, width * (wide ? .25 : .40)) * this.zoom;
     this.normals = [];
     const radius = this.radius;
     for (let y = Math.max(0, Math.floor(this.cy - radius)); y <= Math.min(height - 1, Math.ceil(this.cy + radius)); y++) {
@@ -254,16 +257,10 @@ export class Globe {
     const ctx = this.ctx, width = this.canvas.width, height = this.canvas.height;
     ctx.clearRect(0, 0, width, height);
     ctx.imageSmoothingEnabled = false;
-    const halo = ctx.createRadialGradient(this.cx - this.radius * .3, this.cy - this.radius * .2, this.radius * .8, this.cx, this.cy, this.radius * 1.14);
-    halo.addColorStop(0, '#dd958700'); halo.addColorStop(.7, '#dc897810'); halo.addColorStop(.85, '#e9a18b20'); halo.addColorStop(1, '#d48a7a00');
-    ctx.fillStyle = halo;
-    ctx.fillRect(this.cx - this.radius * 1.2, this.cy - this.radius * 1.2, this.radius * 2.4, this.radius * 2.4);
-    ctx.save();
-    ctx.translate(this.cx, this.cy + this.radius * 1.04);
-    ctx.scale(1, .1);
-    const shadow = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius * .82);
-    shadow.addColorStop(0, '#02080970'); shadow.addColorStop(1, '#02080900');
-    ctx.fillStyle = shadow; ctx.fillRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2); ctx.restore();
+    // A desk globe: brass stand and meridian behind the sphere, hidden while zoomed in on a reveal.
+    const standAlpha = clamp((1.25 - this.zoom) / .2, 0, 1);
+    if (standAlpha > 0) { ctx.globalAlpha = standAlpha; this.drawStand(); ctx.globalAlpha = 1; }
+
     const data = this.image.data;
     data.fill(0);
     const cosYaw = Math.cos(this.yaw), sinYaw = Math.sin(this.yaw), cosPitch = Math.cos(this.pitch), sinPitch = Math.sin(this.pitch);
@@ -285,7 +282,7 @@ export class Globe {
       const index = ty * 720 + tx, land = this.landMask?.[index];
       const zoneHere = zoneMask ? zoneMask[index] : 0;
       const noise = grain(tx, ty), broad = (Math.sin(lon * 9 + Math.cos(lat * 13)) + Math.cos(lat * 17 - lon * 6)) * .5;
-      const light = .30 + .70 * Math.max(0, nx * -.5 + ny * .52 + nz * .69);
+      const light = .34 + .66 * band(Math.max(0, nx * -.5 + ny * .52 + nz * .69), x, y, 5);
       const coast = this.coastMask?.[index] ? 13 : 0;
       let r, g, b;
       // Neighbouring texels decide outlines: the lit zone's border glows, its surroundings catch the light.
@@ -298,7 +295,9 @@ export class Globe {
         const edge = left !== zoneHere || right !== zoneHere || up !== zoneHere || down !== zoneHere;
         // Unlit zones sit back as dusty grey-green; cleared zones carry their full color and a warm lift.
         const grey = (zoneColor[0] * .3 + zoneColor[1] * .5 + zoneColor[2] * .2);
-        const keep = isCleared || isLit ? 1 : .42, tint = isCleared ? 1.08 : isLit ? 1.12 : 1;
+        // Unexplored land is a checker of its color and parchment fog; explored land is solid.
+        const fog = !isCleared && !isLit && ((x + y) & 1);
+        const keep = isCleared || isLit ? 1 : fog ? .18 : .55, tint = isCleared ? 1.08 : isLit ? 1.12 : 1;
         const boost=(active?14:0)+(isCleared?16:-6)+(isLit?(18+26*pulse)*rise:0);
         r = ((zoneColor[0] * keep + grey * (1 - keep) * .86) * tint + broad * 7 + noise * 9 + coast + boost) * light;
         g = ((zoneColor[1] * keep + grey * (1 - keep) * .9) * tint + broad * 7 + noise * 9 + coast * .6 + boost * (isLit ? .82 : 1)) * light;
@@ -311,10 +310,11 @@ export class Globe {
           r = r * .62 + 236 * .38; g = g * .62 + 196 * .38; b = b * .62 + 130 * .38;
         }
       } else {
-        const wave = Math.sin(tx * .28 + ty * .16) * 2 + noise * 5;
-        r = (43 + wave) * light;
-        g = (70 + wave) * light;
-        b = (76 + wave) * light;
+        // Sea: flat ink bands with sparse wave glints.
+        const glint = noise > .985 ? 26 : 0;
+        r = (34 + glint) * light;
+        g = (60 + glint) * light;
+        b = (72 + glint * .8) * light;
       }
       if (lit && zoneHere !== lit) {
         if (left === lit || right === lit || up === lit || down === lit) {
@@ -327,9 +327,9 @@ export class Globe {
         }
       }
       // Sunset strikes the upper-left limb, rather than outlining every coast.
-      const rim = Math.pow(1 - nz, 3.3) * clamp((-nx + ny) * .65, 0, 1);
-      r += rim * 113; g += rim * 59; b += rim * 44;
-      const shade = 1 - .13 * (1 - nz);
+      const rim = nz < .2 && (-nx + ny) > .35 ? .55 : 0;
+      r += rim * 120; g += rim * 72; b += rim * 40;
+      const shade = nz < .09 ? .55 : 1;
       data[offset] = Math.round(r * shade / 3) * 3;
       data[offset + 1] = Math.round(g * shade / 3) * 3;
       data[offset + 2] = Math.round(b * shade / 3) * 3;
@@ -343,6 +343,41 @@ export class Globe {
     ctx.drawImage(this.surface, 0, 0);
     this.drawMarkers(time, cosYaw, sinYaw, cosPitch, sinPitch);
     this.drawLeaves(time);
+  }
+
+  /** Brass meridian ring and turned base, drawn on the same two-pixel grid as the sphere. */
+  drawStand() {
+    const ctx = this.ctx, cx = this.cx, cy = this.cy, r = this.radius;
+    const brass = ['#5a3f22', '#8c6633', '#c19650', '#ecd08a'];
+    const ring = r * 1.09, tilt = -.38;
+    for (let a = -Math.PI * .93; a <= Math.PI * .02; a += 1 / ring) {
+      const x = cx + Math.cos(a) * ring * Math.cos(tilt) - Math.sin(a) * ring * Math.sin(tilt) * .12;
+      const y = cy + Math.sin(a) * ring;
+      const lit = Math.sin(a) < -.35 && Math.cos(a) < .2;
+      ctx.fillStyle = brass[0]; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 4, 4);
+      ctx.fillStyle = lit ? brass[3] : brass[2]; ctx.fillRect(Math.round(x), Math.round(y), 2, 2);
+    }
+    // Axle caps at the poles.
+    ctx.fillStyle = brass[0]; ctx.fillRect(Math.round(cx - 3), Math.round(cy - ring - 3), 6, 6); ctx.fillStyle = brass[3]; ctx.fillRect(Math.round(cx - 1), Math.round(cy - ring - 1), 2, 2);
+    const bottom = Math.round(cy + ring), neck = Math.max(6, Math.round(r * .16)), baseW = Math.round(r * .9), baseY = bottom + neck;
+    ctx.fillStyle = brass[0]; ctx.fillRect(Math.round(cx - 4), bottom - 2, 8, neck + 2);
+    ctx.fillStyle = brass[2]; ctx.fillRect(Math.round(cx - 2), bottom - 2, 2, neck + 2);
+    // Stepped base: three tiers, lit from the upper left.
+    const tiers = [[.35, 3], [.62, 3], [1, 5]];
+    let y = baseY;
+    for (const [w, h] of tiers) {
+      const half = Math.round(baseW * w / 2);
+      ctx.fillStyle = brass[0]; ctx.fillRect(Math.round(cx - half - 1), y - 1, half * 2 + 2, h + 2);
+      ctx.fillStyle = brass[1]; ctx.fillRect(Math.round(cx - half), y, half * 2, h);
+      ctx.fillStyle = brass[2]; ctx.fillRect(Math.round(cx - half), y, half * 2, 1);
+      ctx.fillStyle = brass[3]; ctx.fillRect(Math.round(cx - half), y, Math.max(2, Math.round(half * .5)), 1);
+      y += h;
+    }
+    // Flat stepped shadow on the desk.
+    ctx.fillStyle = '#05090b'; ctx.globalAlpha *= .5;
+    ctx.fillRect(Math.round(cx - baseW * .62), y + 1, Math.round(baseW * 1.24), 3);
+    ctx.fillRect(Math.round(cx - baseW * .45), y + 4, Math.round(baseW * .9), 2);
+    ctx.globalAlpha = Math.min(1, ctx.globalAlpha * 2);
   }
 
   drawMarkers(time, cosYaw, sinYaw, cosPitch, sinPitch) {
@@ -364,18 +399,16 @@ export class Globe {
       const y = Math.round(this.cy - this.radius * (wy * cosPitch - forward * sinPitch));
       const selected = level.id === this.selectedId;
       const cleared = levels.some(item => item.cleared);
-      const size = selected ? 3 : 2;
-      ctx.fillStyle = '#0c2024'; ctx.fillRect(x - size - 1, y - size - 1, size * 2 + 2, size * 2 + 2);
-      ctx.fillStyle = cleared ? '#f0c285' : selected ? '#f6ccb0' : '#c5bb9e';
-      ctx.fillRect(x - size, y - size, size * 2, size * 2);
-      ctx.fillStyle = '#fff1ce'; ctx.fillRect(x - 1, y - size, 1, 2);
-      if (selected || cleared) {
-        const radius = selected ? 7 : 5;
-        ctx.strokeStyle = selected ? '#e4b194aa' : '#d0ab6555'; ctx.lineWidth = 1;
-        ctx.strokeRect(x - radius, y - radius, radius * 2, radius * 2);
-        ctx.fillStyle = '#e8b18a66';
-        ctx.fillRect(x - 1, y - radius - 3, 1, 2); ctx.fillRect(x - 1, y + radius + 1, 1, 2);
-      }
+      // Pixel flag pins: a pole and a pennant; gold when cleared, rust when selected, bobbing gently.
+      const lift = selected && !this.reduceMotion.matches ? Math.round(Math.sin(time * 4) * 1) : 0;
+      const pole = selected ? 9 : 6, top = y - pole + lift;
+      ctx.fillStyle = '#0a1214'; ctx.fillRect(x - 1, top - 1, 3, pole + 2);
+      ctx.fillStyle = '#e8dcc0'; ctx.fillRect(x, top, 1, pole);
+      const flag = cleared ? '#f0c27a' : selected ? '#d0583f' : '#b9b19a', w = selected ? 6 : 4, h = selected ? 4 : 3;
+      ctx.fillStyle = '#0a1214'; ctx.fillRect(x, top - 1, w + 2, h + 2);
+      ctx.fillStyle = flag; ctx.fillRect(x + 1, top, w, h);
+      if (cleared) { ctx.fillStyle = '#fff3cf'; ctx.fillRect(x + 1 + Math.floor(w / 2) - 1, top + 1, 2, 1); }
+      ctx.fillStyle = '#0a1214'; ctx.fillRect(x - 2, y, 5, 2); ctx.fillStyle = '#5d6b63'; ctx.fillRect(x - 1, y, 3, 1);
       this.projected.push({ id: level.id, x, y, depth, level, levels });
       if (selected) {
         this.placeLabel(`place:${key}`, level.location.name, x, y, 'globe-place-label');
