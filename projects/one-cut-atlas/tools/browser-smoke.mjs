@@ -68,6 +68,7 @@ try {
   await send('Page.enable');
   await evaluate(`new Promise((resolve,reject)=>{const start=performance.now();const poll=()=>{const button=document.querySelector('#challenge-selected');if(button&&!button.disabled&&typeof button.onclick==='function')return resolve(true);if(performance.now()-start>30000)return reject(new Error('Game did not become ready'));setTimeout(poll,50)};poll()})`);
   await evaluate(`document.querySelector('#challenge-selected').click()`);
+  await evaluate(`document.querySelector('#setup-confirm')?.click()`);
   await evaluate(`new Promise(resolve=>setTimeout(resolve,2700))`);
   const sample = send('Runtime.evaluate', { expression: `new Promise(resolve=>{const gaps=[];let last=0;const step=now=>{if(last)gaps.push(now-last);last=now;if(gaps.length<180)requestAnimationFrame(step);else{const sorted=[...gaps].sort((a,b)=>a-b);resolve({mean:gaps.reduce((a,b)=>a+b,0)/gaps.length,p95:sorted[Math.floor(sorted.length*.95)],max:sorted.at(-1)})}};requestAnimationFrame(step)})`, awaitPromise: true, returnByValue: true });
   await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'd', code: 'KeyD', windowsVirtualKeyCode: 68 });

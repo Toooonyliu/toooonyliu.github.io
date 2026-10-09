@@ -5,6 +5,9 @@ import { DEFAULT_AVATAR, avatarFromPalette, validateAvatar, requestAvatar, hasAv
 import { recognizePlace, paintArena, hasArenaApi } from './scene-api.js';
 import { pixelizeBackdrop } from './pixelize.js';
 import { CombatAudio } from './combat-audio.js';
+import { gamepadIndex, validateAssignments } from './controllers.js';
+import { DuelInputs, normalizeSettings } from './duel-inputs.js';
+import { createDuelSetup } from './duel-setup.js';
 const $ = id => document.getElementById(id);
 const globe = new Globe($('world-map'), {onSelect:id=>selectLevel(id), onCreate:point=>openCreator({point})});
 const demos = createZoneLevels();
@@ -16,6 +19,26 @@ let bloodDecals=[],bloodSeen=new Set();
 const hudCache=new Map();
 const keys={left:false,right:false,attack:false,parry:false,dodge:false,duck:false,counter:false,shove:false};
 let aim='mid',mouseLine=null,playerFree=true;
+const SETTINGS_KEY='one-cut-atlas:controls:v1';
+let settings=loadSettings(),activeSettings=null,duelInputs=null,setupLevel=null;
+const duelSetup=createDuelSetup({
+ onStart(config){saveSettings(config);const level=setupLevel;setupLevel=null;if(level)void forgeAndFight(level);},
+ onSave(config){saveSettings(config);if(engine)launchDuel(currentLevel);else toast('Mode and controls saved.');}
+});
+function loadSettings(){try{return normalizeSettings(JSON.parse(localStorage.getItem(SETTINGS_KEY)));}catch{return normalizeSettings();}}
+function saveSettings(config){settings=normalizeSettings(config);try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{toast('Settings apply now; this browser could not save them.');}updateModeMenu();}
+function connectedPads(){try{return navigator.getGamepads?.()||[];}catch{return [];}}
+function dialogOpen(){return Boolean(document.querySelector('dialog[open]'));}
+function keyboardPlayer(){return activeSettings?.devices.slice(0,activeSettings.mode==='local'?2:1).indexOf('keyboard')??-1;}
+function canKeyboardFight(){return Boolean(engine&&!engine.paused&&!dialogOpen()&&keyboardPlayer()>=0);}
+function updateModeMenu(){
+ $('menu-settings').textContent='Mode & Controls';
+ $('menu-settings').title=`Current mode: ${settings.mode==='local'?'Local two-player':'Single player'}`;
+ $('difficulty-select').disabled=settings.mode==='local';
+ $('difficulty-select').closest('label').title=settings.mode==='local'?'Difficulty applies to the computer opponent in single-player mode.':'';
+}
+function startDuel(level){if(!level||!ensureReady())return;if(engine)togglePause(true);setupLevel=level;duelSetup.open(settings,{levelName:level.name,start:true});}
+function openSettings(){if(engine)togglePause(true);duelSetup.open(settings,{levelName:currentLevel?.name||selected()?.name,playing:Boolean(engine)});}
 const FREE_STATES=['idle','walk','charge','parry'];
 function applyMouseLine(){if(mouseLine&&playerFree&&mouseLine!==aim)setAim(mouseLine);}
 const stanceLabels={high:'High',mid:'Mid',low:'Low'};
@@ -191,7 +214,7 @@ function showReveal(level,place,zone){
 function hideReveal(){$('reveal').hidden=true;$('reveal').classList.remove('is-in');}
 async function forgeAndFight(level){
  if(!level)return;if(!ensureReady())return;
- if(level.scene?.backdrop||!level.place||!hasArenaApi()){globe.clearReveal();startDuel(level);return;}
+ if(level.scene?.backdrop||!level.place||!hasArenaApi()){globe.clearReveal();launchDuel(level);return;}
  const controller=new AbortController(),started=Date.now();forgeController=controller;forgeSkipped=false;
  $('forge').hidden=false;$('challenge-selected').disabled=true;
  const tick=()=>{$('forge-time').textContent=`${Math.round((Date.now()-started)/1000)}s · ${level.location.name.toUpperCase()}`;};tick();clearInterval(forgeTimer);forgeTimer=setInterval(tick,1000);
@@ -206,84 +229,133 @@ async function forgeAndFight(level){
  }catch(error){if(forgeController!==controller)return;if(!forgeSkipped)toast('The painter is resting. This duel uses the region’s stage.');}
  finally{clearInterval(forgeTimer);if(forgeController===controller){forgeController=null;$('forge').hidden=true;$('challenge-selected').disabled=false;}}
  if(forgeController!==null)return;
- globe.clearReveal();renderAtlas();startDuel(ready);
+ globe.clearReveal();renderAtlas();launchDuel(ready);
 }
 function clearKeys(){Object.keys(keys).forEach(k=>keys[k]=false);document.querySelectorAll('[data-control]').forEach(b=>b.classList.remove('pressed'));}
-function stopDuel(){mouseLine=null;playerFree=true;duelGeneration++;cancelAnimationFrame(raf);raf=0;engine=null;currentLevel=null;clearKeys();previousTime=0;accumulator=0;hudCache.clear();$('result-panel').hidden=true;$('duel-status').textContent='';}
+function stopDuel(){mouseLine=null;playerFree=true;duelGeneration++;cancelAnimationFrame(raf);raf=0;engine=null;currentLevel=null;duelInputs=null;activeSettings=null;clearKeys();previousTime=0;accumulator=0;hudCache.clear();$('result-panel').hidden=true;$('duel-status').textContent='';}
 function returnToMap(){stopDuel();document.body.classList.remove('is-dueling');$('duel-screen').hidden=true;$('atlas-screen').hidden=false;globe.setVisible(true);globe.resize();renderAtlas();$('world-map').focus({preventScroll:true});if(firstLitId){setTimeout(()=>{firstLitId=null;},1600);}}
 function initAudio(){try{audio ||= new CombatAudio();void audio.start().then(()=>audio.event('begin')).catch(()=>{});}catch{/* Audio is decorative; the duel remains playable. */}}
 function sound(type){audio?.event(type);}
 function toggleSound(){audio ||= new CombatAudio();const enabled=audio.toggle();$('nav-sound').textContent=`Sound: ${enabled?'On':'Off'}`;$('nav-sound').setAttribute('aria-pressed',String(enabled));if(enabled&&engine)initAudio();}
-function startDuel(level){
+function launchDuel(level){
  bloodDecals=[];bloodSeen=new Set();
- if(!ensureReady())return;if(level.avatar?.palette)modules.warmAvatarPalette(level.avatar.style,level.avatar.palette);stopDuel();setAim('mid');globe.setVisible(false);document.body.classList.add('is-dueling');currentLevel=level;if(level.scene?.backdrop&&!modules.hasBackdrop(level.scene.backdrop))modules.registerBackdrop(level.scene.backdrop).catch(()=>{});initAudio();engine=new modules.DuelEngine({seed:Date.now()%2147483647,difficulty:$('difficulty-select').value});resultHandled=false;heard=new Set();$('atlas-screen').hidden=true;$('duel-screen').hidden=false;$('duel-title').textContent=level.name;$('duel-region').textContent=`${level.location.name} / ONE CUT DUEL`;$('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';$('combat-tip').textContent='J · slash   K · guard';window.scrollTo({top:0,behavior:'instant'});$('duel-canvas').focus({preventScroll:true});previousTime=0;accumulator=0;raf=requestAnimationFrame(frame);
+ if(!ensureReady())return;
+ const assignment=validateAssignments(settings.mode,settings.devices,connectedPads());
+ if(!assignment.valid){toast(assignment.message);startDuel(level);return;}
+ if(level.avatar?.palette)modules.warmAvatarPalette(level.avatar.style,level.avatar.palette);
+ stopDuel();setAim('mid');activeSettings=normalizeSettings(settings);duelInputs=new DuelInputs(activeSettings);
+ globe.setVisible(false);document.body.classList.add('is-dueling');currentLevel=level;
+ if(level.scene?.backdrop&&!modules.hasBackdrop(level.scene.backdrop))modules.registerBackdrop(level.scene.backdrop).catch(()=>{});
+ initAudio();engine=new modules.DuelEngine({seed:Date.now()%2147483647,difficulty:$('difficulty-select').value,mode:activeSettings.mode});resultHandled=false;heard=new Set();
+ const local=activeSettings.mode==='local',deviceName=device=>device==='keyboard'?'KEYS':`PAD ${gamepadIndex(device)+1}`;
+ $('player-label').textContent=`${local?'P1':'YOU'} · ${deviceName(activeSettings.devices[0])}`;
+ $('rival-label').textContent=local?`P2 · ${deviceName(activeSettings.devices[1])}`:'AI RIVAL';
+ const hasKeyboard=keyboardPlayer()>=0;
+ $('keyboard-controls').hidden=!hasKeyboard;$('touch-controls').hidden=!hasKeyboard;
+ $('keyboard-controls').setAttribute('aria-label',`Player ${keyboardPlayer()+1} sword stance`);
+ $('touch-controls').setAttribute('aria-label',`Player ${keyboardPlayer()+1} touch combat controls`);
+ $('duel-canvas').setAttribute('aria-label',`${local?'Local two-player':'Single-player'} sword duel. Open Controls to view each player's input bindings. Escape pauses.`);
+ $('atlas-screen').hidden=true;$('duel-screen').hidden=false;$('duel-title').textContent=level.name;$('duel-region').textContent=`${level.location.name} / ${local?'LOCAL TWO-PLAYER':'SINGLE PLAYER'}`;
+ $('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';$('combat-tip').textContent=local?'Player 1 vs Player 2 · One clean hit wins':'You vs AI · One clean hit wins';
+ window.scrollTo({top:0,behavior:'instant'});$('duel-canvas').focus({preventScroll:true});previousTime=0;accumulator=0;raf=requestAnimationFrame(frame);
 }
 function drawDuel(snapshot){
  const ctx=$('duel-canvas').getContext('2d');ctx.clearRect(0,0,WORLD.width,WORLD.height);ctx.save();if(snapshot.shake){const amount=snapshot.shake*5;ctx.translate(Math.round(Math.sin(snapshot.time*117)*amount),Math.round(Math.cos(snapshot.time*89)*amount*.5));}modules.drawScene(ctx,currentLevel.scene,snapshot.time);
- for(const effect of snapshot.effects){if(bloodSeen.has(effect.id))continue;bloodSeen.add(effect.id);if(effect.type==='hit'||(effect.type==='slash'&&snapshot.phase==='postVictory'&&snapshot.result==='victory')){bloodDecals.push({x:effect.x,y:effect.type==='hit'?effect.y:WORLD.ground-90,facing:effect.facing||snapshot.player.facing,seed:effect.id,flick:effect.type==='slash'});if(bloodDecals.length>40)bloodDecals.shift();}}
+ for(const effect of snapshot.effects){if(bloodSeen.has(effect.id))continue;bloodSeen.add(effect.id);if(effect.type==='hit'||(effect.type==='slash'&&snapshot.phase==='postVictory'&&(snapshot.result==='victory'||snapshot.mode==='local'))){bloodDecals.push({x:effect.x,y:effect.type==='hit'?effect.y:WORLD.ground-90,facing:effect.facing||snapshot.player.facing,seed:effect.id,flick:effect.type==='slash'});if(bloodDecals.length>40)bloodDecals.shift();}}
  modules.drawBloodDecals(ctx,bloodDecals);
  const avatar=currentLevel.avatar;
  modules.drawFighter(ctx,snapshot.player,avatar?.target==='player'?avatar.style:'traveler',true,snapshot.time,{wet:currentLevel.scene.environment!=='wilderness',palette:avatar?.target==='player'?avatar.palette:null});modules.drawFighter(ctx,snapshot.opponent,avatar?.target==='opponent'?avatar.style:currentLevel.scene.opponentStyle,false,snapshot.time,{wet:currentLevel.scene.environment!=='wilderness',palette:avatar?.target==='opponent'?avatar.palette:null});modules.drawEffects(ctx,snapshot.effects,snapshot.time);ctx.restore();
- const meter=$('charge-meter');if(meter){meter.value=snapshot.player.charge||0;meter.hidden=snapshot.player.state!=='charge';}
- playerFree=FREE_STATES.includes(snapshot.player.state);applyMouseLine();
- hudText('rival-stance',stanceLabels[snapshot.opponent.stance]||'Mid');
- hudText('player-stance',snapshot.player.counterReady?'Counter · J / L':`${stanceLabels[snapshot.player.stance]||'Mid'}${snapshot.player.guarding?' · Guard':''}`);
+ const keyboardFighter=keyboardPlayer()===1?snapshot.opponent:snapshot.player;
+ const meter=$('charge-meter');if(meter){meter.value=keyboardFighter.charge||0;meter.hidden=keyboardFighter.state!=='charge';}
+ playerFree=FREE_STATES.includes(keyboardFighter.state);if(canKeyboardFight())applyMouseLine();
+ const fighterStatus=f=>f.counterReady?'Counter ready':`${stanceLabels[f.stance]||'Mid'}${f.guarding?' · Guard':''}${f.state==='charge'?` · ${Math.round(f.charge*100)}%`:''}`;
+ hudText('rival-stance',fighterStatus(snapshot.opponent));
+ hudText('player-stance',fighterStatus(snapshot.player));
  document.querySelectorAll('[data-stance]').forEach(button=>{const active=button.dataset.stance===aim;if(button.getAttribute('aria-pressed')!==String(active)){button.setAttribute('aria-pressed',String(active));button.classList.toggle('active',active);}});
- const counterButton=document.querySelector('[data-control=counter]');if(counterButton)counterButton.classList.toggle('ready',Boolean(snapshot.player.counterReady));
+ const counterButton=document.querySelector('[data-control=counter]');if(counterButton)counterButton.classList.toggle('ready',Boolean(keyboardFighter.counterReady));
  // Stable compact status; avoid rebuilding live text on every animation frame.
  const text=snapshot.paused?'PAUSED':snapshot.phase==='countdown'?String(Math.max(1,Math.ceil(snapshot.countdown))):'';
  hudText('duel-status',text);
  if(snapshot.message&&snapshot.phase==='playing')hudText('combat-tip',snapshot.message);
- if(snapshot.phase==='postVictory')hudText('combat-tip',snapshot.result==='victory'?`Free play · ${Math.ceil(snapshot.postVictoryRemaining)}s`:'');
+ if(snapshot.phase==='postVictory')hudText('combat-tip',snapshot.mode==='local'?`${snapshot.result==='victory'?'Player 1':'Player 2'} wins · ${Math.ceil(snapshot.postVictoryRemaining)}s`:snapshot.result==='victory'?`Free play · ${Math.ceil(snapshot.postVictoryRemaining)}s`:'');
  for(const effect of snapshot.effects){if(!heard.has(effect.id)){heard.add(effect.id);sound(effect.type);}}
 }
 function frame(now){
  if(!engine)return;if(!previousTime)previousTime=now;const delta=Math.min((now-previousTime)/1000,.1);previousTime=now;
- accumulator+=delta;while(accumulator>=1/60){engine.tick(1/60,{...keys,aim});accumulator-=1/60;}
+ const pads=connectedPads(),assignment=validateAssignments(activeSettings.mode,activeSettings.devices,pads);
+ if(!assignment.valid&&!engine.paused&&engine.phase!=='result'){togglePause(true);toast(`${assignment.message} Duel paused; reconnect or open Controls.`);}
+ const input=duelInputs.sample(pads,{...keys,aim},{suspended:dialogOpen()||document.hidden,paused:engine.paused});
+ if(input.pause)togglePause();
+ if(input.rematch&&engine.phase==='result')retry();
+ if(input.pause||input.rematch)accumulator=0;
+ else {accumulator+=delta;while(accumulator>=1/60){engine.tick(1/60,input.players[0],input.players[1]);accumulator-=1/60;}}
  const state=engine.snapshot();drawDuel(state);if(state.phase==='result'&&!resultHandled){resultHandled=true;finishDuel(state.result);}raf=requestAnimationFrame(frame);
 }
-function togglePause(force){if(!engine||engine.snapshot().phase==='result')return;const paused=typeof force==='boolean'?force:!engine.snapshot().paused;clearKeys();engine.setPaused(paused);accumulator=0;previousTime=0;$('pause-button').innerHTML=paused?'Resume <span class="key-mini">Esc</span>':'Pause <span class="key-mini">Esc</span>';}
-function retry(){if(!engine)return;bloodDecals=[];bloodSeen=new Set();duelGeneration++;clearKeys();setAim('mid');engine.reset(Date.now()%2147483647);resultHandled=false;heard=new Set();$('result-panel').hidden=true;$('combat-tip').textContent='J · slash   K · guard';$('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';accumulator=0;previousTime=0;$('duel-canvas').focus({preventScroll:true});}
+function togglePause(force){
+ if(!engine||engine.phase==='result')return;
+ const paused=typeof force==='boolean'?force:!engine.paused;
+ if(!paused){const assignment=validateAssignments(activeSettings.mode,activeSettings.devices,connectedPads());if(!assignment.valid){toast(assignment.message);return;}}
+ clearKeys();mouseLine=null;duelInputs?.suppress();engine.setPaused(paused);accumulator=0;previousTime=0;
+ $('pause-button').innerHTML=paused?'Resume <span class="key-mini">Esc</span>':'Pause <span class="key-mini">Esc</span>';
+ if(!paused)$('duel-canvas').focus({preventScroll:true});
+}
+function retry(){
+ if(!engine)return;
+ const assignment=validateAssignments(activeSettings.mode,activeSettings.devices,connectedPads());
+ if(!assignment.valid){toast(assignment.message);openSettings();return;}
+ bloodDecals=[];bloodSeen=new Set();duelGeneration++;clearKeys();mouseLine=null;setAim('mid');duelInputs.reset();engine.reset(Date.now()%2147483647);resultHandled=false;heard=new Set();hudCache.clear();$('result-panel').hidden=true;$('combat-tip').textContent='One clean hit wins';$('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';accumulator=0;previousTime=0;$('duel-canvas').focus({preventScroll:true});
+}
 async function finishDuel(result){
- const level=currentLevel, generation=duelGeneration, activeEngine=engine;const victory=result==='victory',draw=result==='draw';let saveMessage='';
- if(victory&&!level.cleared){const completed={...level,cleared:true};try{await modules.saveLevel(completed);const index=levels.findIndex(l=>l.id===level.id);if(index>=0)levels[index]=completed;firstLitId=completed.id;if(engine===activeEngine&&duelGeneration===generation)currentLevel=completed;saveMessage=`${level.location.name} cleared.`;}catch{saveMessage='Victory! Progress not saved.';}}
- else if(victory)saveMessage='Already cleared.';
+ const level=currentLevel, generation=duelGeneration, activeEngine=engine;const victory=result==='victory',draw=result==='draw',local=activeSettings.mode==='local';let saveMessage='';
+ if(!local&&victory&&!level.cleared){const completed={...level,cleared:true};try{await modules.saveLevel(completed);const index=levels.findIndex(l=>l.id===level.id);if(index>=0)levels[index]=completed;firstLitId=completed.id;if(engine===activeEngine&&duelGeneration===generation)currentLevel=completed;saveMessage=`${level.location.name} cleared.`;}catch{saveMessage='Victory! Progress not saved.';}}
+ else if(!local&&victory)saveMessage='Already cleared.';
  await new Promise(resolve=>setTimeout(resolve,520));
  if(engine!==activeEngine||duelGeneration!==generation||engine.snapshot().phase!=='result')return;
- const panel=$('result-panel');panel.innerHTML=`<h2>${victory?'VICTORY':draw?'DRAW':'DEFEATED'}</h2><p>${escape(victory?saveMessage:draw?'One more cut.':'Find your opening.')}</p><div class="result-actions"><button id="result-primary" class="button primary">${victory?'World':'Rematch'}</button><button id="result-secondary" class="button secondary">${victory?'Rematch':'World'}</button>${victory&&!currentLevel.cleared?'<button id="save-victory" class="button secondary">Save Again</button>':''}</div><p class="result-hint">R · rematch</p>`;panel.hidden=false;
- $('result-primary').onclick=victory?returnToMap:retry;$('result-secondary').onclick=victory?retry:returnToMap;if($('save-victory'))$('save-victory').onclick=()=>finishDuel('victory');
+ const title=draw?'DRAW':local?`PLAYER ${victory?'1':'2'} WINS`:victory?'VICTORY':'DEFEATED',worldFirst=victory&&!local;
+ const panel=$('result-panel');panel.innerHTML=`<h2>${title}</h2><p>${escape(local?'Local duel · no travel stamps awarded.':victory?saveMessage:draw?'One more cut.':'Find your opening.')}</p><div class="result-actions"><button id="result-primary" class="button primary">${worldFirst?'World':'Rematch'}</button><button id="result-secondary" class="button secondary">${worldFirst?'Rematch':'World'}</button>${!local&&victory&&!currentLevel.cleared?'<button id="save-victory" class="button secondary">Save Again</button>':''}</div><p class="result-hint">R / View / Share · rematch</p>`;panel.hidden=false;
+ $('result-primary').onclick=worldFirst?returnToMap:retry;$('result-secondary').onclick=worldFirst?retry:returnToMap;if($('save-victory'))$('save-victory').onclick=()=>finishDuel('victory');
  $('result-primary').focus({preventScroll:true});
 }
 const keyMap={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyJ:'attack',KeyK:'parry',Space:'dodge',KeyC:'duck',KeyL:'counter',KeyV:'shove'};
 const stanceKeys={KeyW:'high',ArrowUp:'high',Digit1:'high',KeyX:'mid',Digit2:'mid',KeyS:'low',ArrowDown:'low',Digit3:'low'};
-document.querySelectorAll('[data-stance]').forEach(button=>button.onclick=()=>{setAim(button.dataset.stance);$('duel-canvas').focus({preventScroll:true});});
+document.querySelectorAll('[data-stance]').forEach(button=>button.onclick=()=>{if(!canKeyboardFight())return;setAim(button.dataset.stance);$('duel-canvas').focus({preventScroll:true});});
 /* Mouse: height over the arena sets the blade line, left button charges and strikes, right button evades. */
 // The mouse line has hysteresis, and it only changes the stance while the fighter is free to: a hand drifting
 // during a cut must not withdraw it as a feint. Keyboard line changes still feint on purpose.
 {const canvas=$('duel-canvas');const HIGH=WORLD.ground-118,LOW=WORLD.ground-46,PAD=12;
  const lineAt=event=>{const rect=canvas.getBoundingClientRect();const y=(event.clientY-rect.top)/rect.height*WORLD.height;const current=mouseLine||'mid';
   if(current==='high')return y<HIGH+PAD?'high':y>LOW+PAD?'low':'mid';if(current==='low')return y>LOW-PAD?'low':y<HIGH-PAD?'high':'mid';return y<HIGH-PAD?'high':y>LOW+PAD?'low':'mid';};
- canvas.addEventListener('pointermove',event=>{if(!engine||event.pointerType!=='mouse')return;mouseLine=lineAt(event);applyMouseLine();});
- canvas.addEventListener('pointerdown',event=>{if(!engine||event.pointerType!=='mouse')return;event.preventDefault();canvas.focus({preventScroll:true});initAudio();if(event.button===0)keys.attack=true;else if(event.button===2)keys.dodge=true;});
+ canvas.addEventListener('pointermove',event=>{if(!canKeyboardFight()||event.pointerType!=='mouse')return;mouseLine=lineAt(event);applyMouseLine();});
+ canvas.addEventListener('pointerdown',event=>{if(!canKeyboardFight()||event.pointerType!=='mouse')return;event.preventDefault();canvas.focus({preventScroll:true});initAudio();if(event.button===0)keys.attack=true;else if(event.button===2)keys.dodge=true;});
  const releaseMouse=event=>{if(event.pointerType!=='mouse')return;if(event.button===0)keys.attack=false;else if(event.button===2)keys.dodge=false;};
  canvas.addEventListener('pointerup',releaseMouse);canvas.addEventListener('pointercancel',releaseMouse);canvas.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse'){keys.attack=false;keys.dodge=false;}});
  canvas.addEventListener('contextmenu',event=>event.preventDefault());}
-window.addEventListener('keydown',event=>{const editing=event.target?.matches?.('input,textarea,select,[contenteditable=true]');if(event.code==='KeyM'&&!event.repeat&&!editing){event.preventDefault();toggleSound();return;}if(!engine||$('creator').open||$('help-dialog').open)return;if(stanceKeys[event.code]){event.preventDefault();if(!event.repeat)setAim(stanceKeys[event.code]);}if(keyMap[event.code]){event.preventDefault();if(!event.repeat)keys[keyMap[event.code]]=true;}if(event.code==='Escape'&&!event.repeat){event.preventDefault();togglePause();}if(event.code==='KeyR'&&!event.repeat&&engine.snapshot().phase==='result'){event.preventDefault();retry();}});
+window.addEventListener('keydown',event=>{
+ const editing=event.target?.matches?.('input,textarea,select,[contenteditable=true]');
+ if(event.code==='KeyM'&&!event.repeat&&!editing){event.preventDefault();toggleSound();return;}
+ if(!engine||dialogOpen()||editing)return;
+ if(event.code==='Escape'&&!event.repeat){event.preventDefault();togglePause();return;}
+ if(event.code==='KeyR'&&!event.repeat&&engine.phase==='result'){event.preventDefault();retry();return;}
+ if(!canKeyboardFight())return;
+ if(stanceKeys[event.code]){event.preventDefault();if(!event.repeat)setAim(stanceKeys[event.code]);}
+ if(keyMap[event.code]){event.preventDefault();if(!event.repeat)keys[keyMap[event.code]]=true;}
+});
 window.addEventListener('keyup',event=>{if(keyMap[event.code]){keys[keyMap[event.code]]=false;if(engine)event.preventDefault();}});
 window.addEventListener('blur',()=>{clearKeys();if(engine)togglePause(true);});document.addEventListener('visibilitychange',()=>{if(document.hidden){clearKeys();if(engine)togglePause(true);}});
-document.querySelectorAll('[data-control]').forEach(button=>{const control=button.dataset.control;button.addEventListener('pointerdown',event=>{if(!engine)return;event.preventDefault();button.setPointerCapture(event.pointerId);keys[control]=true;button.classList.add('pressed');initAudio();});const release=()=>{keys[control]=false;button.classList.remove('pressed');};button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);});
+document.querySelectorAll('[data-control]').forEach(button=>{const control=button.dataset.control;button.addEventListener('pointerdown',event=>{if(!canKeyboardFight())return;event.preventDefault();button.setPointerCapture(event.pointerId);keys[control]=true;button.classList.add('pressed');initAudio();});const release=()=>{keys[control]=false;button.classList.remove('pressed');};button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);});
 function openHelp(){if(engine)togglePause(true);$('help-dialog').showModal();}
-function registerTools(){const context=document.modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();const tools=[{name:'read_atlas',description:'Read saved local levels and which stops have been cleared.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {levels:levels.map(l=>({id:l.id,name:l.name,location:l.location.name,cleared:l.cleared}))};}},{name:'start_duel',description:'Start the visible one-cut duel for an existing local level; winning requires gameplay.',inputSchema:{type:'object',properties:{levelId:{type:'string'}},required:['levelId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||Object.keys(input).some(k=>k!=='levelId')||typeof input.levelId!=='string')throw new Error('Expected a levelId string');const level=levels.find(l=>l.id===input.levelId);if(!level||!modules||!gameReady)throw new Error('Level unavailable');if($('creator').open||$('help-dialog').open)throw new Error('Close the open dialog first');startDuel(level);return {levelId:level.id,phase:engine.snapshot().phase};}}];for(const tool of tools){try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
+function registerTools(){const context=document.modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();const tools=[{name:'read_atlas',description:'Read saved local levels and which stops have been cleared.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {levels:levels.map(l=>({id:l.id,name:l.name,location:l.location.name,cleared:l.cleared}))};}},{name:'start_duel',description:'Open mode and input selection for an existing local level. Confirm Start duel to play; winning requires gameplay.',inputSchema:{type:'object',properties:{levelId:{type:'string'}},required:['levelId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||Object.keys(input).some(k=>k!=='levelId')||typeof input.levelId!=='string')throw new Error('Expected a levelId string');const level=levels.find(l=>l.id===input.levelId);if(!level||!modules||!gameReady)throw new Error('Level unavailable');if(dialogOpen())throw new Error('Close the open dialog first');startDuel(level);return {levelId:level.id,phase:'setup'};}}];for(const tool of tools){try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
 $('brand')?.addEventListener('click',returnToMap);document.querySelector('.brand').onclick=event=>{event.preventDefault();if(engine)returnToMap();};
-$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>forgeAndFight(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-sound').onclick=toggleSound;$('nav-help').onclick=openHelp;$('menu-destinations').onclick=()=>{const drawer=$('journey-drawer');drawer.open=!drawer.open;if(drawer.open)drawer.querySelector('summary').focus({preventScroll:true});};
+$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>startDuel(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-sound').onclick=toggleSound;$('nav-help').onclick=openHelp;$('menu-destinations').onclick=()=>{const drawer=$('journey-drawer');drawer.open=!drawer.open;if(drawer.open)drawer.querySelector('summary').focus({preventScroll:true});};
+$('menu-settings').onclick=openSettings;$('duel-settings').onclick=openSettings;$('duel-bindings').onclick=openSettings;
 $('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{analysisController?.abort();analysisController=null;photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('help-close').onclick=()=>$('help-dialog').close();$('help-play').onclick=()=>{$('help-dialog').close();startDuel(selected());};$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
 $('photo-input').onchange=event=>pickPhoto(event.target.files[0]);$('photo-drop').addEventListener('dragover',event=>{event.preventDefault();$('photo-drop').classList.add('dragover');});$('photo-drop').addEventListener('dragleave',()=>$('photo-drop').classList.remove('dragover'));$('photo-drop').addEventListener('drop',event=>{event.preventDefault();$('photo-drop').classList.remove('dragover');pickPhoto(event.dataTransfer.files[0]);});
 $('location-select').onchange=updateLocationFields;$('lighting-select').onchange=()=>{draft.scene.lighting=$('lighting-select').value;markManual();updateCreator();};$('style-select').onchange=()=>{draft.avatar.style=$('style-select').value;updateCreator();};$('ai-analyze').onclick=analyze;$('creator-form').onsubmit=saveAndPlay;
-$('gate-input').onchange=event=>{gatePhoto(event.target.files[0]);event.target.value='';};$('photo-gate').addEventListener('dragover',event=>{event.preventDefault();$('photo-gate').classList.add('dragover');});$('photo-gate').addEventListener('dragleave',()=>$('photo-gate').classList.remove('dragover'));$('photo-gate').addEventListener('drop',event=>{event.preventDefault();$('photo-gate').classList.remove('dragover');gatePhoto(event.dataTransfer.files[0]);});$('reveal-challenge').onclick=()=>{const level=gate.pending;hideReveal();if(level)forgeAndFight(level);};$('reveal-rescan').onclick=()=>scanPlace();$('reveal-close').onclick=()=>{hideReveal();globe.clearReveal();};$('forge-skip').onclick=()=>{forgeSkipped=true;forgeController?.abort();};
+$('gate-input').onchange=event=>{gatePhoto(event.target.files[0]);event.target.value='';};$('photo-gate').addEventListener('dragover',event=>{event.preventDefault();$('photo-gate').classList.add('dragover');});$('photo-gate').addEventListener('dragleave',()=>$('photo-gate').classList.remove('dragover'));$('photo-gate').addEventListener('drop',event=>{event.preventDefault();$('photo-gate').classList.remove('dragover');gatePhoto(event.dataTransfer.files[0]);});$('reveal-challenge').onclick=()=>{const level=gate.pending;hideReveal();if(level)startDuel(level);};$('reveal-rescan').onclick=()=>scanPlace();$('reveal-close').onclick=()=>{hideReveal();globe.clearReveal();};$('forge-skip').onclick=()=>{forgeSkipped=true;forgeController?.abort();};
 $('zone-select').onchange=()=>{const zone=getZone($('zone-select').value);draft.scene=sceneForZone(zone.id);draft.location={name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon};$('level-name').value=`${zone.stage} · Custom`;const city=CITIES.find(city=>city.name===zone.place);$('location-select').value=city?.id||'custom';$('custom-name').value=zone.place;$('custom-lat').value=zone.lat;$('custom-lon').value=zone.lon;updateLocationFields();updateCreator();};
 $('avatar-target').onchange=()=>{draft.avatar.target=$('avatar-target').value;updateCreator();};
 for(const key of Object.keys(DEFAULT_AVATAR))$(`avatar-${key}`).oninput=()=>{draft.avatar.palette[key]=$(`avatar-${key}`).value;draft.avatar.source='local';updatePhotoPreview();drawPreview($('creator-preview'),draft.scene,draft.avatar);};
-window.addEventListener('pagehide',()=>globe.destroy(),{once:true});
+window.addEventListener('pagehide',()=>{globe.destroy();duelSetup.destroy();},{once:true});
 // ?debug exposes the live duel for automated playtests; it changes nothing else.
-if(new URLSearchParams(location.search).has('debug'))window.__duel={get engine(){return engine;},get aim(){return aim;},get keys(){return {...keys};}};
-setupChoices();setBusy();renderAtlas();for(const id of ['play-demo','challenge-selected','upload-open','edit-selected'])$(id).disabled=true;registerTools();init();
+if(new URLSearchParams(location.search).has('debug'))window.__duel={get engine(){return engine;},get aim(){return aim;},get keys(){return {...keys};},get settings(){return structuredClone(activeSettings||settings);}};
+setupChoices();setBusy();renderAtlas();updateModeMenu();for(const id of ['play-demo','challenge-selected','upload-open','edit-selected'])$(id).disabled=true;registerTools();init();

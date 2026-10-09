@@ -29,7 +29,7 @@ local. Photo stages and AI Colors call the public backend set in the
 ## The desk
 
 The home screen is a traveller's desk. The title menu is bare pixel text:
-**Fight**, **Send a postcard**, **Fighter**, **Destinations** and
+**Fight**, **Mode & Controls**, **Send a postcard**, **Fighter**, **Destinations** and
 **Difficulty**. The selected stage is a postcard; the photo upload is a blank
 postcard; progress is a row of eleven passport stamps that ink and cancel as
 zones are cleared; Destinations opens a typed traveller's log.
@@ -73,6 +73,28 @@ a face or generate sprites. Only use photos you own or may share.
 
 ## Duel
 
+**Fight** opens the mode and input selection screen before each duel. Choose
+**Single player** against the AI, or **Local two-player** on the same screen.
+Each human can use keyboard + mouse or a browser-standard gamepad. Local play
+supports keyboard + gamepad in either player order, or two separate gamepads;
+sharing one keyboard or one pad between players is intentionally not supported.
+Both human fighters have identical movement and combat timings. Local wins do
+not award solo destination stamps, and AI difficulty applies only to solo mode.
+
+Connect controllers and press a button so the browser can discover them. The
+selection screen lists detected devices and shows each player's bindings.
+Xbox / PlayStation button names are shown together; support depends on the
+browser exposing a standard gamepad mapping. Unsupported or disconnected pads
+cannot start a duel. Settings are remembered locally; reconnect/reselect pads
+if the browser assigns them different device numbers.
+
+Open **Controls** during a duel to pause and inspect bindings. Applying settings
+restarts the duel; Cancel preserves it paused, then **Resume** continues.
+Disconnecting an assigned pad or leaving the tab pauses combat. Reconnect and
+resume explicitly, releasing held controls before acting again.
+
+### Keyboard + mouse
+
 | Input | Action |
 | --- | --- |
 | A / D or ← / → | Move |
@@ -85,6 +107,22 @@ a face or generate sprites. Only use photos you own or may share.
 | L | Counter after a block or evade |
 | V | Close shove; with backward movement, a pull |
 | Esc / R | Pause / rematch after the result |
+| M | Toggle music and effects |
+
+### Gamepad (Xbox / PlayStation labels)
+
+| Input | Action |
+| --- | --- |
+| Left stick ← / → | Move |
+| D-pad ↑ / ← or → / ↓ | High / mid / low blade line (latched) |
+| A / Cross | Hold to charge; release to strike |
+| X / Square | Hold to guard |
+| B / Circle | Evade |
+| LB / L1 | Hold to duck |
+| Y / Triangle | Counter |
+| RB / R1 | Shove; with backward movement, a pull |
+| Start / Options | Pause / resume |
+| Back / Share | Rematch after the result |
 
 The mouse line has a little hysteresis and only changes while you are free to act, so a drifting hand never withdraws a cut; line changes on the keyboard can still feint on purpose. Add `?debug` to the URL to expose the live duel engine for automated playtests.
 
@@ -116,6 +154,9 @@ scope and provenance, and confirm redistribution rights before publishing.
 index.html, src/style.css   Desk menu, dialogs, duel HUD
 src/app.js                  Screens, photo gate, input, duel loop
 src/engine.js               Deterministic fixed-step duel rules and AI
+src/duel-setup.js           Mode/device selection and per-player binding cards
+src/controllers.js          Standard gamepad mapping and device validation
+src/duel-inputs.js           Independent player routing and pause input safety
 src/art.js, src/render.js   Palette sprites, cached animation, effects, stages
 src/classic-fighter.js      Layered classic animation adapter and frame cache
 src/combat-audio.js         Predecoded effects, music and ambience
@@ -138,3 +179,16 @@ provenance JSON files beside the art. Supplied reference assets are documented
 separately in `assets/classic/README.md` and `assets/audio/README.md`.
 `submission-checklist.md` lists the remaining
 student-authored work: the personal README, actual code edits and the video.
+
+## Input regression checks
+
+`npm test` includes two-human combat, gamepad mapping, assignment validation,
+and pause/resume input tests. With the local server running, macOS developers
+with Google Chrome installed can run:
+
+```sh
+node tools/local-duel-smoke.mjs http://127.0.0.1:4173/
+```
+
+This browser check injects simulated gamepad snapshots and exercises the real
+setup screen and game loop. It does not replace testing physical controllers.

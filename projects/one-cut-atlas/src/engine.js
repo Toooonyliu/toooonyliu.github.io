@@ -59,7 +59,7 @@ function visibleFighter(f) {
 }
 
 /**
- * tick(seconds, input): left/right move; aim ('high'|'mid'|'low') latches the
+ * tick(seconds, player1Input, player2Input): left/right move; aim ('high'|'mid'|'low') latches the
  * stance. up/down are optional aim aliases. attack is hold-to-charge/release-to-
  * strike; parry holds a directional guard; dodge backsteps against vertical
  * cuts; duck advances under mid cuts; counter spends a real block/evade window;
@@ -74,7 +74,8 @@ function visibleFighter(f) {
  * AI/collisions stop, and phase='result' signals that the result UI may open.
  */
 export class DuelEngine {
-  constructor({ seed = 113, difficulty = 'beginner' } = {}) {
+  constructor({ seed = 113, difficulty = 'beginner', mode = 'solo' } = {}) {
+    this.mode = mode === 'local' ? 'local' : 'solo';
     this.difficulty = difficulty === 'easy' ? 'beginner' : (PROFILES[difficulty] ? difficulty : 'beginner');
     this._profile = PROFILES[this.difficulty];
     this._seed = hashSeed(seed);
@@ -100,6 +101,8 @@ export class DuelEngine {
     this._attackSerial = 0;
     this._held = Object.fromEntries(ACTIONS.map(action => [action, false]));
     this._releaseRequired = { ...this._held };
+    this._opponentHeld = { ...this._held };
+    this._opponentReleaseRequired = { ...this._held };
     this._playerAttackSerial = 0;
     this._playerFeintSerial = 0;
     this._seenPlayerFeintSerial = 0;
@@ -118,14 +121,19 @@ export class DuelEngine {
       this.paused = next;
       this._effects = [];
       this._held = Object.fromEntries(ACTIONS.map(action => [action, false]));
+      this._opponentHeld = { ...this._held };
       // Focus loss must never release a held charge into an unexpected strike.
       this._releaseRequired = Object.fromEntries(ACTIONS.map(action => [action, true]));
-      this._player._buffer = null;
-      this._player._bufferTime = 0;
-      this._player._guardArmed = false;
-      if (this._player.state === 'charge' || this._player.state === 'parry') {
-        this._player.charge = this._player.chargeTime = 0;
-        this._setState(this._player, 'idle');
+      this._opponentReleaseRequired = { ...this._releaseRequired };
+      for (const f of [this._player, this._opponent].filter(f => this._isHuman(f))) {
+        f._buffer = null;
+        f._bufferTime = 0;
+        f._guardArmed = false;
+        f.duckHeld = false;
+        if (['charge', 'parry', 'duck'].includes(f.state)) {
+          f.charge = f.chargeTime = 0;
+          this._setState(f, 'idle');
+        }
       }
       this._aiMove = 0;
       this._pendingThreatAt = Infinity;
@@ -136,40 +144,52 @@ export class DuelEngine {
 
   snapshot() {
     return {
-      phase: this.phase, countdown: Math.max(0, this.countdown), time: this.time,
+      mode: this.mode, phase: this.phase, countdown: Math.max(0, this.countdown), time: this.time,
       player: visibleFighter(this._player), opponent: visibleFighter(this._opponent),
       result: this.result, postVictoryRemaining: this.postVictoryRemaining,
       effects: this._effects.map(effect => ({ ...effect })),
       message: this.message, paused: this.paused, hitstop: this.hitstop, shake: this.shake,
-      opponentTactic: this._aiTemperament
+      opponentTactic: this.mode === 'local' ? null : this._aiTemperament
     };
   }
 
-  tick(seconds, input = {}) {
+  tick(seconds, input = {}, opponentInput = {}) {
     if (this.paused || !Number.isFinite(seconds) || seconds <= 0) return this.snapshot();
     const elapsed = Math.min(seconds, 0.25);
+    const [controls, edges] = this._readInput(this._player, input, this._held, this._releaseRequired);
+    const [opponentControls, opponentEdges] = this._readInput(this._opponent,
+      this.mode === 'local' ? opponentInput : {}, this._opponentHeld, this._opponentReleaseRequired);
+    const steps = Math.ceil(elapsed / STEP);
+    const dt = elapsed / steps;
+    for (let i = 0; i < steps; i++) {
+      this._step(dt, controls, i === 0 ? edges : {}, opponentControls, i === 0 ? opponentEdges : {});
+    }
+    return this.snapshot();
+  }
+
+  _readInput(f, input, held, releaseRequired) {
     const controls = Object.fromEntries(ACTIONS.map(action => [action, Boolean(input[action])]));
     controls.left = Boolean(input.left);
     controls.right = Boolean(input.right);
     controls.aim = DIRECTIONS.includes(input.aim) ? input.aim : input.up ? 'high' : input.down ? 'low' : null;
     const edges = {};
     for (const action of ACTIONS) {
-      if (!controls[action]) this._releaseRequired[action] = false;
-      edges[action] = controls[action] && !this._held[action] && !this._releaseRequired[action];
-      this._held[action] = controls[action];
-      if (this._releaseRequired[action]) controls[action] = false;
+      if (!controls[action]) releaseRequired[action] = false;
+      edges[action] = controls[action] && !held[action] && !releaseRequired[action];
+      held[action] = controls[action];
+      if (releaseRequired[action]) controls[action] = false;
     }
     // Only a living player can act during the winner's aftermath. Inputs held
     // through countdown still do not become queued combat actions.
-    if (!this._playerCanAct()) for (const action of ACTIONS) edges[action] = false;
-    const steps = Math.ceil(elapsed / STEP);
-    const dt = elapsed / steps;
-    for (let i = 0; i < steps; i++) this._step(dt, controls, i === 0 ? edges : {});
-    return this.snapshot();
+    if (!this._humanCanAct(f)) for (const action of ACTIONS) edges[action] = false;
+    return [controls, edges];
   }
 
-  _playerCanAct() {
-    return this.phase === 'playing' || this.phase === 'postVictory' && this.result === 'victory';
+  _isHuman(f) { return f === this._player || this.mode === 'local'; }
+
+  _humanCanAct(f) {
+    return this._isHuman(f) && !f.dead && (this.phase === 'playing' ||
+      this.phase === 'postVictory' && this.result === (f === this._player ? 'victory' : 'defeat'));
   }
 
   _random() {
@@ -213,7 +233,7 @@ export class DuelEngine {
     f.attackKind = 'normal';
     f._aiChargeDuration = duration;
     this._setState(f, 'charge', MAX_CHARGE);
-    if (f === this._opponent) this.message = `Rival winds up ${DIRECTION_NAME[f.stance]}`;
+    if (!this._isHuman(f)) this.message = `Rival winds up ${DIRECTION_NAME[f.stance]}`;
     return true;
   }
 
@@ -233,13 +253,13 @@ export class DuelEngine {
     f._protectedAttack = counter ? f._evadedAttack : 0;
     f.counterWindow = 0;
     f.counterReady = false;
-    const isPlayer = f === this._player;
-    const base = isPlayer ? (f.attackDirection === 'mid' ? 0.13 : 0.19) : this._profile.windup + (f.attackDirection === 'mid' ? 0 : 0.06);
-    const windup = counter ? (isPlayer ? 0.065 : 0.14) : Math.max(0.085, base - f.charge * 0.045) + f.fatigue * 0.055;
+    const isHuman = this._isHuman(f);
+    const base = isHuman ? (f.attackDirection === 'mid' ? 0.13 : 0.19) : this._profile.windup + (f.attackDirection === 'mid' ? 0 : 0.06);
+    const windup = counter ? (isHuman ? 0.065 : 0.14) : Math.max(0.085, base - f.charge * 0.045) + f.fatigue * 0.055;
     f.fatigue = clamp(f.fatigue + 0.10 + f.charge * 0.08, 0, 1);
     this._setState(f, 'windup', windup);
-    if (isPlayer) this._playerAttackSerial++;
-    else this.message = `${DIRECTION_NAME[f.attackDirection]} cut · ${f.attackDirection === 'mid' ? 'Duck / match guard' : 'Backstep / match guard'}`;
+    if (f === this._player) this._playerAttackSerial++;
+    else if (!isHuman) this.message = `${DIRECTION_NAME[f.attackDirection]} cut · ${f.attackDirection === 'mid' ? 'Duck / match guard' : 'Backstep / match guard'}`;
     return true;
   }
 
@@ -254,7 +274,7 @@ export class DuelEngine {
     if (f === this._player) {
       this._playerFeintSerial++;
       this.message = 'Feint · Read the reaction';
-    }
+    } else if (this.mode === 'local') this.message = 'Feint · Read the reaction';
     this._effect('feint', f.x, WORLD.ground - 150, f.facing, 0.4, { direction: f.stance, strength: 0.5 });
     return true;
   }
@@ -297,16 +317,15 @@ export class DuelEngine {
     return true;
   }
 
-  _bufferPlayer(edges) {
+  _bufferHuman(f, edges) {
     const action = ['dodge', 'duck', 'shove', 'counter', 'parry', 'attack'].find(name => edges[name]);
     if (action) {
-      this._player._buffer = action;
-      this._player._bufferTime = action === 'attack' && ['duck', 'dodge'].includes(this._player.state) ? 0.38 : 0.14;
+      f._buffer = action;
+      f._bufferTime = action === 'attack' && ['duck', 'dodge'].includes(f.state) ? 0.38 : 0.14;
     }
   }
 
-  _playerIntent(input) {
-    const f = this._player;
+  _humanIntent(f, input) {
     if (!input.parry) f._guardArmed = false;
     if (input.aim) {
       const previous = f.stance;
@@ -319,7 +338,7 @@ export class DuelEngine {
     let accepted = false;
     if (action === 'dodge') accepted = this._evade(f, 'dodge');
     else if (action === 'duck') accepted = this._evade(f, 'duck');
-    else if (action === 'shove') accepted = this._shove(f, input.left ? 'pull' : 'push');
+    else if (action === 'shove') accepted = this._shove(f, (f.facing > 0 ? input.left : input.right) ? 'pull' : 'push');
     else if (action === 'counter') accepted = this._attack(f, 'counter');
     else if (action === 'parry') {
       accepted = this._parry(f);
@@ -356,23 +375,23 @@ export class DuelEngine {
     if (f.state === 'charge') {
       f.chargeTime += dt;
       f.charge = clamp(f.chargeTime / MAX_CHARGE, 0, 1);
-      if (f === this._opponent && f.chargeTime >= f._aiChargeDuration) this._attack(f, 'normal', f.charge);
+      if (!this._isHuman(f) && f.chargeTime >= f._aiChargeDuration) this._attack(f, 'normal', f.charge);
       return;
     }
     if (f.state === 'parry') {
-      const holding = f === this._player ? guardHeld : f.timer < f._aiGuardDuration;
+      const holding = this._isHuman(f) ? guardHeld : f.timer < f._aiGuardDuration;
       if (holding) return;
       this._setState(f, 'recovery', 0.09);
       return;
     }
     // A held duck stays in its established posture, not in startup/end frames.
     // Attack input requests getting up, preserving its buffered follow-up.
-    if (f.state === 'duck' && f === this._player && duckHeld && !f._leaveDuck && f.timer >= 0.17) {
+    if (f.state === 'duck' && this._isHuman(f) && duckHeld && !f._leaveDuck && f.timer >= 0.17) {
       f.timer = 0.17;
       return;
     }
     if (f.timer + 1e-9 < f.stateDuration) return;
-    const isPlayer = f === this._player;
+    const isHuman = this._isHuman(f);
     switch (f.state) {
       case 'windup': {
         f._feintUsed = false;
@@ -383,7 +402,7 @@ export class DuelEngine {
       }
       case 'active': {
         if (!f._contact) f.fatigue = clamp(f.fatigue + 0.11, 0, 1);
-        const duration = (isPlayer ? 0.23 : 0.30) + f.fatigue * 0.07 + (f.attackDirection === 'mid' ? 0 : 0.035);
+        const duration = (isHuman ? 0.23 : 0.30) + f.fatigue * 0.07 + (f.attackDirection === 'mid' ? 0 : 0.035);
         this._setState(f, 'recovery', duration);
         break;
       }
@@ -537,7 +556,7 @@ export class DuelEngine {
         defender.counterReady = true;
         this._effect('evade', defender.x, this._bladeY(attacker), defender.facing, 0.25,
           { direction: attacker.attackDirection, strength: 0.7 });
-        if (defender === this._player) this.message = 'Evaded · L to counter';
+        if (this._isHuman(defender)) this.message = 'Evaded · Counter now';
       }
       return false;
     }
@@ -566,7 +585,8 @@ export class DuelEngine {
       this._effect('parry', defender.x + defender.facing * 37, this._bladeY(attacker), defender.facing, 0.3,
         { direction: attacker.attackDirection, strength: 0.5, passive: true });
       this._impact(0.04, 0.22);
-      this.message = defender === this._player ? 'Guarded · Your stance held the line' : 'Guarded · Strike the open line';
+      this.message = this.mode === 'local' ? 'Guarded · Counter opening' :
+        defender === this._player ? 'Guarded · Your stance held the line' : 'Guarded · Strike the open line';
       return true;
     }
     const strong = attacker.charge >= 0.85;
@@ -583,12 +603,13 @@ export class DuelEngine {
     this._effect('parry', defender.x + defender.facing * 37, this._bladeY(attacker), defender.facing, 0.38,
       { direction: attacker.attackDirection, strength: strong ? 1 : 0.65 });
     this._impact(strong ? 0.065 : 0.045, strong ? 0.55 : 0.28);
-    this.message = defender === this._player ? 'Parried · J / L to counter' : 'Blocked · Reset your distance';
+    this.message = this._isHuman(defender) ? 'Parried · Attack / counter to reply' : 'Blocked · Reset your distance';
     return true;
   }
 
-  _resolveShove(attacker, defender) {
-    if (attacker.state !== 'shove' || attacker._shoveResolved || attacker.timer < 0.055) return;
+  _resolveShove(attacker, defender, committed = false) {
+    // A simultaneous local shove is committed before either fighter is stunned.
+    if (!committed && (attacker.state !== 'shove' || attacker._shoveResolved || attacker.timer < 0.055)) return;
     attacker._shoveResolved = true;
     if (Math.abs(attacker.x - defender.x) > 82 || defender.dead) {
       attacker.fatigue = clamp(attacker.fatigue + 0.05, 0, 1);
@@ -604,7 +625,25 @@ export class DuelEngine {
     this._effect('shove', (attacker.x + defender.x) / 2, WORLD.ground - 62, attacker.facing, 0.30,
       { direction: 'mid', shoveKind: attacker.shoveKind, strength: 0.7 });
     this._impact(0.025, 0.25);
-    this.message = attacker === this._player ? `${attacker.shoveKind === 'pull' ? 'Pull' : 'Push'} · Reset your distance` : 'Shoved · Recover';
+    this.message = this._isHuman(attacker) ? `${attacker.shoveKind === 'pull' ? 'Pull' : 'Push'} · Reset your distance` : 'Shoved · Recover';
+  }
+
+  _resolveShoves() {
+    const player = this._player;
+    const opponent = this._opponent;
+    const simultaneous = this.mode === 'local' && Math.abs(player.x - opponent.x) <= 82 &&
+      [player, opponent].every(f => f.state === 'shove' && !f._shoveResolved && f.timer >= 0.055);
+    this._resolveShove(player, opponent);
+    this._resolveShove(opponent, player, simultaneous);
+    if (simultaneous) {
+      // Combine the received impulse and each puller's own recoil, rather than
+      // letting iteration order decide whose shove or recoil survives.
+      for (const [f, other] of [[player, opponent], [opponent, player]]) {
+        f.knockback = other.facing * (other.shoveKind === 'pull' ? -340 : 495) -
+          (f.shoveKind === 'pull' ? f.facing * 95 : 0);
+      }
+      this.message = 'Shove clash · Reset your distance';
+    }
   }
 
   _collide() {
@@ -648,7 +687,9 @@ export class DuelEngine {
     this._aiMove = 0;
     this._pendingThreatAt = Infinity;
     this._impact(0.16, 1);
-    this.message = { victory: 'Victory · Keep moving', defeat: 'Defeat · Try again', draw: 'Double hit · Draw' }[this.result];
+    this.message = this.mode === 'local'
+      ? { victory: 'Player 1 wins · Keep moving', defeat: 'Player 2 wins · Keep moving', draw: 'Double hit · Draw' }[this.result]
+      : { victory: 'Victory · Keep moving', defeat: 'Defeat · Try again', draw: 'Double hit · Draw' }[this.result];
   }
 
   _kill(defender, attacker) {
@@ -661,11 +702,12 @@ export class DuelEngine {
       { direction: attacker.attackDirection, attackKind: attacker.attackKind, strength: 1 });
   }
 
-  _step(dt, input, edges) {
+  _step(dt, input, edges, opponentInput, opponentEdges) {
     for (const effect of this._effects) effect.age += dt;
     this._effects = this._effects.filter(effect => effect.age < effect.duration);
     this.shake = Math.max(0, this.shake - dt * 4);
-    if (this._playerCanAct()) this._bufferPlayer(edges);
+    if (this._humanCanAct(this._player)) this._bufferHuman(this._player, edges);
+    if (this._humanCanAct(this._opponent)) this._bufferHuman(this._opponent, opponentEdges);
     if (this.hitstop > 0) {
       this.hitstop = Math.max(0, this.hitstop - dt);
       return;
@@ -678,16 +720,19 @@ export class DuelEngine {
     }
     if (this.phase === 'postVictory') {
       this.postVictoryRemaining = Math.max(0, this.postVictoryRemaining - dt);
-      if (this.result === 'victory') {
-        const move = Number(input.right) - Number(input.left);
+      for (const [f, controls] of [[this._player, input], [this._opponent, opponentInput]]) {
+        if (!this._humanCanAct(f)) {
+          this._advanceState(f, dt);
+          continue;
+        }
+        const move = Number(controls.right) - Number(controls.left);
         // The corpse no longer separates the arena. Free footwork can turn the
         // winner, while a released swing keeps its facing through recovery.
-        if (move && ready(this._player)) this._player.facing = Math.sign(move);
-        this._playerIntent(input);
-        this._advanceState(this._player, dt, input.parry, input.duck);
-        this._player.x = clamp(this._player.x + this._movement(this._player, move, dt, 235), MIN_X, MAX_X);
-      } else this._advanceState(this._player, dt);
-      this._advanceState(this._opponent, dt);
+        if (move && ready(f)) f.facing = Math.sign(move);
+        this._humanIntent(f, controls);
+        this._advanceState(f, dt, controls.parry, controls.duck);
+        f.x = clamp(f.x + this._movement(f, move, dt, 235), MIN_X, MAX_X);
+      }
       // No AI, shoves or sword collisions are resolved after the decisive hit.
       if (this.postVictoryRemaining < 1e-8) {
         this.postVictoryRemaining = 0;
@@ -704,16 +749,19 @@ export class DuelEngine {
       }
       return;
     }
-    this._playerIntent(input);
-    const enemyDirection = this._opponentIntent();
+    this._humanIntent(this._player, input);
+    let enemyDirection;
+    if (this.mode === 'local') {
+      this._humanIntent(this._opponent, opponentInput);
+      enemyDirection = Number(opponentInput.right) - Number(opponentInput.left);
+    } else enemyDirection = this._opponentIntent();
     this._advanceState(this._player, dt, input.parry, input.duck);
-    this._advanceState(this._opponent, dt);
+    this._advanceState(this._opponent, dt, opponentInput.parry, opponentInput.duck);
     this._constrainBodies(
       this._movement(this._player, Number(input.right) - Number(input.left), dt, 235),
-      this._movement(this._opponent, enemyDirection, dt, this._profile.speed)
+      this._movement(this._opponent, enemyDirection, dt, this.mode === 'local' ? 235 : this._profile.speed)
     );
-    this._resolveShove(this._player, this._opponent);
-    this._resolveShove(this._opponent, this._player);
+    this._resolveShoves();
     this._collide();
   }
 }

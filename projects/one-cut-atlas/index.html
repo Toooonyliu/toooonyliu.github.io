@@ -38,6 +38,7 @@
     <p class="tagline">One world. One cut.</p>
     <nav class="text-menu" aria-label="Main menu">
      <button id="challenge-selected" class="menu-item">Fight</button>
+     <button id="menu-settings" class="menu-item" aria-haspopup="dialog" aria-controls="duel-setup">Mode &amp; Controls</button>
      <label class="menu-item" for="gate-input">Send a postcard</label>
      <button id="upload-open" class="menu-item">Fighter</button>
      <button id="menu-destinations" class="menu-item" aria-controls="journey-drawer">Destinations</button>
@@ -75,11 +76,38 @@
   </div>
  </main>
  <main id="duel-screen" hidden>
-  <div class="duel-top"><div class="duel-exits"><button id="duel-back" class="text-button">← World</button><a class="text-button" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></div><div><p id="duel-region" class="eyebrow"></p><h1 id="duel-title"></h1></div><button id="pause-button" class="button secondary small">Pause <span class="key-mini">Esc</span></button></div>
-  <div class="arena-shell"><canvas id="duel-canvas" width="960" height="540" tabindex="0" aria-label="Sword duel. A D move. Mouse height or W X S choose high, mid or low stance. Tap or hold J or the left mouse button to strike. Hold K to guard. Space or right mouse button evades. C duck. L counter. V shove. M toggles sound. Esc pauses."></canvas><div class="arena-identity"><span>YOU<small id="player-stance">Mid</small></span><span>RIVAL<small id="rival-stance">Mid</small></span></div><div id="duel-status" class="duel-status" aria-live="polite"></div><div id="result-panel" class="result-panel" hidden></div></div>
-  <div class="duel-bottom"><div class="stance-controls" role="group" aria-label="Sword stance"><button data-stance="high" aria-pressed="false">High</button><button data-stance="mid" class="active" aria-pressed="true">Mid</button><button data-stance="low" aria-pressed="false">Low</button><progress id="charge-meter" class="charge-meter" value="0" max="1" aria-label="Strike charge"></progress></div><p id="combat-tip" class="muted"></p><details class="combat-guide"><summary>Controls <span aria-hidden="true">＋</span></summary><div class="combat-guide-content"><span><kbd>A D</kbd> Move</span><span><kbd>W X S</kbd> High / mid / low</span><span><kbd>J</kbd> Hold to charge · release to strike</span><span><kbd>K</kbd> Hold to guard matching stance</span><span><kbd>Space</kbd> Evade</span><span><kbd>C</kbd> Duck</span><span><kbd>L</kbd> Counter</span><span><kbd>V</kbd> Shove</span><span><kbd>Esc / R</kbd> Pause / retry</span></div></details></div>
-  <div class="touch-controls" aria-label="Touch combat controls"><div class="touch-move"><button data-control="left" aria-label="Move left">◀</button><button data-control="right" aria-label="Move right">▶</button></div><div class="touch-actions"><button data-control="dodge">Evade</button><button data-control="duck">Duck</button><button data-control="shove">Shove</button><button data-control="parry">Guard</button><button data-control="counter">Counter</button><button data-control="attack" class="touch-attack">Strike</button></div></div>
+  <div class="duel-top"><div class="duel-exits"><button id="duel-back" class="text-button">← World</button><a class="text-button" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></div><div class="duel-heading"><p id="duel-region" class="eyebrow"></p><h1 id="duel-title"></h1></div><div class="duel-options"><button id="duel-settings" class="text-button" aria-haspopup="dialog" aria-controls="duel-setup">Controls</button><button id="pause-button" class="button secondary small">Pause <span class="key-mini">Esc</span></button></div></div>
+  <div class="arena-shell"><canvas id="duel-canvas" width="960" height="540" tabindex="0" aria-label="Sword duel. Choose keyboard and mouse or gamepads in Controls. A D move. Mouse height or W X S choose stance. J or left mouse charges and strikes. K guards. Space or right mouse evades. C ducks. L counters. V shoves. M toggles sound. Esc pauses."></canvas><div class="arena-identity"><span><span id="player-label">YOU</span><small id="player-stance">Mid</small></span><span><span id="rival-label">RIVAL</span><small id="rival-stance">Mid</small></span></div><div id="duel-status" class="duel-status" aria-live="polite"></div><div id="result-panel" class="result-panel" hidden></div></div>
+  <div class="duel-bottom"><div id="keyboard-controls" class="stance-controls" role="group" aria-label="Keyboard player sword stance"><button data-stance="high" aria-pressed="false">High</button><button data-stance="mid" class="active" aria-pressed="true">Mid</button><button data-stance="low" aria-pressed="false">Low</button><progress id="charge-meter" class="charge-meter" value="0" max="1" aria-label="Strike charge"></progress></div><p id="combat-tip" class="muted"></p><button id="duel-bindings" class="text-button" aria-haspopup="dialog" aria-controls="duel-setup">View bindings</button></div>
+  <div id="touch-controls" class="touch-controls" aria-label="Touch combat controls"><div class="touch-move"><button data-control="left" aria-label="Move left">◀</button><button data-control="right" aria-label="Move right">▶</button></div><div class="touch-actions"><button data-control="dodge">Evade</button><button data-control="duck">Duck</button><button data-control="shove">Shove</button><button data-control="parry">Guard</button><button data-control="counter">Counter</button><button data-control="attack" class="touch-attack">Strike</button></div></div>
  </main>
+ <dialog id="duel-setup" class="duel-setup" aria-labelledby="duel-setup-title" aria-describedby="setup-context">
+  <div class="dialog-top"><div><p class="eyebrow">BEFORE THE FIRST CUT</p><h2 id="duel-setup-title">Mode &amp; Controls</h2></div><button id="setup-close" class="close-button" type="button" aria-label="Close mode and controls">×</button></div>
+  <div class="setup-scroll">
+  <p id="setup-context" class="setup-context">Choose your duel and who holds each blade.</p>
+  <div class="setup-modes" role="group" aria-label="Game mode">
+   <button class="setup-mode" type="button" data-setup-mode="solo" aria-pressed="true"><strong>Single player</strong><span>Your blade against an AI rival</span></button>
+   <button class="setup-mode" type="button" data-setup-mode="local" aria-pressed="false"><strong>Local two-player</strong><span>Two players, one screen</span></button>
+  </div>
+  <div class="setup-players">
+   <section class="setup-player" aria-labelledby="setup-player-one-title">
+    <div class="setup-player-heading"><h3 id="setup-player-one-title">Player 1</h3><span class="setup-side">Left side</span></div>
+    <label class="setup-device-label" for="setup-device-1">Input device<select id="setup-device-1" aria-describedby="setup-device-status-1"></select></label>
+    <p id="setup-device-status-1" class="setup-device-status"></p>
+    <dl id="setup-bindings-1" class="setup-bindings" aria-label="Player 1 controls"></dl>
+   </section>
+   <section class="setup-player" aria-labelledby="setup-player-two-title">
+    <div class="setup-player-heading"><h3 id="setup-player-two-title">AI rival</h3><span class="setup-side">Right side</span></div>
+    <div id="setup-player-two-input" hidden><label class="setup-device-label" for="setup-device-2">Input device<select id="setup-device-2" aria-describedby="setup-device-status-2"></select></label><p id="setup-device-status-2" class="setup-device-status"></p><dl id="setup-bindings-2" class="setup-bindings" aria-label="Player 2 controls"></dl></div>
+    <div id="setup-ai" class="setup-ai"><span class="setup-ai-mark" aria-hidden="true">CPU</span><h4>One worthy rival.</h4><p>The game controls the other blade. Choose the AI difficulty from the world menu.</p><p>Win solo duels to collect destination stamps.</p></div>
+   </section>
+  </div>
+  <p id="setup-pad-hint" class="setup-pad-hint">Connect a controller, then press any button to let the browser detect it. Standard Xbox / PlayStation-style controllers are supported.</p>
+  <p id="setup-mode-note" class="setup-mode-note"></p>
+  </div>
+  <p id="setup-validation" class="setup-validation" role="status" aria-live="polite" aria-atomic="true"></p>
+  <div class="setup-actions"><button id="setup-cancel" type="button" class="button secondary">Cancel</button><button id="setup-confirm" type="button" class="button primary">Start duel</button></div>
+ </dialog>
  <dialog id="creator" class="creator-dialog" aria-labelledby="creator-title">
   <div class="dialog-top"><div><h2 id="creator-title">Your fighter</h2></div><button id="creator-close" class="close-button" aria-label="Close">×</button></div>
   <div class="creator-grid">
