@@ -8,6 +8,7 @@
   <title>One Cut Atlas</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23111b20'/%3E%3Cpath d='M8 24L24 8M8 8v7M8 8h7M24 24v-7M24 24h-7' stroke='%23edb777' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./src/style.css">
+  <link rel="stylesheet" href="./src/control-diagrams.css">
 </head>
 <body>
  <header class="topbar">
@@ -92,18 +93,28 @@
   <div class="setup-players">
    <section class="setup-player" aria-labelledby="setup-player-one-title">
     <div class="setup-player-heading"><h3 id="setup-player-one-title">Player 1</h3><span class="setup-side">Left side</span></div>
-    <label class="setup-device-label" for="setup-device-1">Input device<select id="setup-device-1" aria-describedby="setup-device-status-1"></select></label>
+    <div id="setup-types-1" class="device-type-picker" role="group" aria-label="Player 1 input type"></div>
+    <div id="setup-pad-picker-1" class="setup-pad-picker"><label class="setup-device-label" for="setup-device-1">Assigned controller<select id="setup-device-1" aria-describedby="setup-device-status-1"></select></label><button id="setup-assign-1" class="setup-assign" type="button" aria-pressed="false">Press A to assign a controller</button></div>
+    <p id="setup-keyboard-note-1" class="setup-keyboard-note">Use this computer’s keyboard and mouse. Touch buttons also work.</p>
     <p id="setup-device-status-1" class="setup-device-status"></p>
-    <dl id="setup-bindings-1" class="setup-bindings" aria-label="Player 1 controls"></dl>
+    <div id="setup-diagram-1"></div>
+    <details class="setup-full-bindings"><summary>Full bindings &amp; alternate keys</summary><dl id="setup-bindings-1" class="setup-bindings" aria-label="Player 1 controls"></dl></details>
    </section>
    <section class="setup-player" aria-labelledby="setup-player-two-title">
     <div class="setup-player-heading"><h3 id="setup-player-two-title">AI rival</h3><span class="setup-side">Right side</span></div>
-    <div id="setup-player-two-input" hidden><label class="setup-device-label" for="setup-device-2">Input device<select id="setup-device-2" aria-describedby="setup-device-status-2"></select></label><p id="setup-device-status-2" class="setup-device-status"></p><dl id="setup-bindings-2" class="setup-bindings" aria-label="Player 2 controls"></dl></div>
+    <div id="setup-player-two-input" hidden>
+     <div id="setup-types-2" class="device-type-picker" role="group" aria-label="Player 2 input type"></div>
+     <div id="setup-pad-picker-2" class="setup-pad-picker"><label class="setup-device-label" for="setup-device-2">Assigned controller<select id="setup-device-2" aria-describedby="setup-device-status-2"></select></label><button id="setup-assign-2" class="setup-assign" type="button" aria-pressed="false">Press A to assign a controller</button></div>
+     <p id="setup-keyboard-note-2" class="setup-keyboard-note">Use this computer’s keyboard and mouse. Touch buttons also work.</p>
+     <p id="setup-device-status-2" class="setup-device-status"></p><div id="setup-diagram-2"></div>
+     <details class="setup-full-bindings"><summary>Full bindings &amp; alternate keys</summary><dl id="setup-bindings-2" class="setup-bindings" aria-label="Player 2 controls"></dl></details>
+    </div>
     <div id="setup-ai" class="setup-ai"><span class="setup-ai-mark" aria-hidden="true">CPU</span><h4>One worthy rival.</h4><p>The game controls the other blade. Choose the AI difficulty from the world menu.</p><p>Win solo duels to collect destination stamps.</p></div>
    </section>
   </div>
   <p id="setup-pad-hint" class="setup-pad-hint">Connect a controller, then press any button to let the browser detect it. Standard Xbox / PlayStation-style controllers are supported.</p>
   <p id="setup-mode-note" class="setup-mode-note"></p>
+  <details class="controller-help"><summary>Controller not detected? Connection help</summary><ol><li>Connect the controller with a data-capable USB cable, or pair it over Bluetooth.</li><li>Click this game page, press A on the controller, then use “Press A to assign”.</li><li>On Windows, press Win + R, enter joy.cpl, and check whether Windows sees your controller.</li><li>If a device is detected with an unsupported layout, it is shown below but cannot start a duel. The game will not guess its button mapping.</li></ol><pre id="setup-controller-report" class="controller-report" aria-label="Browser controller detection report"></pre><button id="setup-rescan" type="button" class="button secondary setup-rescan">Check controllers again</button><p>Only device names and connection information are shown here. Nothing is uploaded.</p></details>
   </div>
   <p id="setup-validation" class="setup-validation" role="status" aria-live="polite" aria-atomic="true"></p>
   <div class="setup-actions"><button id="setup-cancel" type="button" class="button secondary">Cancel</button><button id="setup-confirm" type="button" class="button primary">Start duel</button></div>

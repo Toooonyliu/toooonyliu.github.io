@@ -1,4 +1,6 @@
-import { listGamepads, validateAssignments, gamepadIndex } from './controllers.js';
+import { validateAssignments, gamepadIndex } from './controllers.js';
+import { scanControllers, deviceOptions, chooseGamepadDevice, validatePreferences } from './controller-discovery.js';
+import { controlDiagram, deviceIcon } from './control-diagrams.js';
 
 const KEYBOARD_BINDINGS = [
   ['Move', 'A / D · ← / →'],
@@ -25,11 +27,6 @@ const GAMEPAD_BINDINGS = [
   ['Rematch', 'Back / Share', 'After the result'],
 ];
 
-function readGamepads() {
-  try { return Array.from(navigator.getGamepads?.() || []); }
-  catch { return []; }
-}
-
 function copyConfig(config) {
   return {
     mode: config?.mode === 'local' ? 'local' : 'solo',
@@ -46,7 +43,11 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   const cleanups = [];
   let draft = copyConfig();
   let start = false;
+  let playing = false;
   let timer = null;
+  let assigning = null;
+  let assignmentMessage = '';
+  let assignmentHeld = new Map();
   let bindingsTypes = ['', ''];
 
   function listen(target, event, handler) {
@@ -58,6 +59,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
     const type = draft.devices[index] === 'keyboard' ? 'keyboard' : 'gamepad';
     if (bindingsTypes[index] === type) return;
     bindingsTypes[index] = type;
+    $(`setup-diagram-${index + 1}`).innerHTML = controlDiagram(type);
     const rows = type === 'keyboard' ? KEYBOARD_BINDINGS : GAMEPAD_BINDINGS;
     const list = $(`setup-bindings-${index + 1}`);
     list.replaceChildren();
@@ -78,12 +80,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   }
 
   function updateOptions(select, selected, pads) {
-    const choices = [{ value: 'keyboard', label: 'Keyboard + mouse', disabled: false }];
-    for (const pad of pads) choices.push({ value: `gamepad:${pad.index}`, label: pad.label, disabled: false });
-    if (!choices.some(option => option.value === selected)) {
-      const index = gamepadIndex(selected);
-      choices.push({ value: selected, label: index === null ? 'Choose an input device' : `Gamepad ${index + 1} · unavailable`, disabled: true });
-    }
+    const choices = selected === 'keyboard' ? [{ value: 'keyboard', label: 'Keyboard + mouse' }] : deviceOptions(selected, pads);
     // Keep the select element, its focus and its selected value during hot-plug polling.
     const signature = JSON.stringify(choices);
     if (select.dataset.options !== signature) {
@@ -92,7 +89,6 @@ export function createDuelSetup({ onStart, onSave } = {}) {
         const option = document.createElement('option');
         option.value = choice.value;
         option.textContent = choice.label;
-        option.disabled = choice.disabled;
         return option;
       });
       select.replaceChildren(...options);
@@ -101,31 +97,69 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   }
 
   function refresh() {
-    const rawPads = readGamepads();
-    const pads = listGamepads(rawPads);
+    const report = scanControllers(navigator, window.isSecureContext);
+    const rawPads = report.pads;
+    if (assigning !== null) {
+      for (const pad of rawPads) {
+        if (!pad?.connected || pad.mapping !== 'standard') continue;
+        const down = pad.buttons?.[0]?.pressed || pad.buttons?.[0]?.value >= .5;
+        const wasDown = assignmentHeld.get(pad.index);
+        assignmentHeld.set(pad.index, Boolean(down));
+        if (!down || wasDown) continue;
+        const device = `gamepad:${pad.index}`;
+        const other = 1 - assigning;
+        if (draft.mode === 'local' && draft.devices[other] === device) {
+          assignmentMessage = `That controller belongs to Player ${other + 1}. Select another device for them first.`;
+          break;
+        }
+        draft.devices[assigning] = device;
+        assignmentMessage = '';
+        assigning = null;
+        break;
+      }
+    }
     for (let index = 0; index < selectors.length; index++) {
       const device = draft.devices[index];
-      updateOptions(selectors[index], device, pads);
+      const keyboard = device === 'keyboard';
+      updateOptions(selectors[index], device, rawPads);
+      $(`setup-pad-picker-${index + 1}`).hidden = keyboard;
+      $(`setup-keyboard-note-${index + 1}`).hidden = !keyboard;
+      for (const button of $(`setup-types-${index + 1}`).querySelectorAll('button')) {
+        button.setAttribute('aria-pressed', String(button.dataset.deviceType === (keyboard ? 'keyboard' : 'gamepad')));
+      }
+      const assign = $(`setup-assign-${index + 1}`);
+      assign.textContent = assigning === index ? 'Listening… press A again (click to cancel)' : 'Press A to assign a controller';
+      assign.setAttribute('aria-pressed', String(assigning === index));
       renderBindings(index);
       const status = $(`setup-device-status-${index + 1}`);
-      const connected = device === 'keyboard' || pads.some(pad => `gamepad:${pad.index}` === device);
-      status.dataset.ready = String(connected);
-      status.textContent = device === 'keyboard'
-        ? 'Ready · keyboard, mouse and touch controls'
-        : connected ? 'Connected · Xbox / PlayStation button names below' : 'Unavailable · connect this pad and press a button';
+      const pad = report.devices.find(pad => pad.value === device);
+      const ready = keyboard || pad?.supported;
+      status.dataset.ready = String(Boolean(ready));
+      status.dataset.state = ready ? 'ready' : pad ? 'unsupported' : 'waiting';
+      status.textContent = keyboard ? 'Ready · keyboard + mouse' : pad?.supported ? 'Connected · standard controller layout' : pad
+        ? 'Detected, but this controller layout is not supported. See connection help.'
+        : ['blocked', 'insecure', 'unsupported'].includes(report.state) ? report.message
+        : `Gamepad selected · waiting for detection. ${start || playing ? 'Connect and assign it to play.' : 'You can save this choice now.'}`;
     }
-    const validation = validateAssignments(draft.mode, draft.devices, rawPads);
+    const preferences = validatePreferences(draft.mode, draft.devices);
+    const connected = validateAssignments(draft.mode, draft.devices, rawPads);
+    const requiresConnection = start || playing;
+    const valid = preferences.valid && (!requiresConnection || connected.valid);
     const message = $('setup-validation');
-    const readyText = draft.mode === 'local' ? 'Ready for two players. Each blade has its own input device.' : 'Ready for a solo duel.';
-    const text = validation.valid ? readyText : validation.message;
+    const hasGamepad = draft.devices.slice(0, draft.mode === 'local' ? 2 : 1).some(device => device !== 'keyboard');
+    const detectionBlocked = hasGamepad && ['blocked', 'insecure', 'unsupported'].includes(report.state);
+    const missingText = detectionBlocked ? report.message : connected.message.replace('is disconnected. Connect it and press a button.', 'is not detected. Connect it and press A, then assign it above.');
+    const text = assignmentMessage || (!preferences.valid ? preferences.message : !connected.valid
+      ? requiresConnection ? missingText : 'You can save this setup now. Connect and assign the controller before starting a duel.'
+      : draft.mode === 'local' ? 'Ready · two players, two separate input devices.' : 'Ready for a solo duel.');
     if (message.textContent !== text) message.textContent = text;
-    message.dataset.valid = String(validation.valid);
-    $('setup-confirm').disabled = !validation.valid;
-    const apiAvailable = typeof navigator.getGamepads === 'function';
-    $('setup-pad-hint').textContent = apiAvailable
-      ? 'Connect a controller, then press any button to let the browser detect it. Standard Xbox / PlayStation-style controllers are supported.'
-      : 'Gamepads are not available in this browser. Try a current browser over HTTPS, or choose keyboard + mouse for a solo duel.';
-    return validation.valid;
+    message.dataset.valid = String(valid);
+    $('setup-confirm').disabled = !valid;
+    $('setup-pad-hint').textContent = hasGamepad ? report.message : 'Choose an input type above. Controller choices can be saved before you connect one.';
+    const rows = report.devices.map(pad => `#${pad.index + 1} ${pad.id}\n  ${pad.supported ? 'Standard layout · playable' : 'Detected · unsupported/raw layout'}`);
+    const reportText = `Browser status: ${report.state}\n${report.message}\n${rows.join('\n')}`;
+    if ($('setup-controller-report').textContent !== reportText) $('setup-controller-report').textContent = reportText;
+    return valid;
   }
 
   function renderMode() {
@@ -147,18 +181,41 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   }
 
   function close() {
+    assigning = null;
+    assignmentMessage = '';
     stopPolling();
     if (dialog.open) dialog.close();
   }
 
   for (const button of modeButtons) listen(button, 'click', () => {
+    assigning = null;
+    assignmentMessage = '';
     draft.mode = button.dataset.setupMode;
     renderMode();
   });
   selectors.forEach((select, index) => listen(select, 'change', () => {
+    assigning = null;
+    assignmentMessage = '';
     draft.devices[index] = select.value;
     refresh();
   }));
+  for (let index = 0; index < 2; index++) {
+    $(`setup-types-${index + 1}`).innerHTML = ['keyboard', 'gamepad'].map(type => `<button type="button" class="device-type" data-device-type="${type}" data-player="${index}" aria-pressed="false">${deviceIcon(type)}<span>${type === 'keyboard' ? 'Keyboard<br>+ mouse' : 'Gamepad<br>Xbox / PS'}</span></button>`).join('');
+    for (const button of $(`setup-types-${index + 1}`).querySelectorAll('button')) listen(button, 'click', () => {
+      assigning = null;
+      assignmentMessage = '';
+      if (button.dataset.deviceType === 'keyboard') draft.devices[index] = 'keyboard';
+      else if (draft.devices[index] === 'keyboard') draft.devices[index] = chooseGamepadDevice(index, draft.mode === 'local' ? draft.devices : [draft.devices[0]], scanControllers(navigator).pads);
+      refresh();
+    });
+    listen($(`setup-assign-${index + 1}`), 'click', () => {
+      assigning = assigning === index ? null : index;
+      assignmentMessage = '';
+      assignmentHeld = new Map(scanControllers(navigator).pads.filter(Boolean).map(pad => [pad.index, Boolean(pad.buttons?.[0]?.pressed || pad.buttons?.[0]?.value >= .5)]));
+      refresh();
+    });
+  }
+  listen($('setup-rescan'), 'click', refresh);
   listen($('setup-close'), 'click', close);
   listen($('setup-cancel'), 'click', close);
   listen(dialog, 'close', stopPolling);
@@ -175,9 +232,12 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   });
 
   return {
-    open(config, { levelName = '', playing = false, start: shouldStart = false } = {}) {
+    open(config, { levelName = '', playing: isPlaying = false, start: shouldStart = false } = {}) {
       draft = copyConfig(config);
       start = shouldStart;
+      playing = isPlaying;
+      assigning = null;
+      assignmentMessage = '';
       const context = [];
       if (levelName) context.push(levelName);
       context.push(playing ? 'Apply to restart. Cancel keeps this duel paused; close, then Resume to continue.' : 'Choose your duel and who holds each blade.');
@@ -186,7 +246,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
       renderMode();
       stopPolling();
       if (!dialog.open) dialog.showModal();
-      timer = setInterval(refresh, 500);
+      timer = setInterval(refresh, 100);
     },
     close,
     destroy() {

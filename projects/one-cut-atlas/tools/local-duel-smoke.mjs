@@ -89,6 +89,9 @@ try {
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: point.x, y: point.y, button: 'left', clickCount: 1 });
   };
   const select = async (id, value) => {
+    const player = Number(id.slice(-1)) - 1;
+    const type = value === 'keyboard' ? 'keyboard' : 'gamepad';
+    await click(`[data-player="${player}"][data-device-type="${type}"]`);
     const okay = await evaluate(`(()=>{const el=document.getElementById(${JSON.stringify(id)});if(!el||![...el.options].some(option=>option.value===${JSON.stringify(value)}))return false;el.value=${JSON.stringify(value)};el.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
     assert.equal(okay, true, `${id} has option ${value}`);
   };
@@ -303,9 +306,10 @@ try {
   await assertSetupValidationVisible();
   await screenshot('mobile');
   await evaluate(`window.__testPads[2].connected=false;window.dispatchEvent(new Event('gamepaddisconnected'))`);
-  await until('document.querySelector("#setup-confirm").disabled', 'missing mobile gamepad validation');
+  await until('document.querySelector("#setup-device-status-2").textContent.includes("waiting")', 'missing mobile gamepad status');
+  assert.equal(await evaluate('document.querySelector("#setup-confirm").disabled'), false, 'Missing pads do not prevent saving preferences');
   await assertSetupValidationVisible();
-  assert.match(await evaluate('document.querySelector("#setup-validation").textContent'), /disconnected/);
+  assert.match(await evaluate('document.querySelector("#setup-validation").textContent'), /save this setup now/);
   await screenshot('mobile-missing-pad');
   await evaluate(`window.__testPads[2].connected=true;window.dispatchEvent(new Event('gamepadconnected'))`);
   await until('!document.querySelector("#setup-confirm").disabled', 'mobile gamepad reconnected');

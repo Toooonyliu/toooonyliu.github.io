@@ -81,11 +81,23 @@ sharing one keyboard or one pad between players is intentionally not supported.
 Both human fighters have identical movement and combat timings. Local wins do
 not award solo destination stamps, and AI difficulty applies only to solo mode.
 
-Connect controllers and press a button so the browser can discover them. The
-selection screen lists detected devices and shows each player's bindings.
+Input-type cards always let you choose keyboard + mouse or gamepad, even before
+a controller is connected. Settings can be saved offline; starting or restarting
+a duel still requires every assigned controller to be available and supported.
+Connect controllers and press a button so the browser can discover them, then
+choose the detected device or click **Press A to assign a controller** and press
+A on the intended pad. Assignment requires a fresh press and does not silently
+take a controller from the other player.
+
+Each player's controls are shown as an authored SVG keyboard + mouse or Xbox-style
+controller diagram with colored buttons and a compact action legend. Full key
+aliases and PlayStation equivalents remain in the expandable binding list.
 Xbox / PlayStation button names are shown together; support depends on the
-browser exposing a standard gamepad mapping. Unsupported or disconnected pads
-cannot start a duel. Settings are remembered locally; reconnect/reselect pads
+browser exposing a standard gamepad mapping. Detected but unsupported/raw devices
+are listed explicitly, not hidden or mislabeled as disconnected. Connection help
+distinguishes an empty device list from browser access being blocked; the visible
+device report stays on the page and is never uploaded. Unsupported or disconnected
+pads cannot start a duel. Settings are remembered locally; reconnect/reselect pads
 if the browser assigns them different device numbers.
 
 Open **Controls** during a duel to pause and inspect bindings. Applying settings
@@ -155,6 +167,8 @@ index.html, src/style.css   Desk menu, dialogs, duel HUD
 src/app.js                  Screens, photo gate, input, duel loop
 src/engine.js               Deterministic fixed-step duel rules and AI
 src/duel-setup.js           Mode/device selection and per-player binding cards
+src/control-diagrams.*     Scalable keyboard/mouse and controller illustrations
+src/controller-discovery.js Device discovery, diagnostics and offline preferences
 src/controllers.js          Standard gamepad mapping and device validation
 src/duel-inputs.js           Independent player routing and pause input safety
 src/art.js, src/render.js   Palette sprites, cached animation, effects, stages
@@ -188,6 +202,7 @@ with Google Chrome installed can run:
 
 ```sh
 node tools/local-duel-smoke.mjs http://127.0.0.1:4173/
+node tools/controller-picker-smoke.mjs http://127.0.0.1:4173/
 ```
 
 This browser check injects simulated gamepad snapshots and exercises the real
