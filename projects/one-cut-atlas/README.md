@@ -96,15 +96,19 @@ delay, aims at the open line more often on harder difficulties, and can be
 baited by a feint.
 
 The decisive cut freezes for a beat, flashes white, throws a heavy spray, and
-the loser staggers before falling over 1.3 s; the winner holds the
-follow-through and keeps control for a five-second aftermath. Walking keeps
-the blade steady in its guard while the lower body steps from the hip; idle
-fighters breathe, turns squash through a thin silhouette, and cuts lean back,
-surge forward and leave a lingering crescent.
+the loser staggers before falling; the winner holds the follow-through and
+keeps control for a five-second aftermath. Preset duels now use the supplied
+layered classic fighter art: 16-frame walks, 12/13-frame cuts, 6-frame evasions
+and a 25-frame fall. Those layers are flattened into small cache frames before
+play, keeping the measured browser loop at 60 FPS instead of cropping eight
+large atlas regions per fighter on every frame. Photo-colored custom fighters
+continue to use the palette-aware One Cut Atlas sheets.
 
-These rules were rebuilt from First Cut's public instructions and from
-studying how classic one-hit duels layer their animation and timing. No First
-Cut code, art or audio is included in this repository.
+The deterministic duel rules remain an independent browser implementation;
+no native First Cut code was copied. The layered fighter pixels, music,
+ambience and selected combat effects were imported from the user-supplied
+local `First Cut Browser Game` reference build. See the asset READMEs for exact
+scope and provenance, and confirm redistribution rights before publishing.
 
 ## Project layout
 
@@ -112,19 +116,25 @@ Cut code, art or audio is included in this repository.
 index.html, src/style.css   Desk menu, dialogs, duel HUD
 src/app.js                  Screens, photo gate, input, duel loop
 src/engine.js               Deterministic fixed-step duel rules and AI
-src/art.js, src/render.js   Sprite preparation, animation, effects, stages
+src/art.js, src/render.js   Palette sprites, cached animation, effects, stages
+src/classic-fighter.js      Layered classic animation adapter and frame cache
+src/combat-audio.js         Predecoded effects, music and ambience
 src/globe.js                Pixel desk globe and zone highlighting
 src/scene-api.js            Recognition and painting client
 src/pixelize.js             Painting → 960×540, 48-color pixel grid
 src/avatar.js, photo.js     AI Colors client and local photo handling
 src/storage.js, shared.js   IndexedDB saves and validated data contracts
 assets/art                  Shipped sprite sheets and stage backgrounds
+assets/classic              Supplied layered fighter atlas subset + manifest
+assets/audio                Supplied music, ambience and combat effects
 assets/ui, assets/fonts     Generated textures; OFL pixel fonts
 tools/                      Asset build scripts (stages, sprites, textures)
 tests/                      node:test suites
 presentation.html           Ten-slide walkthrough with a live game embed
 ```
 
-Asset provenance is recorded in `assets/art/README.md` and the provenance JSON
-files beside the art. `submission-checklist.md` lists the remaining
+Generated-art provenance is recorded in `assets/art/README.md` and the
+provenance JSON files beside the art. Supplied reference assets are documented
+separately in `assets/classic/README.md` and `assets/audio/README.md`.
+`submission-checklist.md` lists the remaining
 student-authored work: the personal README, actual code edits and the video.

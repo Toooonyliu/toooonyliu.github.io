@@ -1,6 +1,11 @@
 import { WORLD } from './shared.js';
-import { drawBackdrop, drawSprite } from './art.js';
-export { preloadArt, registerBackdrop, preloadBackdrops, hasBackdrop } from './art.js';
+import { drawBackdrop, drawSprite, preloadArt as preloadGeneratedArt } from './art.js';
+import { drawClassicFighter, preloadClassicArt } from './classic-fighter.js';
+export { registerBackdrop, preloadBackdrops, hasBackdrop, warmAvatarPalette } from './art.js';
+
+export function preloadArt() {
+  return Promise.all([preloadGeneratedArt(), preloadClassicArt()]);
+}
 
 /* Original, resolution-independent pixel art. All geometry is painted on a
  * two-pixel grid; the renderer never mutates a scene or the duel engine. */
@@ -474,6 +479,18 @@ function head(ctx, style, c, isPlayer) {
 export function drawFighter(ctx, fighter, style = 'kendo', isPlayer = true, time = 0, options = {}) {
   if(!fighter) return;
   fighterShadow(ctx, Number(fighter.x) || 0, fighter.dead);
+  // Preset duels use the original layered animation set. Photo/custom fighters
+  // retain the generated palette-aware sheets below.
+  if (!options.palette) {
+    if (fighter.state === 'dodge' || fighter.state === 'duck') {
+      const facing = fighter.facing === -1 ? -1 : 1;
+      const progress = clamp((fighter.timer || 0) / (fighter.stateDuration || 1));
+      ctx.save(); ctx.globalAlpha = Math.sin(progress * Math.PI) * .13;
+      drawClassicFighter(ctx, { ...fighter, x: fighter.x + facing * (fighter.state === 'dodge' ? 12 : -8) }, isPlayer, Math.max(0, time - .055));
+      ctx.restore();
+    }
+    if (drawClassicFighter(ctx, fighter, isPlayer, time)) { movementAccent(ctx, fighter, time); return; }
+  }
   if (fighter.state === 'dodge' || fighter.state === 'duck') {
     const facing = fighter.facing === -1 ? -1 : 1;
     const progress = clamp((fighter.timer || 0) / (fighter.stateDuration || 1));

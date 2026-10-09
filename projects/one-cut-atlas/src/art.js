@@ -321,6 +321,17 @@ function recolorFrame(frame,palette){
  }
  context.putImageData(pixels,0,0);if(variants.size>=12)variants.delete(variants.keys().next().value);variants.set(key,output);return output;
 }
+
+/** Build every palette variant before a custom duel so no getImageData loop runs on an action frame. */
+export function warmAvatarPalette(style, palette) {
+  if (!palette || !spriteAtlas) return false;
+  const row = rows[style] ?? rows.kendo;
+  const frames = new Set(spriteFrames[row] || []);
+  for (const sequence of (motionFrames.get(style) || motionFrames.get('kendo'))?.values?.() || []) for (const frame of sequence) frames.add(frame);
+  for (const frame of contactFrames.get(style) || contactFrames.get('kendo') || []) frames.add(frame);
+  for (const frame of frames) if (frame?.picture) recolorFrame(frame, palette);
+  return true;
+}
 export function drawSprite(ctx, fighter, style, isPlayer, time = 0, options = {}) {
   if (!spriteAtlas) return false;
   const state = fighter.dead ? 'dead' : fighter.state || 'idle';
