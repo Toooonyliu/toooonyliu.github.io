@@ -1,18 +1,23 @@
 # toooonyliu.github.io
 
-Tony Liu's personal portfolio — hand-built HTML/CSS/JS, no framework or build step, deployed on GitHub Pages.
+Tony Liu's portfolio of product, UX and game design work, hand-built in HTML, CSS and JavaScript with no framework or build step and served by GitHub Pages at [toooonyliu.github.io](https://toooonyliu.github.io/). Built for CMU 15-113 (Effective Coding with AI).
 
-Built for CMU 15-113 (Effective Coding with AI), Project 1.
+## Projects in this repository
+
+| Project | What it is | Links |
+| --- | --- | --- |
+| **One Cut Atlas** (Project 2) | Pixel-art travel and sword-duel game with an AI backend | [Play](https://toooonyliu.github.io/projects/one-cut-atlas/) · [README](projects/one-cut-atlas/README.md) · [Walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) · [Prompt log](projects/one-cut-atlas/prompt_log.md) · [Backend](https://github.com/Toooonyliu/OneCutAtlas_Backend) |
+| **Ask (速问)** (HW3, HW4) | Bilingual Xiao Liu Ren reading with live lunisolar calendar data and a Flask backend | [Live](https://toooonyliu.github.io/projects/xiaoliuren/) · [README](projects/xiaoliuren/README.md) · [HW4 notes](projects/xiaoliuren/HW4.md) |
+| **Flighty, a new chapter** | Product-design case study with a working prototype | [Case study](https://toooonyliu.github.io/projects/flighty/) · [README](projects/flighty/README.md) |
+| **Kangaroo Crossing** | Crossy Road-inspired arcade browser game | [Play](https://toooonyliu.github.io/games/kangaroo-crossing/) · [README](games/kangaroo-crossing/README.md) |
 
 ## Project 2 — One Cut Atlas
 
-[Play the game](https://toooonyliu.github.io/projects/one-cut-atlas/) · [Project README](projects/one-cut-atlas/README.md) · [English walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) · [AI prompt log](projects/one-cut-atlas/prompt_log.md)
+One Cut Atlas is a browser-based pixel-art sword-dueling game set on a traveller's desk. A player sends a travel photo as a postcard. A separate Render-hosted Node backend asks an OpenAI vision model to recognize the place from visible clues (people are ignored and never identified), the pixel desk globe turns to it and unlocks its zone with a rubber-stamp reveal, and an OpenAI image model paints an original pixel-art arena of that place. The player's photo is never sent to the painter; it receives a text description and the game's own stages as style references.
 
-One Cut Atlas is a browser-based pixel-art sword-dueling game set on a traveller's desk. Players send a travel photo as a postcard: a Render-hosted Node backend asks an OpenAI vision model to recognize the place from visible clues (people are ignored), the pixel desk globe turns to it and unlocks its zone, and an OpenAI image model paints an original pixel-art arena of that place for the duel. Each one-hit duel turns on reading the open line: standing in the same line as a cut blocks it, with quick cuts, charged lunges, feints, evasions and a short playable victory aftermath.
+Each duel is decided by one clean hit and turns on reading the open line: standing in the same line as an incoming cut blocks it. Quick cuts, charged lunges, feints, evasions and a short playable victory aftermath round it out, with keyboard or mouse control.
 
-The API key stays server-side with hourly and daily painting caps. Stages, painted arenas, photos and progress are saved locally in IndexedDB. The optional **AI Colors** feature suggests a fighter palette and one of the existing outfits.
-
-[Backend source](https://github.com/Toooonyliu/OneCutAtlas_Backend) · [Live backend](https://one-cut-atlas-api.onrender.com)
+The API key stays server-side, with hourly and daily painting caps and a short cache. Stages, painted arenas, photos and progress are saved locally in IndexedDB; there are no accounts. The optional **AI Colors** feature suggests a fighter palette and one of the existing outfits. See the [project README](projects/one-cut-atlas/README.md) for controls, design and architecture, and the [backend README](https://github.com/Toooonyliu/OneCutAtlas_Backend) for the API.
 
 ## HW4 — Ask backend integration
 
@@ -26,40 +31,32 @@ Ask is a bilingual interactive introduction to Xiao Liu Ren with an animated pal
 
 To run HW3, install Python 3, run `python3 -m http.server 4173 --directory projects/xiaoliuren` from the repository root, and open `http://localhost:4173/`. No JavaScript packages or build step are needed. See the project README for calculation conventions, source attribution, and optional tests.
 
-## Structure
+## Repository layout
 
 ```
-index.html                  Home: hero, about, experience, featured work, contact
-projects/*.html              One case-study page per project
-css/styles.css                Shared styles (design tokens, layout, responsive breakpoints)
-js/i18n.js                    EN/中文 copy dictionary
-js/main.js                    Language toggle, mobile nav, scroll-reveal
-assets/photo/tony.jpg         Headshot
-assets/covers/*.svg           Project cover art
+index.html, about.html        Portfolio home and about pages (self-contained styles and scripts)
+projects/one-cut-atlas/       One Cut Atlas frontend (see its README)
+projects/xiaoliuren/          Ask (速问), HW3 and HW4
+projects/flighty/             Flighty case study, prototype and documents
+games/kangaroo-crossing/      Kangaroo Crossing
+favicon*                      Site icons
+*-session-log.md              Development session logs
 ```
 
-## Features
+## Run locally
 
-- Fully responsive (tested at 375 / 768 / 1024 / 1440px) — no framework, plain CSS with real breakpoints.
-- EN / 中文 language toggle, persisted in `localStorage`, driven by the dictionary in `js/i18n.js`.
-- Scroll-reveal animation on section entry (`IntersectionObserver`, respects `prefers-reduced-motion`).
+No build step. Serve the repository root and open the printed address:
 
-## Local development
-
-No build step — just open `index.html`, or serve the folder locally:
-
-```
+```sh
 python3 -m http.server 8000
 ```
 
-## Editing content
+Individual projects document their own commands in their READMEs; One Cut Atlas uses `npm start` and `npm test` inside its folder.
 
-All copy lives in `js/i18n.js`, one key per string, `en` and `zh` side by side. HTML files only reference `data-i18n="key"` (plain text) or `data-i18n-html="key"` (allows inline tags like `<b>`) — edit the dictionary, not the HTML, to change wording.
+## Deploy
 
-## Deploying
-
-Pushed to `main` on `toooonyliu.github.io` — GitHub Pages serves it automatically from the repo root.
+Pushing to `main` publishes the site through GitHub Pages from the repository root. The One Cut Atlas backend deploys separately from its own repository to Render.
 
 ## Flighty concept (September 2026)
 
-The homepage now links to `projects/flighty/`: a portfolio-style case study with an on-demand demo preview. The full interactive demo and its source are included in the repository. See [the project README](projects/flighty/README.md) for source and rebuild instructions. This addition uses the current static HTML portfolio; the older structure and language-toggle notes above describe an earlier iteration.
+The homepage now links to `projects/flighty/`: a portfolio-style case study with an on-demand demo preview. The full interactive demo and its source are included in the repository. See [the project README](projects/flighty/README.md) for source and rebuild instructions.
