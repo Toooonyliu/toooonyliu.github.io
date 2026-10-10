@@ -9,11 +9,12 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23111b20'/%3E%3Cpath d='M8 24L24 8M8 8v7M8 8h7M24 24v-7M24 24h-7' stroke='%23edb777' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./src/style.css">
   <link rel="stylesheet" href="./src/control-diagrams.css">
+  <link rel="stylesheet" href="./src/language.css">
 </head>
 <body>
  <header class="topbar">
   <a class="brand" href="#" aria-label="One Cut Atlas world menu"><span class="brand-mark" aria-hidden="true">╱</span><span>ONE CUT <b>ATLAS</b></span></a>
-  <nav aria-label="Game menu"><button id="nav-map" class="nav-link active" hidden>World</button><button id="nav-sound" class="nav-link" aria-pressed="true">Sound: On</button><button id="nav-help" class="nav-link">Help</button><a class="nav-link portfolio-link" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></nav>
+  <nav aria-label="Game menu"><button id="nav-map" class="nav-link active" hidden>World</button><button id="nav-sound" class="nav-link" aria-pressed="true">Sound: On</button><details id="language-picker" class="language-picker"><summary id="language-toggle" class="nav-link"><span>Language</span><span id="language-current" class="language-current" aria-hidden="true">EN</span></summary><div class="language-options" role="group" aria-label="Language" data-no-translate><button type="button" data-language="en" lang="en" aria-pressed="true">English <span>EN</span></button><button type="button" data-language="zh-CN" lang="zh-CN" aria-pressed="false">简体中文 <span>中</span></button></div></details><a class="nav-link portfolio-link" href="https://toooonyliu.github.io/" aria-label="Exit to Tony Liu's portfolio">Portfolio ↗</a></nav>
  </header>
  <main id="atlas-screen">
   <div class="atlas-stage">
@@ -40,7 +41,6 @@
     <nav class="text-menu" aria-label="Main menu">
      <button id="challenge-selected" class="menu-item">Fight</button>
      <button id="menu-settings" class="menu-item" aria-haspopup="dialog" aria-controls="duel-setup">Mode &amp; Controls</button>
-     <label class="menu-item" for="gate-input">Send a postcard</label>
      <button id="upload-open" class="menu-item">Fighter</button>
      <button id="menu-destinations" class="menu-item" aria-controls="journey-drawer">Destinations</button>
      <label class="menu-item menu-select">Difficulty<select id="difficulty-select"><option value="beginner">Wanderer</option><option value="normal">Duelist</option><option value="hard">Master</option></select></label>
@@ -140,7 +140,6 @@
    </form>
   </div>
  </dialog>
- <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title"><button id="help-close" class="close-button" aria-label="Close">×</button><p class="eyebrow">HOW TO PLAY</p><h2 id="help-title">One clean hit.</h2><p>Read the blade. Control the distance.</p><div class="help-row"><kbd>A / D</kbd><span>Move. Arrow keys work too.</span></div><div class="help-row"><kbd>Mouse</kbd><span>Point high, mid or low over the arena to set your blade line. Left button charges and strikes, right button evades.</span></div><div class="help-row"><kbd>W / X / S</kbd><span>High / mid / low stance. Or 1 / 2 / 3. Standing in the same line as a cut blocks it.</span></div><div class="help-row"><kbd>J</kbd><span>Tap to cut, hold to charge a longer lunge. Switch to a neighbouring line right after a tap to feint.</span></div><div class="help-row"><kbd>K</kbd><span>Hold a firm guard: a harder parry and a longer counter window.</span></div><div class="help-row"><kbd>L</kbd><span>Counter after a successful guard or evade.</span></div><div class="help-row"><kbd>Space / C</kbd><span>Evade vertical cuts / duck mid cuts.</span></div><div class="help-row"><kbd>V</kbd><span>Shove at close range.</span></div><div class="help-row"><kbd>M</kbd><span>Toggle music and effects.</span></div><div class="help-row"><kbd>Esc / R</kbd><span>Pause / retry after the result.</span></div><div class="help-row"><kbd>Photo</kbd><span>Drop a travel photo on the home screen. The scout finds the place, the globe unlocks it, and the duel is fought in a painted pixel arena of that place.</span></div><button id="help-play" class="button primary full">Fight</button></dialog>
  <div id="toast" class="toast" role="status" hidden></div>
  <script type="module" src="./src/app.js"></script>
 </body>

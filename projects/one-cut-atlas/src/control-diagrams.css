@@ -1,10 +1,16 @@
-.control-map{margin:0;padding:12px 0 0;border-top:1px solid #c9bc9d}
-.control-drawing{display:block;width:100%;height:auto;max-height:235px;margin:0 auto 14px}
-.control-legend{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px}
-.control-legend>div{display:flex;align-items:center;gap:7px;min-width:0;font:17px/1.05 var(--type)}
-.control-legend b{flex-shrink:0;min-width:24px;padding:4px 5px;background:var(--binding-color);color:#fff9e9;font:600 11px/1.15 ui-monospace,monospace;text-align:center;border-radius:2px}
-.control-legend span{color:var(--paper-ink);overflow-wrap:anywhere}
-.control-map figcaption{margin-top:12px;color:var(--paper-muted);font:15px/1.1 var(--type)}
+.control-map{margin:0;padding:12px 0 0;border-top:2px solid #c9bc9d}
+.control-map .control-drawing{display:block;width:100%;height:auto;max-height:none;margin:0 auto 10px;overflow:visible;image-rendering:pixelated}
+.control-drawing .diagram-key-type{font-family:var(--type),"PingFang SC","Microsoft YaHei",monospace;font-weight:700}
+.control-drawing .diagram-callout{font-family:var(--type),"PingFang SC","Microsoft YaHei",monospace;font-size:22px;font-weight:400}
+.control-drawing .diagram-shortcut{font-family:var(--type),"PingFang SC","Microsoft YaHei",monospace;font-size:18px;font-weight:400}
+.control-drawing .diagram-pad-letter{fill:#fff8e3;font-size:21px;font-weight:700}
+.control-drawing .diagram-pad-meta,.control-drawing .diagram-line-guide,.control-drawing .diagram-label{font:20px var(--type),"PingFang SC","Microsoft YaHei",monospace;fill:var(--paper-muted)}
+.control-map .control-drawing--mouse{margin-top:18px;padding-top:12px;border-top:2px dashed #c9bc9d}
+.control-map figcaption{margin-top:8px;color:var(--paper-muted);font:17px/1.25 var(--type)}
+.control-map figcaption>span{display:block;margin-top:6px}
+.diagram-keyboard-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font:17px/1.2 var(--type);color:var(--paper-muted)}
+.diagram-keyboard-meta>span{white-space:nowrap}
+.control-map .diagram-keyboard-meta kbd{margin:0 3px 0 0;padding:2px 4px;border:0;background:#71634b;font:15px/1 var(--type);color:#fff6de;letter-spacing:0}
 .device-type-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .device-type{display:flex;align-items:center;justify-content:center;gap:8px;min-height:66px;padding:6px 8px;border:2px solid #b0a286;background:#e2d7bd;color:#6a5d47;font:16px/1.1 var(--type)}
 .device-type svg{width:57px;height:47px;flex-shrink:0}
@@ -28,4 +34,4 @@
 .duel-setup .setup-device-status{min-height:34px;font-size:16px!important;margin:8px 0}
 .duel-setup .setup-device-status[data-state=waiting]{color:#85621e!important}
 .duel-setup .setup-device-status[data-state=ready]{color:#3f6c49!important}
-@media(max-width:600px){.control-drawing{max-height:215px}.control-legend{gap:8px}.control-legend>div{font-size:16px}.control-legend b{font-size:10px;padding:4px}.device-type{font-size:16px;gap:5px}.device-type svg{width:45px}.setup-keyboard-note{min-height:35px}.setup-pad-picker{min-height:0}}
+@media(max-width:600px){.device-type{font-size:16px;gap:5px}.device-type svg{width:45px}.setup-keyboard-note{min-height:35px}.setup-pad-picker{min-height:0}.control-map figcaption{font-size:16px}.diagram-keyboard-meta{gap:6px 10px;font-size:16px}}

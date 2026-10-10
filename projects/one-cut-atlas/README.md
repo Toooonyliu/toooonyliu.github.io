@@ -29,10 +29,16 @@ local. Photo stages and AI Colors call the public backend set in the
 ## The desk
 
 The home screen is a traveller's desk. The title menu is bare pixel text:
-**Fight**, **Mode & Controls**, **Send a postcard**, **Fighter**, **Destinations** and
+**Fight**, **Mode & Controls**, **Fighter**, **Destinations** and
 **Difficulty**. The selected stage is a postcard; the photo upload is a blank
 postcard; progress is a row of eleven passport stamps that ink and cancel as
 zones are cleared; Destinations opens a typed traveller's log.
+
+The top-right **Language** menu switches between English and Simplified Chinese,
+with the choice remembered on this device. The Chinese UI uses a self-hosted
+Fusion Pixel font; menu copy, control diagrams, preset destinations and combat
+messages translate without modifying custom names or saved levels. The postcard
+upload remains in its original card, and bindings live only in Mode & Controls.
 
 The globe is a desk globe drawn pixel by pixel: ordered-dither light bands, a
 flat sea with glints, unexplored land as a fog checker, cleared zones in full
@@ -90,7 +96,8 @@ A on the intended pad. Assignment requires a fresh press and does not silently
 take a controller from the other player.
 
 Each player's controls are shown as an authored SVG keyboard + mouse or Xbox-style
-controller diagram with colored buttons and a compact action legend. Full key
+controller diagram with stepped pixel silhouettes and labeled lines pointing
+directly to the corresponding keys, buttons and stick. Full key
 aliases and PlayStation equivalents remain in the expandable binding list.
 Xbox / PlayStation button names are shown together; support depends on the
 browser exposing a standard gamepad mapping. Detected but unsupported/raw devices
@@ -168,6 +175,8 @@ src/app.js                  Screens, photo gate, input, duel loop
 src/engine.js               Deterministic fixed-step duel rules and AI
 src/duel-setup.js           Mode/device selection and per-player binding cards
 src/control-diagrams.*     Scalable keyboard/mouse and controller illustrations
+src/i18n.js, src/locales/   English / Simplified Chinese interface and persistence
+src/language.css           Language menu, self-hosted CJK font and locale spacing
 src/controller-discovery.js Device discovery, diagnostics and offline preferences
 src/controllers.js          Standard gamepad mapping and device validation
 src/duel-inputs.js           Independent player routing and pause input safety
@@ -203,7 +212,10 @@ with Google Chrome installed can run:
 ```sh
 node tools/local-duel-smoke.mjs http://127.0.0.1:4173/
 node tools/controller-picker-smoke.mjs http://127.0.0.1:4173/
+node tools/language-smoke.mjs http://127.0.0.1:4173/
 ```
 
 This browser check injects simulated gamepad snapshots and exercises the real
 setup screen and game loop. It does not replace testing physical controllers.
+The language check also verifies locale persistence, the loaded Chinese font,
+desktop/mobile layouts, translated diagrams and the pause/result screens.

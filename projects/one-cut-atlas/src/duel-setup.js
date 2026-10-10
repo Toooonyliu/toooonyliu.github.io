@@ -1,6 +1,7 @@
 import { validateAssignments, gamepadIndex } from './controllers.js';
 import { scanControllers, deviceOptions, chooseGamepadDevice, validatePreferences } from './controller-discovery.js';
 import { controlDiagram, deviceIcon } from './control-diagrams.js';
+import { t, onLanguageChange } from './i18n.js';
 
 const KEYBOARD_BINDINGS = [
   ['Move', 'A / D · ← / →'],
@@ -44,6 +45,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   let draft = copyConfig();
   let start = false;
   let playing = false;
+  let contextLevelName = '';
   let timer = null;
   let assigning = null;
   let assignmentMessage = '';
@@ -65,14 +67,14 @@ export function createDuelSetup({ onStart, onSave } = {}) {
     list.replaceChildren();
     for (const [action, keys, detail] of rows) {
       const term = document.createElement('dt');
-      term.textContent = action;
+      term.textContent = t(action);
       const description = document.createElement('dd');
       const key = document.createElement('kbd');
-      key.textContent = keys;
+      key.textContent = t(keys);
       description.append(key);
       if (detail) {
         const hint = document.createElement('span');
-        hint.textContent = detail;
+        hint.textContent = t(detail);
         description.append(hint);
       }
       list.append(term, description);
@@ -80,7 +82,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   }
 
   function updateOptions(select, selected, pads) {
-    const choices = selected === 'keyboard' ? [{ value: 'keyboard', label: 'Keyboard + mouse' }] : deviceOptions(selected, pads);
+    const choices = selected === 'keyboard' ? [{ value: 'keyboard', label: t('Keyboard + mouse') }] : deviceOptions(selected, pads);
     // Keep the select element, its focus and its selected value during hot-plug polling.
     const signature = JSON.stringify(choices);
     if (select.dataset.options !== signature) {
@@ -109,7 +111,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
         const device = `gamepad:${pad.index}`;
         const other = 1 - assigning;
         if (draft.mode === 'local' && draft.devices[other] === device) {
-          assignmentMessage = `That controller belongs to Player ${other + 1}. Select another device for them first.`;
+          assignmentMessage = { player: other + 1 };
           break;
         }
         draft.devices[assigning] = device;
@@ -128,7 +130,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
         button.setAttribute('aria-pressed', String(button.dataset.deviceType === (keyboard ? 'keyboard' : 'gamepad')));
       }
       const assign = $(`setup-assign-${index + 1}`);
-      assign.textContent = assigning === index ? 'Listening… press A again (click to cancel)' : 'Press A to assign a controller';
+      assign.textContent = t(assigning === index ? 'Listening… press A again (click to cancel)' : 'Press A to assign a controller');
       assign.setAttribute('aria-pressed', String(assigning === index));
       renderBindings(index);
       const status = $(`setup-device-status-${index + 1}`);
@@ -136,10 +138,12 @@ export function createDuelSetup({ onStart, onSave } = {}) {
       const ready = keyboard || pad?.supported;
       status.dataset.ready = String(Boolean(ready));
       status.dataset.state = ready ? 'ready' : pad ? 'unsupported' : 'waiting';
-      status.textContent = keyboard ? 'Ready · keyboard + mouse' : pad?.supported ? 'Connected · standard controller layout' : pad
-        ? 'Detected, but this controller layout is not supported. See connection help.'
+      status.textContent = keyboard ? t('Ready · keyboard + mouse') : pad?.supported ? t('Connected · standard controller layout') : pad
+        ? t('Detected, but this controller layout is not supported. See connection help.')
         : ['blocked', 'insecure', 'unsupported'].includes(report.state) ? report.message
-        : `Gamepad selected · waiting for detection. ${start || playing ? 'Connect and assign it to play.' : 'You can save this choice now.'}`;
+        : t(start || playing
+          ? 'Gamepad selected · waiting for detection. Connect and assign it to play.'
+          : 'Gamepad selected · waiting for detection. You can save this choice now.');
     }
     const preferences = validatePreferences(draft.mode, draft.devices);
     const connected = validateAssignments(draft.mode, draft.devices, rawPads);
@@ -148,16 +152,23 @@ export function createDuelSetup({ onStart, onSave } = {}) {
     const message = $('setup-validation');
     const hasGamepad = draft.devices.slice(0, draft.mode === 'local' ? 2 : 1).some(device => device !== 'keyboard');
     const detectionBlocked = hasGamepad && ['blocked', 'insecure', 'unsupported'].includes(report.state);
-    const missingText = detectionBlocked ? report.message : connected.message.replace('is disconnected. Connect it and press a button.', 'is not detected. Connect it and press A, then assign it above.');
-    const text = assignmentMessage || (!preferences.valid ? preferences.message : !connected.valid
-      ? requiresConnection ? missingText : 'You can save this setup now. Connect and assign the controller before starting a duel.'
-      : draft.mode === 'local' ? 'Ready · two players, two separate input devices.' : 'Ready for a solo duel.');
+    let missingText = detectionBlocked ? report.message : connected.message;
+    if (!detectionBlocked) for (let player = 1; player <= 2; player++) {
+      if (missingText === t("Player {player}'s gamepad is disconnected. Connect it and press a button.", { player })) {
+        missingText = t("Player {player}'s gamepad is not detected. Connect it and press A, then assign it above.", { player });
+        break;
+      }
+    }
+    const text = assignmentMessage ? t('That controller belongs to Player {player}. Select another device for them first.', assignmentMessage)
+      : !preferences.valid ? preferences.message : !connected.valid
+      ? requiresConnection ? missingText : t('You can save this setup now. Connect and assign the controller before starting a duel.')
+      : t(draft.mode === 'local' ? 'Ready · two players, two separate input devices.' : 'Ready for a solo duel.');
     if (message.textContent !== text) message.textContent = text;
     message.dataset.valid = String(valid);
     $('setup-confirm').disabled = !valid;
-    $('setup-pad-hint').textContent = hasGamepad ? report.message : 'Choose an input type above. Controller choices can be saved before you connect one.';
-    const rows = report.devices.map(pad => `#${pad.index + 1} ${pad.id}\n  ${pad.supported ? 'Standard layout · playable' : 'Detected · unsupported/raw layout'}`);
-    const reportText = `Browser status: ${report.state}\n${report.message}\n${rows.join('\n')}`;
+    $('setup-pad-hint').textContent = hasGamepad ? report.message : t('Choose an input type above. Controller choices can be saved before you connect one.');
+    const rows = report.devices.map(pad => `#${pad.index + 1} ${pad.id}\n  ${t(pad.supported ? 'Standard layout · playable' : 'Detected · unsupported/raw layout')}`);
+    const reportText = `${t('Browser status: {state}', { state: t(report.state) })}\n${report.message}\n${rows.join('\n')}`;
     if ($('setup-controller-report').textContent !== reportText) $('setup-controller-report').textContent = reportText;
     return valid;
   }
@@ -165,14 +176,27 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   function renderMode() {
     const local = draft.mode === 'local';
     for (const button of modeButtons) button.setAttribute('aria-pressed', String(button.dataset.setupMode === draft.mode));
-    $('setup-player-two-title').textContent = local ? 'Player 2' : 'AI rival';
+    $('setup-player-two-title').textContent = t(local ? 'Player 2' : 'AI rival');
     $('setup-player-two-input').hidden = !local;
     $('setup-ai').hidden = local;
     selectors[1].disabled = !local;
-    $('setup-mode-note').textContent = local
+    $('setup-mode-note').textContent = t(local
       ? 'Use one keyboard + one gamepad, or two gamepads. The keyboard can belong to either player. Local wins do not award solo stamps.'
-      : 'Choose keyboard + mouse or one gamepad. The rival is controlled by the game.';
+      : 'Choose keyboard + mouse or one gamepad. The rival is controlled by the game.');
     refresh();
+  }
+
+  function renderContext() {
+    const context = [];
+    if (contextLevelName) context.push(contextLevelName);
+    context.push(t(playing ? 'Apply to restart. Cancel keeps this duel paused; close, then Resume to continue.' : 'Choose your duel and who holds each blade.'));
+    $('setup-context').textContent = context.join(' · ');
+    $('setup-confirm').textContent = t(start ? 'Start duel' : playing ? 'Apply & restart' : 'Save settings');
+    for (let index = 0; index < 2; index++) {
+      for (const button of $(`setup-types-${index + 1}`).querySelectorAll('button')) {
+        button.querySelector('span').innerHTML = t(button.dataset.deviceType === 'keyboard' ? 'Keyboard<br>+ mouse' : 'Gamepad<br>Xbox / PS');
+      }
+    }
   }
 
   function stopPolling() {
@@ -200,7 +224,7 @@ export function createDuelSetup({ onStart, onSave } = {}) {
     refresh();
   }));
   for (let index = 0; index < 2; index++) {
-    $(`setup-types-${index + 1}`).innerHTML = ['keyboard', 'gamepad'].map(type => `<button type="button" class="device-type" data-device-type="${type}" data-player="${index}" aria-pressed="false">${deviceIcon(type)}<span>${type === 'keyboard' ? 'Keyboard<br>+ mouse' : 'Gamepad<br>Xbox / PS'}</span></button>`).join('');
+    $(`setup-types-${index + 1}`).innerHTML = ['keyboard', 'gamepad'].map(type => `<button type="button" class="device-type" data-device-type="${type}" data-player="${index}" aria-pressed="false">${deviceIcon(type)}<span>${t(type === 'keyboard' ? 'Keyboard<br>+ mouse' : 'Gamepad<br>Xbox / PS')}</span></button>`).join('');
     for (const button of $(`setup-types-${index + 1}`).querySelectorAll('button')) listen(button, 'click', () => {
       assigning = null;
       assignmentMessage = '';
@@ -230,19 +254,21 @@ export function createDuelSetup({ onStart, onSave } = {}) {
   for (const event of ['gamepadconnected', 'gamepaddisconnected']) listen(window, event, () => {
     if (dialog.open) refresh();
   });
+  cleanups.push(onLanguageChange(() => {
+    bindingsTypes = ['', ''];
+    renderContext();
+    renderMode();
+  }));
 
   return {
     open(config, { levelName = '', playing: isPlaying = false, start: shouldStart = false } = {}) {
       draft = copyConfig(config);
       start = shouldStart;
       playing = isPlaying;
+      contextLevelName = levelName;
       assigning = null;
       assignmentMessage = '';
-      const context = [];
-      if (levelName) context.push(levelName);
-      context.push(playing ? 'Apply to restart. Cancel keeps this duel paused; close, then Resume to continue.' : 'Choose your duel and who holds each blade.');
-      $('setup-context').textContent = context.join(' · ');
-      $('setup-confirm').textContent = start ? 'Start duel' : playing ? 'Apply & restart' : 'Save settings';
+      renderContext();
       renderMode();
       stopPolling();
       if (!dialog.open) dialog.showModal();

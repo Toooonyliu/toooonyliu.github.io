@@ -1,0 +1,54 @@
+@font-face{font-family:'Fusion Pixel';src:url('../assets/fonts/fusion-pixel-12px-proportional-zh_hans.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+.language-picker{position:relative}
+.language-picker>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;white-space:nowrap}
+.language-picker>summary::-webkit-details-marker{display:none}
+.language-picker>summary::after{content:'▾';font:14px var(--type)}
+.language-current{color:var(--gold);font:16px var(--type);letter-spacing:0}
+.language-options{position:absolute;z-index:40;right:0;top:calc(100% + 16px);min-width:200px;padding:8px;background:#ece2c8 url('../assets/ui/paper.png');box-shadow:0 0 0 2px var(--outline),6px 8px #05070a;color:var(--paper-ink)}
+.language-options button{display:flex;align-items:center;justify-content:space-between;gap:22px;width:100%;min-height:48px;padding:12px;background:none;color:var(--paper-ink);font:18px/1.4 var(--type);text-align:left}
+.language-options button[lang=zh-CN]{font-family:'Fusion Pixel','Microsoft YaHei',sans-serif;font-size:16px}
+.language-options button span{font:14px var(--type);color:var(--paper-muted)}
+.language-options button[aria-pressed=true]{background:#d4c5a3;box-shadow:inset 3px 0 var(--stamp)}
+.language-options button:focus-visible,.language-picker>summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+html[lang=zh-CN] body{--px:'Fusion Pixel','Microsoft YaHei',sans-serif;--type:'Fusion Pixel','Microsoft YaHei',sans-serif;--sans:'Fusion Pixel','Microsoft YaHei',sans-serif;--mono:'Fusion Pixel',monospace;--serif:'Fusion Pixel',serif}
+html[lang=zh-CN] #atlas-screen .game-title{line-height:1.25!important;letter-spacing:12px!important}
+html[lang=zh-CN] .tagline{font-size:18px;letter-spacing:3px;line-height:1.6}
+html[lang=zh-CN] .menu-item{letter-spacing:3px!important}
+html[lang=zh-CN] .topbar .nav-link{font-size:12px;letter-spacing:2px}
+html[lang=zh-CN] .globe-place-label{font-size:12px;line-height:20px}
+html[lang=zh-CN] dialog p,html[lang=zh-CN] dialog .muted,html[lang=zh-CN] dialog .field-note,html[lang=zh-CN] dialog small{font-size:16px!important;line-height:1.65!important;letter-spacing:0!important}
+html[lang=zh-CN] dialog h2{line-height:1.5!important;letter-spacing:3px}
+html[lang=zh-CN] .setup-mode strong{font-size:18px;line-height:1.4}
+html[lang=zh-CN] .setup-mode span{font-size:16px;line-height:1.6}
+html[lang=zh-CN] .setup-side{font-size:14px;line-height:1.5}
+html[lang=zh-CN] .setup-full-bindings summary,html[lang=zh-CN] .controller-help summary{font-size:16px;line-height:1.6}
+html[lang=zh-CN] .controller-help li{font-size:16px!important;line-height:1.7!important}
+html[lang=zh-CN] .controller-report{font-family:'Fusion Pixel',monospace;line-height:1.7}
+html[lang=zh-CN] .setup-bindings dt,html[lang=zh-CN] .setup-bindings dd>span{font-size:14px;line-height:1.6}
+html[lang=zh-CN] .zone-button{font-size:16px!important;line-height:1.5!important}
+html[lang=zh-CN] .stamp-name{font-size:12px;letter-spacing:0;line-height:1.4}
+html[lang=zh-CN] .gate-sub,html[lang=zh-CN] .gate-fine{line-height:1.7!important;font-size:14px!important}
+html[lang=zh-CN] .gate-title{font-size:20px!important}
+html[lang=zh-CN] .globe-hint{font-size:16px!important}
+html[lang=zh-CN] .reveal-title{font-size:28px!important;line-height:1.65!important;letter-spacing:3px!important}
+html[lang=zh-CN] #combat-tip{font-size:16px!important;line-height:1.5;letter-spacing:1px}
+html[lang=zh-CN] .arena-identity small{font-size:16px!important;line-height:1.5!important;letter-spacing:1px}
+html[lang=zh-CN] .result-panel h2{font-size:clamp(32px,6vw,72px)!important;line-height:1.5!important;letter-spacing:3px}
+html[lang=zh-CN] .toast{font-size:16px!important;line-height:1.6}
+@media(max-width:720px){
+ body:not(.is-dueling) .topbar .brand{display:none}
+ .topbar{padding-inline:5%;min-width:0}
+ .topbar nav{width:100%;min-width:0;justify-content:flex-end;gap:14px}
+ .topbar .nav-link{font-size:10px!important;letter-spacing:1px;white-space:nowrap}
+ .language-picker>summary{gap:5px}.language-current{font-size:13px}
+ .language-options{min-width:180px}
+ html[lang=zh-CN] #atlas-screen .game-title{letter-spacing:6px!important}
+ html[lang=zh-CN] .topbar nav{gap:15px}
+ html[lang=zh-CN] .topbar .nav-link{font-size:12px!important}
+ html[lang=zh-CN] .zone-button{font-size:14px!important}
+ html[lang=zh-CN] .duel-top .text-button{font-size:10px!important;letter-spacing:0}
+ html[lang=zh-CN] #duel-title{font-size:16px!important;letter-spacing:1px}
+ html[lang=zh-CN] .arena-identity{font-size:12px!important;letter-spacing:1px}
+ html[lang=zh-CN] #combat-tip{font-size:12px!important}
+ html[lang=zh-CN] .setup-player h3{font-size:18px}
+}

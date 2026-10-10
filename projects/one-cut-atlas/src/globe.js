@@ -1,6 +1,7 @@
 // Original software-rendered globe. Geography is rasterized once from the
 // bundled Natural Earth outline; the sphere is shaded on a two-pixel grid.
 import { zoneForCoordinates, TRAVEL_ZONES } from './region-presets.js';
+import { t, levelTitle } from './i18n.js';
 const ZONE_RGB = TRAVEL_ZONES.map(zone => [1, 3, 5].map(index => parseInt(zone.color.slice(index, index + 2), 16)));
 const zoneIndex = id => TRAVEL_ZONES.findIndex(zone => zone.id === id) + 1;
 const TAU = Math.PI * 2;
@@ -49,7 +50,7 @@ export class Globe {
     const signal = this.events.signal;
     canvas.tabIndex = 0;
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', 'Pixel globe. Drag or use arrow keys to rotate; scroll, pinch, or use plus and minus to zoom. Press Enter to choose a destination, or use the region buttons.');
+    canvas.setAttribute('aria-label', t('Pixel globe. Drag or use arrow keys to rotate; scroll, pinch, or use plus and minus to zoom. Press Enter to choose a destination, or use the region buttons.'));
     canvas.addEventListener('pointerdown', event => this.pointerDown(event), { signal });
     canvas.addEventListener('pointermove', event => this.pointerMove(event), { signal });
     canvas.addEventListener('pointerup', event => this.pointerUp(event), { signal });
@@ -411,7 +412,7 @@ export class Globe {
       ctx.fillStyle = '#0a1214'; ctx.fillRect(x - 2, y, 5, 2); ctx.fillStyle = '#5d6b63'; ctx.fillRect(x - 1, y, 3, 1);
       this.projected.push({ id: level.id, x, y, depth, level, levels });
       if (selected) {
-        this.placeLabel(`place:${key}`, level.location.name, x, y, 'globe-place-label');
+        this.placeLabel(`place:${key}`, level.isDemo ? t(level.location.name) : level.location.name, x, y, 'globe-place-label');
         visibleLabels.add(`place:${key}`);
       }
       if (levels.length > 1) {
@@ -491,7 +492,7 @@ export class Globe {
     if (!pointer) {
       const marker = this.hitMarker(event.clientX, event.clientY);
       this.canvas.style.cursor = marker ? 'pointer' : 'grab';
-      this.canvas.title = marker ? marker.levels.length > 1 ? `${marker.level.location.name} · ${marker.levels.length} stages; click again to cycle` : `${marker.level.location.name} · ${marker.level.name}` : '';
+      this.canvas.title = marker ? marker.levels.length > 1 ? t('{place} · {count} stages; click again to cycle', { place: marker.level.isDemo ? t(marker.level.location.name) : marker.level.location.name, count: marker.levels.length }) : `${marker.level.isDemo ? t(marker.level.location.name) : marker.level.location.name} · ${levelTitle(marker.level)}` : '';
       return;
     }
     const dx = event.clientX - pointer.x, dy = event.clientY - pointer.y;

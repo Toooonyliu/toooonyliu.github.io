@@ -8,7 +8,9 @@ import { CombatAudio } from './combat-audio.js';
 import { gamepadIndex, validateAssignments } from './controllers.js';
 import { DuelInputs, normalizeSettings } from './duel-inputs.js';
 import { createDuelSetup } from './duel-setup.js';
+import { t, getLanguage, setLanguage, onLanguageChange, bindStaticTranslations, levelTitle } from './i18n.js';
 const $ = id => document.getElementById(id);
+bindStaticTranslations(document.body);
 const globe = new Globe($('world-map'), {onSelect:id=>selectLevel(id), onCreate:point=>openCreator({point})});
 const demos = createZoneLevels();
 let levels=structuredClone(demos),selectedId=levels[0].id,modules=null,gameReady=false,land=null,draft=null,photoVersion=0,photoBusy=false,analysisBusy=false;
@@ -21,6 +23,7 @@ const keys={left:false,right:false,attack:false,parry:false,dodge:false,duck:fal
 let aim='mid',mouseLine=null,playerFree=true;
 const SETTINGS_KEY='one-cut-atlas:controls:v1';
 let settings=loadSettings(),activeSettings=null,duelInputs=null,setupLevel=null;
+let resultCopy=null;
 const duelSetup=createDuelSetup({
  onStart(config){saveSettings(config);const level=setupLevel;setupLevel=null;if(level)void forgeAndFight(level);},
  onSave(config){saveSettings(config);if(engine)launchDuel(currentLevel);else toast('Mode and controls saved.');}
@@ -32,34 +35,34 @@ function dialogOpen(){return Boolean(document.querySelector('dialog[open]'));}
 function keyboardPlayer(){return activeSettings?.devices.slice(0,activeSettings.mode==='local'?2:1).indexOf('keyboard')??-1;}
 function canKeyboardFight(){return Boolean(engine&&!engine.paused&&!dialogOpen()&&keyboardPlayer()>=0);}
 function updateModeMenu(){
- $('menu-settings').textContent='Mode & Controls';
- $('menu-settings').title=`Current mode: ${settings.mode==='local'?'Local two-player':'Single player'}`;
+ $('menu-settings').textContent=t('Mode & Controls');
+ $('menu-settings').title=t('Current mode: {mode}',{mode:t(settings.mode==='local'?'Local two-player':'Single player')});
  $('difficulty-select').disabled=settings.mode==='local';
- $('difficulty-select').closest('label').title=settings.mode==='local'?'Difficulty applies to the computer opponent in single-player mode.':'';
+ $('difficulty-select').closest('label').title=settings.mode==='local'?t('Difficulty applies to the computer opponent in single-player mode.'):'';
 }
-function startDuel(level){if(!level||!ensureReady())return;if(engine)togglePause(true);setupLevel=level;duelSetup.open(settings,{levelName:level.name,start:true});}
-function openSettings(){if(engine)togglePause(true);duelSetup.open(settings,{levelName:currentLevel?.name||selected()?.name,playing:Boolean(engine)});}
+function startDuel(level){if(!level||!ensureReady())return;if(engine)togglePause(true);setupLevel=level;duelSetup.open(settings,{levelName:levelTitle(level),start:true});}
+function openSettings(){if(engine)togglePause(true);duelSetup.open(settings,{levelName:levelTitle(currentLevel||selected()),playing:Boolean(engine)});}
 const FREE_STATES=['idle','walk','charge','parry'];
 function applyMouseLine(){if(mouseLine&&playerFree&&mouseLine!==aim)setAim(mouseLine);}
 const stanceLabels={high:'High',mid:'Mid',low:'Low'};
 const STAMP_NAMES={'east-asia':'E. Asia','south-asia':'S. Asia','southeast-asia':'SE Asia','west-central-asia':'C. Asia',europe:'Europe',africa:'Africa','north-america':'N. Amer','south-america':'S. Amer',oceania:'Oceania',arctic:'Arctic',antarctic:'Antarc.'};
 function setAim(value){if(!stanceLabels[value])return;aim=value;document.querySelectorAll('[data-stance]').forEach(button=>{const active=button.dataset.stance===aim;button.setAttribute('aria-pressed',String(active));button.classList.toggle('active',active);});}
 const escape = value => String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4300);}
-function hudText(id,value){if(hudCache.get(id)===value)return;hudCache.set(id,value);$(id).textContent=value;}
+function toast(message){$('toast').textContent=t(message);$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4300);}
+function hudText(id,value){value=t(value);if(hudCache.get(id)===value)return;hudCache.set(id,value);$(id).textContent=value;}
 function selected(){return levels.find(l=>l.id===selectedId)||levels[0];}
 function renderMap(){globe.setLevels(levels,selectedId);}
 function renderAtlas(){
  const count=levels.filter(l=>l.cleared).length;$('cleared-count').textContent=String(count).padStart(2,'0');$('progress-fill').style.width=`${count/Math.max(levels.length,1)*100}%`;
- $('progress-copy').textContent=count?`${count} cleared`:'Your first cut awaits.';$('level-count').textContent=String(levels.length).padStart(2,'0');
- $('level-list').innerHTML=levels.map(l=>`<button class="level-item ${l.id===selectedId?'selected':''} ${l.cleared?'cleared':''}" data-level="${escape(l.id)}"><span class="level-dot">${l.cleared?'✦':'◇'}</span><span><b>${escape(l.location.name)}</b><small>${escape(l.name)}${l.cleared?' · Cleared':''}</small></span><span class="level-chevron">›</span></button>`).join('');
+ $('progress-copy').textContent=count?t('{count} cleared',{count}):t('Your first cut awaits.');$('level-count').textContent=String(levels.length).padStart(2,'0');
+ $('level-list').innerHTML=levels.map(l=>`<button class="level-item ${l.id===selectedId?'selected':''} ${l.cleared?'cleared':''}" data-level="${escape(l.id)}"><span class="level-dot">${l.cleared?'✦':'◇'}</span><span><b>${escape(l.isDemo?t(l.location.name):l.location.name)}</b><small>${escape(levelTitle(l))}${l.cleared?' · '+t('Cleared'):''}</small></span><span class="level-chevron">›</span></button>`).join('');
  $('level-list').querySelectorAll('button').forEach(btn=>btn.onclick=()=>selectLevel(btn.dataset.level));
- $('zone-list').innerHTML=TRAVEL_ZONES.map((zone,index)=>`<button class="zone-button ${selected()?.scene.travelZone===zone.id?'active':''}" data-zone="${zone.id}" style="--zone-color:${zone.color}" aria-pressed="${selected()?.scene.travelZone===zone.id}"><span>${String(index+1).padStart(2,'0')}</span>${escape(zone.label)}${zone.flagship?'<i>★</i>':''}</button>`).join('');
+ $('zone-list').innerHTML=TRAVEL_ZONES.map((zone,index)=>`<button class="zone-button ${selected()?.scene.travelZone===zone.id?'active':''}" data-zone="${zone.id}" style="--zone-color:${zone.color}" aria-pressed="${selected()?.scene.travelZone===zone.id}"><span>${String(index+1).padStart(2,'0')}</span>${escape(t(zone.label))}${zone.flagship?'<i>★</i>':''}</button>`).join('');
  $('zone-list').querySelectorAll('button').forEach(button=>button.onclick=()=>selectLevel(`zone-${button.dataset.zone}`));
  const stamped=new Set(levels.filter(level=>level.cleared).map(level=>level.scene.travelZone));
- $('zone-progress').textContent=`${stamped.size} / ${TRAVEL_ZONES.length} stamps`;
+ $('zone-progress').textContent=t('{count} / {total} stamps',{count:stamped.size,total:TRAVEL_ZONES.length});
  const activeZone=selected()?.scene.travelZone;
- $('stamp-row').innerHTML=TRAVEL_ZONES.map(zone=>`<button class="stamp ${stamped.has(zone.id)?'inked':''} ${activeZone===zone.id?'active':''}" data-zone="${zone.id}" style="--zone-color:${zone.color}" title="${escape(zone.label)} · ${escape(zone.stage)}" aria-label="${escape(zone.label)}${stamped.has(zone.id)?', cleared':''}" aria-pressed="${activeZone===zone.id}"><span class="stamp-art" aria-hidden="true"></span><span class="stamp-name">${STAMP_NAMES[zone.id]||escape(zone.label)}</span></button>`).join('');
+ $('stamp-row').innerHTML=TRAVEL_ZONES.map(zone=>`<button class="stamp ${stamped.has(zone.id)?'inked':''} ${activeZone===zone.id?'active':''}" data-zone="${zone.id}" style="--zone-color:${zone.color}" title="${escape(t(zone.label))} · ${escape(t(zone.stage))}" aria-label="${escape(t(zone.label))}${stamped.has(zone.id)?', '+t('cleared'):''}" aria-pressed="${activeZone===zone.id}"><span class="stamp-art" aria-hidden="true"></span><span class="stamp-name">${escape(t(STAMP_NAMES[zone.id]||zone.label))}</span></button>`).join('');
  $('stamp-row').querySelectorAll('button').forEach(button=>button.onclick=()=>selectLevel(levels.find(level=>level.scene.travelZone===button.dataset.zone&&level.place)?.id||`zone-${button.dataset.zone}`));
  renderMap();renderSelected();
 }
@@ -69,7 +72,7 @@ function drawPreview(canvas,scene,avatar=null){
  modules.drawFighter(ctx,{x:360,facing:1,state:'idle',timer:0,stateDuration:1,dead:false},avatar?.target==='player'?avatar.style:'traveler',true,0,{wet:scene.environment!=='wilderness',palette:avatar?.target==='player'?avatar.palette:null});
  modules.drawFighter(ctx,{x:600,facing:-1,state:'idle',timer:0,stateDuration:1,dead:false},avatar?.target==='opponent'?avatar.style:scene.opponentStyle,false,0,{wet:scene.environment!=='wilderness',palette:avatar?.target==='opponent'?avatar.palette:null});
 }
-function renderSelected(){const l=selected();if(!l)return;const zone=getZone(l.scene.travelZone);$('selected-title').textContent=l.name;$('selected-region').textContent=`${zone.name.toUpperCase()} / ${l.location.name}`;$('selected-description').textContent=l.scene.summary;$('selected-source').textContent=l.scene.backdrop?'Painted stage':l.place?'Photo stage':l.avatar?'Custom fighter':zone.flagship?'Signature arena':'Arena';$('selected-source').hidden=false;$('selected-tags').innerHTML=[zone.label,l.cleared?'Cleared':'Ready'].map(t=>`<span>${escape(t)}</span>`).join('');$('challenge-selected').textContent=l.cleared?'Play Again':'Fight';drawPreview($('selected-preview'),l.scene,l.avatar);}
+function renderSelected(){const l=selected();if(!l)return;const zone=getZone(l.scene.travelZone);$('selected-title').textContent=levelTitle(l);$('selected-region').textContent=`${t(zone.name).toUpperCase()} / ${l.isDemo?t(l.location.name):l.location.name}`;$('selected-description').textContent=l.scene.summary;$('selected-source').textContent=t(l.scene.backdrop?'Painted stage':l.place?'Photo stage':l.avatar?'Custom fighter':zone.flagship?'Signature arena':'Arena');$('selected-source').hidden=false;$('selected-tags').innerHTML=[zone.label,l.cleared?'Cleared':'Ready'].map(label=>`<span>${escape(t(label))}</span>`).join('');$('challenge-selected').textContent=t(l.cleared?'Play Again':'Fight');drawPreview($('selected-preview'),l.scene,l.avatar);}
 function selectLevel(id){selectedId=id;renderAtlas();globe.focusLocation(selected().location);const drawer=$('journey-drawer');if(drawer)drawer.open=false;}
 function ensureReady(){if(modules&&gameReady)return true;toast('Loading the arena…');return false;}
 function restoreSavedLevel(level){
@@ -93,11 +96,11 @@ async function init(){
  }catch(error){console.error('Module initialization failed',error);toast('Game unavailable. Refresh to try again.');}
 }
 function setupChoices(){
- $('zone-select').innerHTML=TRAVEL_ZONES.map(zone=>`<option value="${zone.id}">${zone.label} · ${zone.stage}</option>`).join('');
- $('location-select').innerHTML=CITIES.map(c=>`<option value="${c.id}">${escape(c.name)} · ${escape(c.country)}</option>`).join('')+'<option value="custom">Custom location / Photo GPS</option>';
- $('lighting-select').innerHTML=LIGHTINGS.map(x=>`<option value="${x}">${LABELS[x]}</option>`).join('');$('style-select').innerHTML=STYLES.map(x=>`<option value="${x}">${LABELS[x]}</option>`).join('');
- $('environment-options').innerHTML=ENVIRONMENTS.map(x=>`<button type="button" data-environment="${x}" aria-pressed="false">${LABELS[x]}</button>`).join('');
- $('element-options').innerHTML=ELEMENTS.map(x=>`<label><input type="checkbox" value="${x}">${LABELS[x]}</label>`).join('');
+ $('zone-select').innerHTML=TRAVEL_ZONES.map(zone=>`<option value="${zone.id}">${t(zone.label)} · ${t(zone.stage)}</option>`).join('');
+ $('location-select').innerHTML=CITIES.map(c=>`<option value="${c.id}">${escape(t(c.name))} · ${escape(t(c.country))}</option>`).join('')+`<option value="custom">${t('Custom location / Photo GPS')}</option>`;
+ $('lighting-select').innerHTML=LIGHTINGS.map(x=>`<option value="${x}">${t(LABELS[x])}</option>`).join('');$('style-select').innerHTML=STYLES.map(x=>`<option value="${x}">${t(LABELS[x])}</option>`).join('');
+ $('environment-options').innerHTML=ENVIRONMENTS.map(x=>`<button type="button" data-environment="${x}" aria-pressed="false">${t(LABELS[x])}</button>`).join('');
+ $('element-options').innerHTML=ELEMENTS.map(x=>`<label><input type="checkbox" value="${x}">${t(LABELS[x])}</label>`).join('');
  $('environment-options').querySelectorAll('button').forEach(b=>b.onclick=()=>{draft.scene.environment=b.dataset.environment;draft.scene.elements=defaultScene(draft.scene.environment).elements;markManual();updateCreator();});
  $('element-options').querySelectorAll('input').forEach(input=>input.onchange=()=>{const choices=[...$('element-options').querySelectorAll('input:checked')].map(i=>i.value);if(choices.length>4){input.checked=false;toast('Choose up to four elements.');return;}draft.scene.elements=choices;markManual();updateCreator();});
 }
@@ -106,7 +109,7 @@ function openCreator({level=null,point=null}={}){
  analysisController?.abort();analysisController=null;
  const zone=point?zoneForCoordinates(point.lat,point.lon):getZone(selected()?.scene.travelZone);
  photoVersion++;draft=level?structuredClone(level):{id:crypto.randomUUID(),name:`${zone.stage} · Custom`,location:{name:zone.place,country:zone.country,lat:zone.lat,lon:zone.lon},scene:sceneForZone(zone.id),photo:null,cleared:false,createdAt:new Date().toISOString()};
- draft.avatar=validateAvatar(draft.avatar||{style:draft.scene.opponentStyle});draft.editing=Boolean(level);$('creator-title').textContent='Choose Your Fighter';$('level-name').value=draft.name;$('creator-error').hidden=true;$('gps-note').textContent='Regional arena. Your fighter.';$('photo-message').textContent=draft.photo?'Saved on this device.':'Use a photo to choose your colors.';
+ draft.avatar=validateAvatar(draft.avatar||{style:draft.scene.opponentStyle});draft.editing=Boolean(level);$('creator-title').textContent=t('Choose Your Fighter');$('level-name').value=draft.name;$('creator-error').hidden=true;$('gps-note').textContent=t('Regional arena. Your fighter.');$('photo-message').textContent=t(draft.photo?'Saved on this device.':'Use a photo to choose your colors.');
  const city=CITIES.find(c=>Math.abs(c.lat-draft.location.lat)<.001&&Math.abs(c.lon-draft.location.lon)<.001);$('location-select').value=city?city.id:'custom';$('custom-name').value=draft.location.name;$('custom-lat').value=draft.location.lat;$('custom-lon').value=draft.location.lon;updateLocationFields();
  $('photo-input').value='';photoBusy=false;analysisBusy=false;setBusy();updatePhotoPreview();updateCreator();$('creator').showModal();
 }
@@ -116,25 +119,25 @@ function updateCreator(){
  for(const key of Object.keys(DEFAULT_AVATAR))$(`avatar-${key}`).value=draft.avatar.palette[key];
  $('environment-options').querySelectorAll('button').forEach(b=>{const active=b.dataset.environment===draft.scene.environment;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
  $('element-options').querySelectorAll('input').forEach(i=>i.checked=draft.scene.elements.includes(i.value));
- $('creator-mode').textContent=draft.avatar.source==='ai'?'AI colors':'Photo colors';drawPreview($('creator-preview'),draft.scene,draft.avatar);
+ $('creator-mode').textContent=t(draft.avatar.source==='ai'?'AI colors':'Photo colors');drawPreview($('creator-preview'),draft.scene,draft.avatar);
 }
 function markManual(){draft.scene.source='manual';draft.scene.summary=`${LABELS[draft.scene.environment]} · ${LABELS[draft.scene.lighting]}.`;}
 function updateLocationFields(){const custom=$('location-select').value==='custom';$('custom-location-fields').hidden=!custom;['custom-name','custom-lat','custom-lon'].forEach(id=>$(id).required=custom);}
-function setBusy(){const busy=photoBusy||analysisBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=analysisBusy?(analysisPhase==='waking'?'Waking AI…':'Analyzing…'):'AI Colors';const privacy=$('photo-privacy');if(privacy)privacy.textContent=apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.';}
-function creatorError(message){$('creator-error').textContent=message;$('creator-error').hidden=false;}
+function setBusy(){const busy=photoBusy||analysisBusy,apiReady=hasAvatarApi();$('save-start').disabled=busy;$('ai-analyze').hidden=!apiReady;$('ai-analyze').disabled=busy||!apiReady;$('ai-analyze').textContent=t(analysisBusy?(analysisPhase==='waking'?'Waking AI…':'Analyzing…'):'AI Colors');const privacy=$('photo-privacy');if(privacy)privacy.textContent=t(apiReady?'Only use photos you own or have permission to use. AI Colors sends a compressed photo; otherwise it stays here.':'Only use photos you own or have permission to use. Photos stay on this device.');}
+function creatorError(message){$('creator-error').textContent=t(message);$('creator-error').hidden=false;}
 async function pickPhoto(file){
- if(!file||!draft)return;analysisController?.abort();analysisController=null;const version=++photoVersion;analysisBusy=false;photoBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Reading photo…';
- try{const result=await modules.preparePhoto(file);if(version!==photoVersion)return;draft.photo=result.thumbnail;draft.apiImage=result.dataUrl;draft.gps=result.gps||null;draft.avatar=avatarFromPalette(result.palette,draft.avatar.target,draft.avatar.style);updatePhotoPreview();updateCreator();$('photo-message').textContent='Colors applied. Tune your fighter.';}
- catch(error){if(version!==photoVersion)return;creatorError(error.message||'Could not read this photo. Try another.');$('photo-message').textContent=draft.photo?'Your previous photo is kept.':'Choose JPEG, PNG or WebP.';}
+ if(!file||!draft)return;analysisController?.abort();analysisController=null;const version=++photoVersion;analysisBusy=false;photoBusy=true;setBusy();$('creator-error').hidden=true;$('photo-message').textContent=t('Reading photo…');
+ try{const result=await modules.preparePhoto(file);if(version!==photoVersion)return;draft.photo=result.thumbnail;draft.apiImage=result.dataUrl;draft.gps=result.gps||null;draft.avatar=avatarFromPalette(result.palette,draft.avatar.target,draft.avatar.style);updatePhotoPreview();updateCreator();$('photo-message').textContent=t('Colors applied. Tune your fighter.');}
+ catch(error){if(version!==photoVersion)return;creatorError(error.message||'Could not read this photo. Try another.');$('photo-message').textContent=t(draft.photo?'Your previous photo is kept.':'Choose JPEG, PNG or WebP.');}
  finally{if(version===photoVersion){photoBusy=false;setBusy();}}
 }
 async function analyze(){
  if(photoBusy||analysisBusy)return;
  if(!hasAvatarApi()){creatorError('AI is not connected. Photo colors still work.');return;}
  if(!draft?.photo){creatorError('Choose a photo first.');return;}
- const version=photoVersion,controller=new AbortController();analysisController=controller;analysisBusy=true;analysisPhase='waking';setBusy();$('creator-error').hidden=true;$('photo-message').textContent='Waking AI… First use can take a minute.';
- try{const avatar=await requestAvatar(draft.apiImage||draft.photo,{signal:controller.signal,onStatus:phase=>{if(version!==photoVersion)return;analysisPhase=phase;setBusy();$('photo-message').textContent=phase==='waking'?'Waking AI… First use can take a minute.':'Finding your fighter’s colors…';}});if(version!==photoVersion)return;draft.avatar={...avatar,target:draft.avatar.target};updateCreator();updatePhotoPreview();$('photo-message').textContent=avatar.summary;}
- catch(error){if(version!==photoVersion)return;creatorError(error.message||'AI unavailable. Photo colors are kept.');$('photo-message').textContent='Your fighter is kept. Ready to fight.';}
+ const version=photoVersion,controller=new AbortController();analysisController=controller;analysisBusy=true;analysisPhase='waking';setBusy();$('creator-error').hidden=true;$('photo-message').textContent=t('Waking AI… First use can take a minute.');
+ try{const avatar=await requestAvatar(draft.apiImage||draft.photo,{signal:controller.signal,onStatus:phase=>{if(version!==photoVersion)return;analysisPhase=phase;setBusy();$('photo-message').textContent=t(phase==='waking'?'Waking AI… First use can take a minute.':'Finding your fighter’s colors…');}});if(version!==photoVersion)return;draft.avatar={...avatar,target:draft.avatar.target};updateCreator();updatePhotoPreview();$('photo-message').textContent=avatar.summary;}
+ catch(error){if(version!==photoVersion)return;creatorError(error.message||'AI unavailable. Photo colors are kept.');$('photo-message').textContent=t('Your fighter is kept. Ready to fight.');}
  finally{if(analysisController===controller)analysisController=null;if(version===photoVersion){analysisBusy=false;setBusy();}}
 }
 async function saveAndPlay(event){
@@ -144,11 +147,11 @@ async function saveAndPlay(event){
  const {editing,apiImage,...base}=draft;const level={...base,isDemo:false,name,location,scene:validateScene(draft.scene),avatar:validateAvatar(draft.avatar)};
  $('save-start').disabled=true;
  try{await modules.saveLevel(level);const index=levels.findIndex(l=>l.id===level.id);if(index<0)levels.unshift(level);else levels[index]=level;selectedId=level.id;$('creator').close();renderAtlas();startDuel(level);}
- catch(error){creatorError(`Not saved: ${error.message||'Device storage is unavailable.'} Your photo is kept.`);}
+ catch(error){creatorError(t('Not saved: {error} Your photo is kept.',{error:t(error.message||'Device storage is unavailable.')}));}
  finally{$('save-start').disabled=false;}
 }
 /* Photo gate: a travel photo becomes a new stage. Scan → reveal on the globe → challenge → forge the arena → duel. */
-function gateStatus(message='',state=''){const node=$('gate-status');node.textContent=message;node.dataset.state=state;}
+function gateStatus(message='',state=''){const node=$('gate-status');node.dataset.message=message;node.textContent=t(message);node.dataset.state=state;}
 function setGateBusy(busy){gate.busy=busy;$('photo-gate').classList.toggle('is-busy',busy);$('gate-input').disabled=busy;}
 function loadPicture(src){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Could not show this photo.'));image.src=src;});}
 function drawGate(block,scan){
@@ -205,11 +208,15 @@ async function scanPlace(){
 }
 function stamp(node,text){node.textContent='';node.setAttribute('aria-label',text);text.split(' ').forEach((word,k)=>{if(k)node.append(' ');const span=document.createElement('span');span.textContent=word;span.setAttribute('aria-hidden','true');node.append(span);});}
 function showReveal(level,place,zone){
- $('reveal-eyebrow').textContent=place.recognized?'New stage unlocked':'Uncharted stage unlocked';
- stamp($('reveal-title'),(place.recognized&&place.name?place.name:`Somewhere in ${zone.name}`).toUpperCase());
- $('reveal-sub').textContent=[place.recognized?place.city:null,place.recognized?place.country:null,zone.name].filter(Boolean).join(' · ');
+ gate.reveal={level,place,zone};renderReveal();
  const panel=$('reveal');panel.hidden=false;panel.classList.remove('is-in');void panel.offsetWidth;panel.classList.add('is-in');
  $('reveal-challenge').focus({preventScroll:true});
+}
+function renderReveal(){
+ if(!gate.reveal)return;const {place,zone}=gate.reveal;
+ $('reveal-eyebrow').textContent=t(place.recognized?'New stage unlocked':'Uncharted stage unlocked');
+ stamp($('reveal-title'),(place.recognized&&place.name?place.name:t('Somewhere in {zone}',{zone:t(zone.name)})).toUpperCase());
+ $('reveal-sub').textContent=[place.recognized?place.city:null,place.recognized?place.country:null,t(zone.name)].filter(Boolean).join(' · ');
 }
 function hideReveal(){$('reveal').hidden=true;$('reveal').classList.remove('is-in');}
 async function forgeAndFight(level){
@@ -236,7 +243,7 @@ function stopDuel(){mouseLine=null;playerFree=true;duelGeneration++;cancelAnimat
 function returnToMap(){stopDuel();document.body.classList.remove('is-dueling');$('duel-screen').hidden=true;$('atlas-screen').hidden=false;globe.setVisible(true);globe.resize();renderAtlas();$('world-map').focus({preventScroll:true});if(firstLitId){setTimeout(()=>{firstLitId=null;},1600);}}
 function initAudio(){try{audio ||= new CombatAudio();void audio.start().then(()=>audio.event('begin')).catch(()=>{});}catch{/* Audio is decorative; the duel remains playable. */}}
 function sound(type){audio?.event(type);}
-function toggleSound(){audio ||= new CombatAudio();const enabled=audio.toggle();$('nav-sound').textContent=`Sound: ${enabled?'On':'Off'}`;$('nav-sound').setAttribute('aria-pressed',String(enabled));if(enabled&&engine)initAudio();}
+function toggleSound(){audio ||= new CombatAudio();const enabled=audio.toggle();$('nav-sound').textContent=t(enabled?'Sound: On':'Sound: Off');$('nav-sound').setAttribute('aria-pressed',String(enabled));if(enabled&&engine)initAudio();}
 function launchDuel(level){
  bloodDecals=[];bloodSeen=new Set();
  if(!ensureReady())return;
@@ -247,17 +254,24 @@ function launchDuel(level){
  globe.setVisible(false);document.body.classList.add('is-dueling');currentLevel=level;
  if(level.scene?.backdrop&&!modules.hasBackdrop(level.scene.backdrop))modules.registerBackdrop(level.scene.backdrop).catch(()=>{});
  initAudio();engine=new modules.DuelEngine({seed:Date.now()%2147483647,difficulty:$('difficulty-select').value,mode:activeSettings.mode});resultHandled=false;heard=new Set();
- const local=activeSettings.mode==='local',deviceName=device=>device==='keyboard'?'KEYS':`PAD ${gamepadIndex(device)+1}`;
- $('player-label').textContent=`${local?'P1':'YOU'} · ${deviceName(activeSettings.devices[0])}`;
- $('rival-label').textContent=local?`P2 · ${deviceName(activeSettings.devices[1])}`:'AI RIVAL';
+ resultCopy=null;renderDuelLabels();
  const hasKeyboard=keyboardPlayer()>=0;
  $('keyboard-controls').hidden=!hasKeyboard;$('touch-controls').hidden=!hasKeyboard;
- $('keyboard-controls').setAttribute('aria-label',`Player ${keyboardPlayer()+1} sword stance`);
- $('touch-controls').setAttribute('aria-label',`Player ${keyboardPlayer()+1} touch combat controls`);
- $('duel-canvas').setAttribute('aria-label',`${local?'Local two-player':'Single-player'} sword duel. Open Controls to view each player's input bindings. Escape pauses.`);
- $('atlas-screen').hidden=true;$('duel-screen').hidden=false;$('duel-title').textContent=level.name;$('duel-region').textContent=`${level.location.name} / ${local?'LOCAL TWO-PLAYER':'SINGLE PLAYER'}`;
- $('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';$('combat-tip').textContent=local?'Player 1 vs Player 2 · One clean hit wins':'You vs AI · One clean hit wins';
+ $('atlas-screen').hidden=true;$('duel-screen').hidden=false;
  window.scrollTo({top:0,behavior:'instant'});$('duel-canvas').focus({preventScroll:true});previousTime=0;accumulator=0;raf=requestAnimationFrame(frame);
+}
+function renderDuelLabels(){
+ if(!engine||!activeSettings)return;
+ const local=activeSettings.mode==='local',deviceName=device=>device==='keyboard'?t('KEYS'):t('PAD {number}',{number:gamepadIndex(device)+1});
+ $('player-label').textContent=`${local?'P1':t('YOU')} · ${deviceName(activeSettings.devices[0])}`;
+ $('rival-label').textContent=local?`P2 · ${deviceName(activeSettings.devices[1])}`:t('AI RIVAL');
+ $('keyboard-controls').setAttribute('aria-label',t('Player {player} sword stance',{player:keyboardPlayer()+1}));
+ $('touch-controls').setAttribute('aria-label',t('Player {player} touch combat controls',{player:keyboardPlayer()+1}));
+ $('duel-canvas').setAttribute('aria-label',t('Sword duel. Open Controls to view each player’s input bindings. Escape pauses.'));
+ $('duel-title').textContent=levelTitle(currentLevel);
+ $('duel-region').textContent=`${currentLevel.isDemo?t(currentLevel.location.name):currentLevel.location.name} / ${t(local?'LOCAL TWO-PLAYER':'SINGLE PLAYER')}`;
+ $('pause-button').innerHTML=`${t(engine.paused?'Resume':'Pause')} <span class="key-mini">Esc</span>`;
+ $('combat-tip').textContent=t(local?'Player 1 vs Player 2 · One clean hit wins':'You vs AI · One clean hit wins');
 }
 function drawDuel(snapshot){
  const ctx=$('duel-canvas').getContext('2d');ctx.clearRect(0,0,WORLD.width,WORLD.height);ctx.save();if(snapshot.shake){const amount=snapshot.shake*5;ctx.translate(Math.round(Math.sin(snapshot.time*117)*amount),Math.round(Math.cos(snapshot.time*89)*amount*.5));}modules.drawScene(ctx,currentLevel.scene,snapshot.time);
@@ -268,7 +282,7 @@ function drawDuel(snapshot){
  const keyboardFighter=keyboardPlayer()===1?snapshot.opponent:snapshot.player;
  const meter=$('charge-meter');if(meter){meter.value=keyboardFighter.charge||0;meter.hidden=keyboardFighter.state!=='charge';}
  playerFree=FREE_STATES.includes(keyboardFighter.state);if(canKeyboardFight())applyMouseLine();
- const fighterStatus=f=>f.counterReady?'Counter ready':`${stanceLabels[f.stance]||'Mid'}${f.guarding?' · Guard':''}${f.state==='charge'?` · ${Math.round(f.charge*100)}%`:''}`;
+ const fighterStatus=f=>f.counterReady?t('Counter ready'):`${t(stanceLabels[f.stance]||'Mid')}${f.guarding?' · '+t('Guard'):''}${f.state==='charge'?` · ${Math.round(f.charge*100)}%`:''}`;
  hudText('rival-stance',fighterStatus(snapshot.opponent));
  hudText('player-stance',fighterStatus(snapshot.player));
  document.querySelectorAll('[data-stance]').forEach(button=>{const active=button.dataset.stance===aim;if(button.getAttribute('aria-pressed')!==String(active)){button.setAttribute('aria-pressed',String(active));button.classList.toggle('active',active);}});
@@ -277,13 +291,13 @@ function drawDuel(snapshot){
  const text=snapshot.paused?'PAUSED':snapshot.phase==='countdown'?String(Math.max(1,Math.ceil(snapshot.countdown))):'';
  hudText('duel-status',text);
  if(snapshot.message&&snapshot.phase==='playing')hudText('combat-tip',snapshot.message);
- if(snapshot.phase==='postVictory')hudText('combat-tip',snapshot.mode==='local'?`${snapshot.result==='victory'?'Player 1':'Player 2'} wins · ${Math.ceil(snapshot.postVictoryRemaining)}s`:snapshot.result==='victory'?`Free play · ${Math.ceil(snapshot.postVictoryRemaining)}s`:'');
+ if(snapshot.phase==='postVictory')hudText('combat-tip',snapshot.mode==='local'?t('Player {player} wins · {seconds}s',{player:snapshot.result==='victory'?1:2,seconds:Math.ceil(snapshot.postVictoryRemaining)}):snapshot.result==='victory'?t('Free play · {seconds}s',{seconds:Math.ceil(snapshot.postVictoryRemaining)}):'');
  for(const effect of snapshot.effects){if(!heard.has(effect.id)){heard.add(effect.id);sound(effect.type);}}
 }
 function frame(now){
  if(!engine)return;if(!previousTime)previousTime=now;const delta=Math.min((now-previousTime)/1000,.1);previousTime=now;
  const pads=connectedPads(),assignment=validateAssignments(activeSettings.mode,activeSettings.devices,pads);
- if(!assignment.valid&&!engine.paused&&engine.phase!=='result'){togglePause(true);toast(`${assignment.message} Duel paused; reconnect or open Controls.`);}
+ if(!assignment.valid&&!engine.paused&&engine.phase!=='result'){togglePause(true);toast(t('{message} Duel paused; reconnect or open Controls.',{message:assignment.message}));}
  const input=duelInputs.sample(pads,{...keys,aim},{suspended:dialogOpen()||document.hidden,paused:engine.paused});
  if(input.pause)togglePause();
  if(input.rematch&&engine.phase==='result')retry();
@@ -296,25 +310,31 @@ function togglePause(force){
  const paused=typeof force==='boolean'?force:!engine.paused;
  if(!paused){const assignment=validateAssignments(activeSettings.mode,activeSettings.devices,connectedPads());if(!assignment.valid){toast(assignment.message);return;}}
  clearKeys();mouseLine=null;duelInputs?.suppress();engine.setPaused(paused);accumulator=0;previousTime=0;
- $('pause-button').innerHTML=paused?'Resume <span class="key-mini">Esc</span>':'Pause <span class="key-mini">Esc</span>';
+ $('pause-button').innerHTML=`${t(paused?'Resume':'Pause')} <span class="key-mini">Esc</span>`;
  if(!paused)$('duel-canvas').focus({preventScroll:true});
 }
 function retry(){
  if(!engine)return;
  const assignment=validateAssignments(activeSettings.mode,activeSettings.devices,connectedPads());
  if(!assignment.valid){toast(assignment.message);openSettings();return;}
- bloodDecals=[];bloodSeen=new Set();duelGeneration++;clearKeys();mouseLine=null;setAim('mid');duelInputs.reset();engine.reset(Date.now()%2147483647);resultHandled=false;heard=new Set();hudCache.clear();$('result-panel').hidden=true;$('combat-tip').textContent='One clean hit wins';$('pause-button').innerHTML='Pause <span class="key-mini">Esc</span>';accumulator=0;previousTime=0;$('duel-canvas').focus({preventScroll:true});
+ bloodDecals=[];bloodSeen=new Set();duelGeneration++;clearKeys();mouseLine=null;setAim('mid');duelInputs.reset();engine.reset(Date.now()%2147483647);resultHandled=false;resultCopy=null;heard=new Set();hudCache.clear();$('result-panel').hidden=true;$('combat-tip').textContent=t('One clean hit wins');$('pause-button').innerHTML=`${t('Pause')} <span class="key-mini">Esc</span>`;accumulator=0;previousTime=0;$('duel-canvas').focus({preventScroll:true});
 }
 async function finishDuel(result){
  const level=currentLevel, generation=duelGeneration, activeEngine=engine;const victory=result==='victory',draw=result==='draw',local=activeSettings.mode==='local';let saveMessage='';
- if(!local&&victory&&!level.cleared){const completed={...level,cleared:true};try{await modules.saveLevel(completed);const index=levels.findIndex(l=>l.id===level.id);if(index>=0)levels[index]=completed;firstLitId=completed.id;if(engine===activeEngine&&duelGeneration===generation)currentLevel=completed;saveMessage=`${level.location.name} cleared.`;}catch{saveMessage='Victory! Progress not saved.';}}
+ if(!local&&victory&&!level.cleared){const completed={...level,cleared:true};try{await modules.saveLevel(completed);const index=levels.findIndex(l=>l.id===level.id);if(index>=0)levels[index]=completed;firstLitId=completed.id;if(engine===activeEngine&&duelGeneration===generation)currentLevel=completed;saveMessage='{place} cleared.';}catch{saveMessage='Victory! Progress not saved.';}}
  else if(!local&&victory)saveMessage='Already cleared.';
  await new Promise(resolve=>setTimeout(resolve,520));
  if(engine!==activeEngine||duelGeneration!==generation||engine.snapshot().phase!=='result')return;
- const title=draw?'DRAW':local?`PLAYER ${victory?'1':'2'} WINS`:victory?'VICTORY':'DEFEATED',worldFirst=victory&&!local;
- const panel=$('result-panel');panel.innerHTML=`<h2>${title}</h2><p>${escape(local?'Local duel · no travel stamps awarded.':victory?saveMessage:draw?'One more cut.':'Find your opening.')}</p><div class="result-actions"><button id="result-primary" class="button primary">${worldFirst?'World':'Rematch'}</button><button id="result-secondary" class="button secondary">${worldFirst?'Rematch':'World'}</button>${!local&&victory&&!currentLevel.cleared?'<button id="save-victory" class="button secondary">Save Again</button>':''}</div><p class="result-hint">R / View / Share · rematch</p>`;panel.hidden=false;
- $('result-primary').onclick=worldFirst?returnToMap:retry;$('result-secondary').onclick=worldFirst?retry:returnToMap;if($('save-victory'))$('save-victory').onclick=()=>finishDuel('victory');
+ resultCopy={result,saveMessage};renderResult();
  $('result-primary').focus({preventScroll:true});
+}
+function renderResult(){
+ if(!resultCopy||!engine)return;const {result,saveMessage}=resultCopy;
+ const victory=result==='victory',draw=result==='draw',local=activeSettings.mode==='local';
+ const title=draw?t('DRAW'):local?t('PLAYER {player} WINS',{player:victory?1:2}):t(victory?'VICTORY':'DEFEATED'),worldFirst=victory&&!local;
+ const message=t(local?'Local duel · no travel stamps awarded.':victory?saveMessage:draw?'One more cut.':'Find your opening.',{place:currentLevel.isDemo?t(currentLevel.location.name):currentLevel.location.name});
+ const panel=$('result-panel');panel.innerHTML=`<h2>${escape(title)}</h2><p>${escape(message)}</p><div class="result-actions"><button id="result-primary" class="button primary">${t(worldFirst?'World':'Rematch')}</button><button id="result-secondary" class="button secondary">${t(worldFirst?'Rematch':'World')}</button>${!local&&victory&&!currentLevel.cleared?`<button id="save-victory" class="button secondary">${t('Save Again')}</button>`:''}</div><p class="result-hint">${t('R / View / Share · rematch')}</p>`;panel.hidden=false;
+ $('result-primary').onclick=worldFirst?returnToMap:retry;$('result-secondary').onclick=worldFirst?retry:returnToMap;if($('save-victory'))$('save-victory').onclick=()=>finishDuel('victory');
 }
 const keyMap={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyJ:'attack',KeyK:'parry',Space:'dodge',KeyC:'duck',KeyL:'counter',KeyV:'shove'};
 const stanceKeys={KeyW:'high',ArrowUp:'high',Digit1:'high',KeyX:'mid',Digit2:'mid',KeyS:'low',ArrowDown:'low',Digit3:'low'};
@@ -343,12 +363,30 @@ window.addEventListener('keydown',event=>{
 window.addEventListener('keyup',event=>{if(keyMap[event.code]){keys[keyMap[event.code]]=false;if(engine)event.preventDefault();}});
 window.addEventListener('blur',()=>{clearKeys();if(engine)togglePause(true);});document.addEventListener('visibilitychange',()=>{if(document.hidden){clearKeys();if(engine)togglePause(true);}});
 document.querySelectorAll('[data-control]').forEach(button=>{const control=button.dataset.control;button.addEventListener('pointerdown',event=>{if(!canKeyboardFight())return;event.preventDefault();button.setPointerCapture(event.pointerId);keys[control]=true;button.classList.add('pressed');initAudio();});const release=()=>{keys[control]=false;button.classList.remove('pressed');};button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);});
-function openHelp(){if(engine)togglePause(true);$('help-dialog').showModal();}
 function registerTools(){const context=document.modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();const tools=[{name:'read_atlas',description:'Read saved local levels and which stops have been cleared.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {levels:levels.map(l=>({id:l.id,name:l.name,location:l.location.name,cleared:l.cleared}))};}},{name:'start_duel',description:'Open mode and input selection for an existing local level. Confirm Start duel to play; winning requires gameplay.',inputSchema:{type:'object',properties:{levelId:{type:'string'}},required:['levelId'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||Object.keys(input).some(k=>k!=='levelId')||typeof input.levelId!=='string')throw new Error('Expected a levelId string');const level=levels.find(l=>l.id===input.levelId);if(!level||!modules||!gameReady)throw new Error('Level unavailable');if(dialogOpen())throw new Error('Close the open dialog first');startDuel(level);return {levelId:level.id,phase:'setup'};}}];for(const tool of tools){try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});}
 $('brand')?.addEventListener('click',returnToMap);document.querySelector('.brand').onclick=event=>{event.preventDefault();if(engine)returnToMap();};
-$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>startDuel(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-sound').onclick=toggleSound;$('nav-help').onclick=openHelp;$('menu-destinations').onclick=()=>{const drawer=$('journey-drawer');drawer.open=!drawer.open;if(drawer.open)drawer.querySelector('summary').focus({preventScroll:true});};
+$('upload-open').onclick=()=>openCreator({level:selected()?.isDemo?null:selected()});$('play-demo').onclick=()=>startDuel(levels.find(l=>l.id==='demo-maple')||selected());$('challenge-selected').onclick=()=>startDuel(selected());$('edit-selected').onclick=()=>openCreator({level:selected()});$('nav-map').onclick=()=>{if(engine)returnToMap();};$('nav-sound').onclick=toggleSound;$('menu-destinations').onclick=()=>{const drawer=$('journey-drawer');drawer.open=!drawer.open;if(drawer.open)drawer.querySelector('summary').focus({preventScroll:true});};
 $('menu-settings').onclick=openSettings;$('duel-settings').onclick=openSettings;$('duel-bindings').onclick=openSettings;
-$('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{analysisController?.abort();analysisController=null;photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('help-close').onclick=()=>$('help-dialog').close();$('help-play').onclick=()=>{$('help-dialog').close();startDuel(selected());};$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
+function renderLanguage(){
+ $('language-current').textContent=getLanguage()==='zh-CN'?'中':'EN';
+ document.querySelectorAll('[data-language]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.language===getLanguage())));
+ $('nav-sound').textContent=t($('nav-sound').getAttribute('aria-pressed')==='false'?'Sound: Off':'Sound: On');
+}
+for(const button of document.querySelectorAll('[data-language]'))button.onclick=()=>{
+ if(button.dataset.language!==getLanguage()&&engine)togglePause(true);
+ setLanguage(button.dataset.language);$('language-picker').open=false;$('language-toggle').focus();
+};
+document.addEventListener('pointerdown',event=>{if(!$('language-picker').contains(event.target))$('language-picker').open=false;});
+$('language-picker').addEventListener('keydown',event=>{if(event.key==='Escape'){$('language-picker').open=false;$('language-toggle').focus();event.stopPropagation();}});
+onLanguageChange(()=>{
+ renderLanguage();updateModeMenu();renderAtlas();renderReveal();
+ // Rebuild labels, not saved data. Preserve any in-progress creator choices.
+ const location=$('location-select').value;
+ setupChoices();if(draft){$('location-select').value=location;updateCreator();}
+ setBusy();hudCache.clear();renderDuelLabels();renderResult();
+ gateStatus($('gate-status').dataset.message||'',$('gate-status').dataset.state||'');
+});
+$('creator-close').onclick=()=>$('creator').close();$('creator').addEventListener('close',()=>{analysisController?.abort();analysisController=null;photoVersion++;photoBusy=false;analysisBusy=false;draft=null;});$('duel-back').onclick=returnToMap;$('pause-button').onclick=()=>togglePause();
 $('photo-input').onchange=event=>pickPhoto(event.target.files[0]);$('photo-drop').addEventListener('dragover',event=>{event.preventDefault();$('photo-drop').classList.add('dragover');});$('photo-drop').addEventListener('dragleave',()=>$('photo-drop').classList.remove('dragover'));$('photo-drop').addEventListener('drop',event=>{event.preventDefault();$('photo-drop').classList.remove('dragover');pickPhoto(event.dataTransfer.files[0]);});
 $('location-select').onchange=updateLocationFields;$('lighting-select').onchange=()=>{draft.scene.lighting=$('lighting-select').value;markManual();updateCreator();};$('style-select').onchange=()=>{draft.avatar.style=$('style-select').value;updateCreator();};$('ai-analyze').onclick=analyze;$('creator-form').onsubmit=saveAndPlay;
 $('gate-input').onchange=event=>{gatePhoto(event.target.files[0]);event.target.value='';};$('photo-gate').addEventListener('dragover',event=>{event.preventDefault();$('photo-gate').classList.add('dragover');});$('photo-gate').addEventListener('dragleave',()=>$('photo-gate').classList.remove('dragover'));$('photo-gate').addEventListener('drop',event=>{event.preventDefault();$('photo-gate').classList.remove('dragover');gatePhoto(event.dataTransfer.files[0]);});$('reveal-challenge').onclick=()=>{const level=gate.pending;hideReveal();if(level)startDuel(level);};$('reveal-rescan').onclick=()=>scanPlace();$('reveal-close').onclick=()=>{hideReveal();globe.clearReveal();};$('forge-skip').onclick=()=>{forgeSkipped=true;forgeController?.abort();};
@@ -358,4 +396,4 @@ for(const key of Object.keys(DEFAULT_AVATAR))$(`avatar-${key}`).oninput=()=>{dra
 window.addEventListener('pagehide',()=>{globe.destroy();duelSetup.destroy();},{once:true});
 // ?debug exposes the live duel for automated playtests; it changes nothing else.
 if(new URLSearchParams(location.search).has('debug'))window.__duel={get engine(){return engine;},get aim(){return aim;},get keys(){return {...keys};},get settings(){return structuredClone(activeSettings||settings);}};
-setupChoices();setBusy();renderAtlas();updateModeMenu();for(const id of ['play-demo','challenge-selected','upload-open','edit-selected'])$(id).disabled=true;registerTools();init();
+setupChoices();setBusy();renderAtlas();updateModeMenu();renderLanguage();for(const id of ['play-demo','challenge-selected','upload-open','edit-selected'])$(id).disabled=true;registerTools();init();

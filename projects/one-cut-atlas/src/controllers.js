@@ -1,4 +1,6 @@
 // Browser-standard gamepad layout. Keep polling/DOM work outside these pure helpers.
+import { t } from './i18n.js';
+
 const STANCES = new Set(['high', 'mid', 'low']);
 const MOVE_DEADZONE = 0.25;
 
@@ -54,30 +56,30 @@ export function listGamepads(pads) {
       const id = typeof pad.id === 'string' ? pad.id : '';
       const name = id.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
       const shortName = name.length > 64 ? `${name.slice(0, 61)}…` : name;
-      return { index: pad.index, id, label: `Gamepad ${pad.index + 1}${shortName ? ` · ${shortName}` : ''}` };
+      return { index: pad.index, id, label: `${t('Gamepad {number}', { number: pad.index + 1 })}${shortName ? ` · ${shortName}` : ''}` };
     });
 }
 
 export function validateAssignments(mode, devices, pads) {
   const invalid = message => ({ valid: false, message });
-  if (mode !== 'solo' && mode !== 'local') return invalid('Choose single player or local two-player mode.');
+  if (mode !== 'solo' && mode !== 'local') return invalid(t('Choose single player or local two-player mode.'));
   const count = mode === 'local' ? 2 : 1;
   const selected = Array.isArray(devices) ? devices.slice(0, count) : [];
-  if (selected.length !== count || selected.some(device => !device)) return invalid('Choose an input device for each player.');
+  if (selected.length !== count || selected.some(device => !device)) return invalid(t('Choose an input device for each player.'));
   if (count === 2 && selected[0] === selected[1]) {
-    return invalid(selected[0] === 'keyboard'
+    return invalid(t(selected[0] === 'keyboard'
       ? 'Use a keyboard and gamepad, or two separate gamepads.'
-      : 'Each player needs a different gamepad.');
+      : 'Each player needs a different gamepad.'));
   }
   const connected = Array.from(pads ?? []);
   for (let player = 0; player < count; player++) {
     const device = selected[player];
     if (device === 'keyboard') continue;
     const index = gamepadIndex(device);
-    if (index === null) return invalid(`Choose a valid input device for Player ${player + 1}.`);
+    if (index === null) return invalid(t('Choose a valid input device for Player {player}.', { player: player + 1 }));
     const pad = connected.find(candidate => candidate?.index === index && candidate.connected === true);
-    if (!pad) return invalid(`Player ${player + 1}'s gamepad is disconnected. Connect it and press a button.`);
-    if (pad.mapping !== 'standard') return invalid(`Player ${player + 1}'s gamepad needs a browser-standard mapping. Try a compatible controller.`);
+    if (!pad) return invalid(t("Player {player}'s gamepad is disconnected. Connect it and press a button.", { player: player + 1 }));
+    if (pad.mapping !== 'standard') return invalid(t("Player {player}'s gamepad needs a browser-standard mapping. Try a compatible controller.", { player: player + 1 }));
   }
   return { valid: true, message: '' };
 }
