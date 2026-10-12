@@ -1,0 +1,21 @@
+{
+  "project": "Mibly by Tony Liu",
+  "screenshotTreatment": "Original browser captures are unchanged. CSS viewports crop browser whitespace or enlarge individual UI components.",
+  "currentScreens": {
+    "map.png": "Project 2/demo/qa/mibly-home.png",
+    "feed.png": "Project 2/demo/qa/mibly-feed.png",
+    "memories.png": "Project 2/demo/qa/mibly-memories.png",
+    "restaurant.png": "Project 2/demo/qa/mibly-community-10-venue.png"
+  },
+  "historicalScreens": {
+    "iterations/early-feed.png": "Project 2/demo/qa/iteration4-before-home.png",
+    "iterations/early-map.png": "Project 2/demo/qa/iteration4-before-map.png",
+    "iterations/duplicate-chat-home.png": "Project 2/demo/qa/iteration5-01-before-home.png",
+    "iterations/people-center.png": "Project 2/demo/qa/mibly-community-05-people.png",
+    "iterations/mibly-home.png": "Project 2/demo/qa/mibly-home.png"
+  },
+  "mealPhotos": "Designer-supplied photographs. See ../demo/assets/meals/credits.json for file provenance. Originals remain unchanged in Project 2/Photo References.",
+  "illustration": "The map, pin positions, and sample avatars are illustrative. Earlier screenshots include generated food imagery.",
+  "demoScenarios": "Names, timestamps, social connections, and restaurant visits are synthetic examples; they are not identities or locations inferred from the photos.",
+  "siteReference": "Tony Liu's Flighty case study informed this page's narrative structure, floating navigation, and visual pacing. The existing Flighty project is unchanged."
+}

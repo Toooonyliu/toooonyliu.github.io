@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183d31">
+  <title>Designing Mibly with AI · Tony Liu</title>
+  <meta name="description" content="Tony Liu reflects on using AI to research, define, develop, prototype, and evaluate Mibly—and where human judgment remained essential.">
+  <link rel="canonical" href="https://toooonyliu.github.io/projects/mibly/ai-process.html">
+  <meta property="og:title" content="Designing Mibly with AI">
+  <meta property="og:description" content="What I tried, where AI helped, and where it did not in the Mibly product-design process.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://toooonyliu.github.io/projects/mibly/ai-process.html">
+  <meta property="og:image" content="https://toooonyliu.github.io/projects/mibly/images/iterations/mibly-home.png">
+  <link rel="icon" href="/favicon-tl.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="case-study.css">
+  <script src="ai-process.js" defer></script>
+  <noscript><style>.menu-button{display:none!important}.nav-links{display:flex!important;position:static;flex-wrap:wrap;padding:0;border:0;box-shadow:none}.floating-nav{flex-wrap:wrap}</style></noscript>
+</head>
+<body class="ai-process-page">
+<a class="skip-link" href="#main">Skip to reflection</a>
+<div class="project-banner"><span>Mibly · AI design process</span><a href="./">Back to the case study ↗</a></div>
+<header class="nav-wrap">
+  <nav class="floating-nav" aria-label="AI process navigation">
+    <a class="wordmark" href="./" aria-label="Mibly case study">Mibly<span>.</span></a>
+    <button class="menu-button" aria-expanded="false" aria-controls="project-links" aria-label="Open process navigation">☰</button>
+    <div class="nav-links" id="project-links"><a href="#discover">Discover</a><a href="#define">Define</a><a href="#develop">Develop</a><a href="#deliver">Deliver</a></div>
+    <a class="nav-cta" href="./">Case study <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<main id="main">
+  <section class="ai-hero container" aria-labelledby="ai-title">
+    <p class="eyebrow">Process reflection · Mibly</p>
+    <h1 id="ai-title">I used AI to move faster.<br><span>I did not use it to decide what mattered.</span></h1>
+    <p class="hero-lede">This is what I tried across Discover, Define, Develop, and Deliver—plus the places where AI’s speed created false confidence, generic choices, or evidence that looked stronger than it was.</p>
+    <div class="ai-hero-art" aria-label="Mibly interface changed from an early contained map to a map-first social homepage">
+      <figure><span>Earlier direction</span><div class="phone-crop"><img src="images/iterations/early-map.png" alt="Earlier Food Reals prototype with a contained map above a feed" width="1280" height="1000"></div></figure>
+      <div class="ai-transition"><span>Prompt</span><span>Inspect</span><span>Revise</span></div>
+      <figure><span>Current direction</span><div class="phone-crop"><img src="images/map.png" alt="Current Mibly map-first social homepage" width="1280" height="1000"></div></figure>
+    </div>
+  </section>
+
+  <dl class="project-meta container"><div><dt>What I used AI for</dt><dd>Research synthesis, concepts, prototyping & QA</dd></div><div><dt>What stayed human</dt><dd>Framing, critique, trust & product judgment</dd></div><div><dt>Evidence boundary</dt><dd>Public reviews and synthetic scenarios</dd></div><div><dt>Next step</dt><dd>Research with real friend groups</dd></div></dl>
+
+  <section class="section dark-section ai-opening"><div class="container">
+    <div class="section-heading"><p class="eyebrow">The approach</p><h2>AI was a collaborator<br>with a narrow job.</h2><p class="section-lede">I used it to widen the set of things I could inspect: more reviews, more possible framings, more working states, and more edge cases. I did not treat fluent output as user evidence or a generated interface as a design decision.</p></div>
+    <div class="ai-rules"><article><span>01</span><h3>Keep the source visible.</h3><p>Every insight had to point back to a review, a saved prototype, or a declared hypothesis.</p></article><article><span>02</span><h3>Turn output into something inspectable.</h3><p>A coded theme, screen, or interaction was useful only when I could challenge it.</p></article><article><span>03</span><h3>Name what remained unknown.</h3><p>Functional checks could not establish desire, trust, or a lasting social habit.</p></article></div>
+  </div></section>
+
+  <section class="section container ai-phase" id="discover">
+    <div class="ai-phase-heading"><div><p class="eyebrow">01 / Discover</p><h2>Organize the evidence.<br>Do not inflate it.</h2></div><p>I collected 688 unique public Beli reviews and created a deliberately star-balanced sample of 250 for analysis: 25 reviews per star rating on each of two platforms. AI read the full text against a defined multilabel codebook and helped surface recurring themes.</p></div>
+    <div class="ai-phase-grid"><article><span class="small-label">What I tried</span><h3>Review coding and synthetic scenarios.</h3><p>Scripts gathered and deduplicated review text. One AI analyst applied overlapping codes. I also ran five AI-simulated interviews to explore situations around posting, privacy, and remembering meals.</p></article><article class="helped"><span class="small-label">Where it helped</span><h3>A faster first map of the problem.</h3><p>AI made a large text set easier to organize, preserved review IDs, and surfaced social connection and personal memories as themes worth investigating.</p></article><article class="limited"><span class="small-label">Where it did not</span><h3>Patterns were not population truth.</h3><p>The sample was nonrepresentative, one AI coder had no intercoder check, and simulated interviews were not participants. The output framed questions; it did not validate demand.</p></article></div>
+    <div class="ai-evidence-band"><div><strong>250</strong><span>reviews analyzed</span></div><div><strong>26</strong><span>coded for social connection</span></div><div><strong>23</strong><span>coded for records & memories</span></div><p>Overlapping counts in the selected sample, not estimates of all Beli users.</p></div>
+  </section>
+
+  <section class="section design-section ai-phase" id="define"><div class="container">
+    <div class="ai-phase-heading"><div><p class="eyebrow">02 / Define</p><h2>Use AI to compare.<br>Use judgment to choose.</h2></div><p>I asked AI to compare incumbent capabilities, review themes, and several possible product centers: ranking restaurants, browsing a food feed, keeping personal memories, or catching up with friends on a map.</p></div>
+    <div class="ai-turning-point"><div><span class="small-label">The incumbent’s center</span><p>“Keep track of restaurants.”</p></div><div><span class="small-label">The opportunity I chose</span><p>“Catch up through today’s meals.”</p></div></div>
+    <div class="ai-phase-grid"><article><span class="small-label">What I tried</span><h3>Competitive comparison and reframing.</h3><p>AI helped contrast Beli’s published product, BeReal’s social structure, map conventions, and the themes in the review sample.</p></article><article class="helped"><span class="small-label">Where it helped</span><h3>More framings, sooner.</h3><p>It was useful for stress-testing whether a feature was actually different, or merely a familiar pattern with a new surface.</p></article><article class="limited"><span class="small-label">Where it did not</span><h3>It could not choose the meaningful question.</h3><p>I made the shift from restaurant utility to everyday connection and set the privacy principle: a meal location is not live presence.</p></article></div>
+    <blockquote class="ai-question">How might everyday meals help<br><strong>friends feel a little closer?</strong></blockquote>
+  </div></section>
+
+  <section class="section container ai-phase" id="develop">
+    <div class="ai-phase-heading"><div><p class="eyebrow">03 / Develop</p><h2>Generation was<br>the beginning of critique.</h2></div><p>I used AI to turn directions into working React prototypes, then treated every output as a draft. The faster I could see and use a version, the more specific my next critique became.</p></div>
+    <div class="ai-iteration-strip"><figure><img src="images/iterations/early-feed.png" alt="Early feed-led Food Reals prototype" width="1280" height="1000" loading="lazy"><figcaption>Feed-led start</figcaption></figure><figure><img src="images/iterations/early-map.png" alt="Early prototype with a contained map module" width="1280" height="1000" loading="lazy"><figcaption>Map as a module</figcaption></figure><figure><img src="images/map.png" alt="Mibly with the map as the full social homepage" width="1280" height="1000" loading="lazy"><figcaption>Map as Home</figcaption></figure></div>
+    <div class="ai-phase-grid"><article><span class="small-label">What I tried</span><h3>Prompt, interact, critique, revise.</h3><p>I supplied product references, asked for functional screens, used the prototype, named the mismatch, and generated a narrower revision.</p></article><article class="helped"><span class="small-label">Where it helped</span><h3>Critique became working UI quickly.</h3><p>The map could become Home, the duplicate Chat action could become a people center, and audience rules could become testable behavior without restarting the prototype.</p></article><article class="limited"><span class="small-label">Where it did not</span><h3>The first answer was often generic.</h3><p>AI did not notice that the hierarchy still felt like a restaurant tool, that Chat appeared twice, or that sample imagery made the experience feel less personal. I had to see and name those problems.</p></article></div>
+  </section>
+
+  <section class="section process-section ai-phase" id="deliver"><div class="container">
+    <div class="ai-phase-heading"><div><p class="eyebrow">04 / Deliver</p><h2>Test the behavior.<br>Stay honest about the product.</h2></div><p>I used AI-assisted implementation and automated checks to move beyond a happy-path mockup. The prototype exercises navigation, posting, audience visibility, restaurant actions, and fallback behavior.</p></div>
+    <div class="ai-checks"><article><span>Checked</span><h3>Social boundaries</h3><p>A pending request does not unlock friend content. Home and private meals remain outside friends-of-friends discovery.</p></article><article><span>Checked</span><h3>Interaction states</h3><p>Map, feed, people, memories, capture, and profile flows remain navigable across the supported phone frames.</p></article><article><span>Checked</span><h3>Sharing fallbacks</h3><p>A canceled native share does nothing; unavailable clipboard access reveals selectable text instead of failing silently.</p></article></div>
+    <div class="ai-phase-grid"><article><span class="small-label">What I tried</span><h3>Code generation, walkthroughs, and automated checks.</h3><p>I used AI to implement interaction rules, generate test cases, and compare expected states against the working prototype.</p></article><article class="helped"><span class="small-label">Where it helped</span><h3>More edge cases fit into the project.</h3><p>AI was valuable for tracing state, checking regressions, and keeping privacy rules consistent across multiple screens.</p></article><article class="limited"><span class="small-label">Where it did not</span><h3>Functional is not desirable.</h3><p>No automated test can tell me whether friends understand the map, feel safe sharing, or return for an ordinary meal. That requires real participants over time.</p></article></div>
+  </div></section>
+
+  <section class="section container ai-reflection">
+    <div class="section-heading"><p class="eyebrow">What I learned</p><h2>The best use of AI was<br>making judgment more concrete.</h2><p class="section-lede">AI increased the number of artifacts I could inspect. The quality of the project still depended on the quality of the questions, critiques, sources, and boundaries I brought to it.</p></div>
+    <div class="learning-grid light-learning"><article><span class="small-label">I would use AI again for</span><h3>Organizing, building, and checking.</h3><p>Review coding with a visible method, rapid concept prototypes, focused UI revisions, and systematic interaction checks.</p></article><article><span class="small-label">I would keep in human hands</span><h3>Meaning, trust, and learning from people.</h3><p>Choosing the need, interpreting weak evidence, evaluating privacy tradeoffs, and deciding whether the product deserves to exist.</p></article></div>
+    <div class="ai-next"><div><span class="small-label">The next honest step</span><h3>Put Mibly in front of a real friend group.</h3><p>Observe whether they understand the location model, share without extra work, and return after the novelty fades.</p></div><div><a class="button primary-button" href="./">Read the product case study ↗</a><a class="button secondary-button" href="demo/?presentation=1">Try the prototype ↗</a></div></div>
+  </section>
+</main>
+<footer class="container"><div><a class="footer-name" href="../../">Tony Liu</a><p>Mibly AI process reflection · 2026.<br>Synthetic research is labeled and is not presented as participant evidence.</p></div><div class="footer-links"><a href="./">Mibly case study</a><a href="evidence/methodology.json">Research method</a><a href="demo/slides/process.html">Process presentation ↗</a><a href="#main">Back to top ↑</a></div></footer>
+</body>
+</html>

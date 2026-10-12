@@ -1,0 +1,52 @@
+import { chromium } from "playwright";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const browser=await chromium.launch({headless:true,executablePath:"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"});
+const context=await browser.newContext({viewport:{width:1280,height:1000},acceptDownloads:true});
+await context.addInitScript(()=>{
+  window.__copied="";
+  Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async value=>{window.__copied=value;}}});
+  Object.defineProperty(navigator,"share",{configurable:true,value:undefined});
+});
+const page=await context.newPage();
+const qaPrefix=process.env.QA_PREFIX||"iteration5";
+const errors=[],passed=[];page.on("pageerror",error=>errors.push(error.message));
+const snap=async name=>{await page.mouse.move(20,20);await page.waitForTimeout(450);await page.screenshot({path:`qa/${qaPrefix}-${name}.png`});assert.deepEqual(await page.locator(".device-screen img").evaluateAll(images=>images.filter(image=>!image.complete||!image.naturalWidth).map(image=>image.src)),[]);};
+const click=async(locator)=>{await page.locator(".device-screen").ariaSnapshot();await locator.click();};
+const button=name=>page.getByRole("button",{name,exact:true});
+const close=async()=>{await click(button("Close"));await page.getByTestId("bottom-sheet").waitFor({state:"detached"});};
+const circle=async label=>{await click(button("Choose people to see"));await click(page.locator(".audience-option").filter({has:page.getByText(label,{exact:true})}));await page.getByTestId("bottom-sheet").waitFor({state:"detached"});};
+const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem("food-reals-v3")));
+try {
+  await page.goto("http://127.0.0.1:4173/?iteration=5",{waitUntil:"networkidle"});
+  assert.equal(await page.locator('[data-iteration="5"]').count(),1);
+  assert.equal(await button("Open conversations").count(),0);assert.equal(await button("Chat").count(),1);assert.equal(await button("Add friends").count(),1);
+  await snap("04-home");passed.push("One Chat entry; Add friends is discoverable");
+  await click(button("Add friends"));await snap("05-people");
+  await page.getByLabel("Search people").fill("not-a-real-person");assert.equal(await page.locator(".person-row").count(),0);assert.match(await page.locator(".people-empty").innerText(),/No matching person/);
+  await page.getByLabel("Search people").fill("Chloe");await page.waitForTimeout(400);assert.ok((await button("Close").boundingBox()).y>(await page.locator(".device-screen").boundingBox()).y+55);await click(button("Add friend"));assert.deepEqual((await state()).network.outgoing,["chloe"]);await close();
+  await page.reload({waitUntil:"networkidle"});await click(button("Add friends"));await page.getByLabel("Search people").fill("Chloe");assert.equal(await button("Cancel request").count(),1);await snap("06-pending");
+  await click(button("Cancel request"));assert.deepEqual((await state()).network.outgoing,[]);await close();passed.push("Search empty state, pending persistence and cancellation");
+  await circle("Friends of friends");assert.equal(await page.locator(".world-pin").count(),3);assert.equal(await page.locator(".world-pin").filter({hasText:"At home"}).count(),0);await snap("07-extended-map");
+  await click(page.locator(".world-pin").filter({hasText:"Chloe"}));await click(page.locator(".map-card-main"));assert.equal(await page.getByLabel("Your reply",{exact:true}).count(),0);assert.equal(await page.locator(".conversation-lock").count(),1);await close();
+  await click(button("Feed"));assert.equal(await page.locator(".feed .meal-card").count(),3);assert.match(await page.locator(".feed").innerText(),/Through Maya/);assert.doesNotMatch(await page.locator(".feed").innerText(),/Pasta at home|private food memory/);await snap("08-extended-feed");passed.push("Friends-of-friends consent, mutual context, private/home exclusion and chat gating");
+  await click(button("Add friends"));await page.getByLabel("Search people").fill("Priya");await click(button("Accept"));assert.equal((await state()).network.friends.length,5);await close();
+  await circle("My friends");await click(button("Map"));assert.equal(await page.locator(".world-pin").filter({hasText:"Priya"}).count(),1);await page.reload({waitUntil:"networkidle"});assert.equal((await state()).network.friends.length,5);passed.push("Accept request updates friendship, map and persistence");
+  await click(page.locator(".world-pin").filter({hasText:"Maya"}));await click(button("See all Maya’s posts"));assert.ok(await page.locator(".feed .meal-card").count()>1);assert.equal(await page.locator(".friend-filter-chip").innerText(),"Maya");await snap("09-friend-posts");
+  await click(page.locator(".friend-filter-chip"));assert.equal(await page.locator(".feed .meal-card").count(),6);await click(page.locator(".load-more"));assert.equal(await page.locator(".feed .meal-card").count(),12);await click(button("Today"));assert.equal(await page.locator(".feed .meal-card").count(),6);passed.push("Friend history, reset filter, pagination and Today filter");
+  await click(button("View profile: Maya Chen"));await click(button("Hide this person’s posts"));assert.equal(await page.locator(".feed .meal-card").filter({hasText:"Maya Chen"}).count(),0);await click(button("Add friends"));await page.getByLabel("Search people").fill("Maya");await click(button("Hidden · Show posts again"));await close();assert.equal(await page.locator(".feed .meal-card").filter({hasText:"Maya Chen"}).count(),1);passed.push("Hide and restore posts");
+  await click(button("Kura Revolving Sushi Bar · South Side"));await page.waitForTimeout(3500);await snap("10-venue");
+  const maps=page.getByRole("link",{name:"Open Google Maps",exact:true});const mapsURL=new URL(await maps.getAttribute("href"));assert.equal(mapsURL.hostname,"www.google.com");assert.equal(mapsURL.searchParams.get("api"),"1");assert.match(mapsURL.searchParams.get("query"),/Kura Revolving Sushi Bar 415 Cinema Dr/);
+  const direction=page.getByRole("link",{name:"Directions",exact:true});assert.match(new URL(await direction.getAttribute("href")).searchParams.get("destination"),/415 Cinema Dr/);
+  await click(button("Copy address"));assert.equal(await page.evaluate(()=>window.__copied),"415 Cinema Dr, Pittsburgh, PA 15203");
+  await click(button("Share restaurant"));assert.match(await page.evaluate(()=>window.__copied),/Kura Revolving Sushi Bar\n415 Cinema Dr/);assert.doesNotMatch(await page.evaluate(()=>window.__copied),/127\.0\.0\.1|localhost|Maya|private/);
+  const downloadEvent=page.waitForEvent("download");await click(button("Export address"));const download=await downloadEvent;assert.equal(download.suggestedFilename(),"kura_sushi-address.txt");assert.match(await readFile(await download.path(),"utf8"),/https:\/\/www.google.com\/maps/);passed.push("Google Maps and directions URLs; copy, share fallback and real address export");
+  await page.evaluate(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async()=>{throw new Error("Denied");}}}));
+  await click(button("Copy address"));assert.equal(await page.getByLabel("Copy restaurant details manually").inputValue(),"415 Cinema Dr, Pittsburgh, PA 15203");await snap("11-copy-fallback");passed.push("Denied clipboard has selectable manual fallback");
+  await page.evaluate(()=>{window.__copied="unchanged";Object.defineProperty(navigator,"share",{configurable:true,value:async()=>{throw new DOMException("Canceled","AbortError");}});});await click(button("Share restaurant"));assert.match(await page.locator(".venue-action-status").innerText(),/canceled/);assert.equal(await page.evaluate(()=>window.__copied),"unchanged");
+  await page.evaluate(()=>Object.defineProperty(navigator,"share",{configurable:true,value:async data=>{window.__shareData=data;}}));await click(button("Share restaurant"));assert.match((await page.evaluate(()=>window.__shareData)).url,/google.com\/maps/);passed.push("Native share payload and cancellation behavior (API simulated)");
+  await close();await click(button("Map"));await click(page.getByTestId("device-picker"));await click(page.getByTestId("device-option-pixel-10"));await snap("12-pixel");
+  await click(button("Profile"));await click(button("Settings"));await click(button("中文"));await click(button("关闭"));await click(button("首页"));await click(button("添加朋友"));await snap("13-chinese-people");passed.push("Pixel and Chinese people flow");
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({passed,pageErrors:errors},null,2));
+} finally {await browser.close();}

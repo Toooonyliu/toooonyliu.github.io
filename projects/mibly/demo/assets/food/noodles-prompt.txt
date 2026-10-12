@@ -1,0 +1,3 @@
+Built-in ImageGen; generated 2026-10-03.
+Prompt: standalone landscape candid smartphone photo of Thai stir-fried flat rice noodles with shrimp and egg on an ordinary white plate. Casually tossed noodles, bean sprouts, herbs, lime and crushed peanut. Ordinary neighborhood restaurant brown table, fork at plate edge. Close oblique overhead seated camera, natural uneven warm light and everyday food texture. No UI, text, logos, branding, watermark, people or commercial plating gloss.
+Generated output resized to 1200 x 850 as noodles.jpg.

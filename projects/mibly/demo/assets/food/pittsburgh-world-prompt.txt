@@ -1,0 +1,7 @@
+Food Reals iteration 4 — generated terrain asset
+Generated with the built-in image generation tool on 2026-10-07.
+This is illustrative Pittsburgh-inspired terrain, not geographic map data.
+Food photos, avatars, location labels, and interactions are separate application layers.
+
+Prompt:
+Generate a square 1536x1536 image asset: an overhead, playful miniature 3D city map inspired by Pittsburgh and the delightful world-like visual feel of Zenly. Soft clay render, sage green parks, cream street grid, peach and ivory townhouses, turquoise river winding diagonally through the city, yellow bridges, tiny restaurant storefronts, trees and university buildings. Orthographic almost top-down view, city fills entire frame edge to edge, crisp details, warm daylight. Plenty of open road and park space for interactive friend and food markers to be layered over later. Absolutely no UI, no text, no letters, no labels, no pins, no portraits, no food photos. This is the base terrain art for a mobile app, not a screenshot or phone mockup. Beautiful premium restrained pastel palette.

@@ -1,0 +1,35 @@
+{
+  "research_date": "2026-10-02",
+  "collected_unique": 688,
+  "analyzed": 250,
+  "sampling": "Latest 25 per platform × star stratum; Apple within latest 500 pool; Google per-star API retrieval, en/US request.",
+  "stars_per_platform": {
+    "Apple": {
+      "1": 25,
+      "2": 25,
+      "3": 25,
+      "4": 25,
+      "5": 25
+    },
+    "Google": {
+      "1": 25,
+      "2": 25,
+      "3": 25,
+      "4": 25,
+      "5": 25
+    }
+  },
+  "coding": "Single AI analyst, complete-text reading, multilabel manual assignments, no independent intercoder reliability.",
+  "duplicates": "Platform+review ID dedup; no exact normalized text duplicate in selected 250.",
+  "limits": [
+    "Nonrepresentative star-balanced sample",
+    "Unequal dates/platform windows",
+    "User reports not verified current functionality",
+    "Mock interviews not real user evidence"
+  ],
+  "scripts": [
+    "scripts/collect.py",
+    "scripts/code_reviews.py",
+    "scripts/build_report.py"
+  ]
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183d31">
+  <title>Mibly — Your people. Their plates. · Tony Liu</title>
+  <meta name="description" content="Mibly is a map-first food-sharing concept by Tony Liu. Explore the research, design iterations, AI process, and interactive prototype behind an everyday social food experience.">
+  <link rel="canonical" href="https://toooonyliu.github.io/projects/mibly/">
+  <meta property="og:title" content="Mibly — Your people. Their plates.">
+  <meta property="og:description" content="A product design case study by Tony Liu: bringing everyday meals, friends, and shared places onto one map.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://toooonyliu.github.io/projects/mibly/">
+  <meta property="og:image" content="https://toooonyliu.github.io/projects/mibly/images/map.png">
+  <link rel="icon" href="/favicon-tl.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="case-study.css">
+  <script src="case-study.js" defer></script>
+  <noscript><style>.iteration-panel[hidden]{display:grid!important}.hero-tabs,.iteration-tabs,.feature-nav,.demo-current,.demo-controls>.fineprint,.menu-button{display:none!important}.nav-links{display:flex!important;position:static;flex-wrap:wrap;padding:0;border:0;box-shadow:none}.floating-nav{flex-wrap:wrap}.demo-placeholder .button{display:none}</style></noscript>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to case study</a>
+<div class="project-banner"><span>Mibly · Independent product design study</span><a href="../../">Tony Liu ↗</a></div>
+<header class="nav-wrap">
+  <nav class="floating-nav" aria-label="Project navigation">
+    <a class="wordmark" href="#main" aria-label="Mibly, back to top">Mibly<span>.</span></a>
+    <button class="menu-button" aria-expanded="false" aria-controls="project-links" aria-label="Open project navigation">☰</button>
+    <div class="nav-links" id="project-links"><a href="#idea">The idea</a><a href="#research">Research</a><a href="#design">Design</a><a href="ai-process.html">AI process</a></div>
+    <a class="nav-cta" href="#demo">Try the demo <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero container" aria-labelledby="hero-title">
+    <p class="eyebrow">A little closer, one meal at a time</p>
+    <h1 id="hero-title">Your people. Their plates.<br><span>A day worth sharing.</span></h1>
+    <p class="hero-lede">A map-first way to catch up through food.<br> At a restaurant, at home, or somewhere in between.</p>
+    <div class="hero-showcase">
+      <div class="hero-orbit" aria-hidden="true"></div>
+      <div class="hero-story story-left"><img src="demo/assets/meals/home-table.jpg" alt="A home-cooked meal shared around a small table" width="220" height="260"><div><span class="story-type">A night in</span><strong>Ordinary meals belong here.</strong></div></div>
+      <div class="hero-center">
+        <div class="phone-crop hero-phone"><img id="hero-screen" src="images/map.png" alt="Mibly Home, showing friends’ food photos and avatars on an illustrated Pittsburgh map" width="1280" height="1000" fetchpriority="high"></div>
+        <div class="hero-tabs" role="group" aria-label="Preview Mibly screens"><button data-preview="map" aria-pressed="true">Map</button><button data-preview="feed" aria-pressed="false">Feed</button><button data-preview="memories" aria-pressed="false">Memories</button></div>
+      </div>
+      <div class="hero-story story-right"><img src="demo/assets/meals/wellington.jpg" alt="Beef Wellington at a shared dinner" width="220" height="260"><div><span class="story-type">A dinner out</span><strong>A good meal. A familiar face.</strong></div></div>
+      <span class="showcase-note">My meal photos · illustrative map · sample activity</span>
+    </div>
+    <p class="hero-caption" id="hero-caption">See who ate what, where, and when—without opening every post.</p>
+    <a class="text-link" href="#demo">Explore the working prototype <span aria-hidden="true">↗</span></a>
+  </section>
+
+  <dl class="project-meta container"><div><dt>My role</dt><dd>Product strategy, UX/UI & prototyping</dd></div><div><dt>Timeline</dt><dd>Three-week academic project · 2026</dd></div><div><dt>Approach</dt><dd>AI-assisted research & iteration</dd></div><div><dt>Outcome</dt><dd>Interactive concept, ready to test</dd></div></dl>
+
+  <nav class="design-arc container" aria-label="Design process">
+    <a href="#research"><span>01 · Discover</span><strong>Research the market and users</strong></a>
+    <a href="#define"><span>02 · Define</span><strong>Choose the underserved need</strong></a>
+    <a href="#design"><span>03 · Develop</span><strong>Explore, critique, and revise</strong></a>
+    <a href="#demo"><span>04 · Deliver</span><strong>Prototype, test, and evaluate</strong></a>
+  </nav>
+
+  <section class="section dark-section" id="idea"><div class="container">
+    <div class="section-heading"><p class="eyebrow">01 / The opportunity</p><h2>Some meals make plans.<br>Others make you feel closer.</h2><p class="section-lede">I started with a simple question: where did my friends eat today? A restaurant list only tells part of that story. I wanted homemade dinners and quick lunches to have a place, too.</p></div>
+    <div class="positioning-grid"><article><span class="small-label">Beli · Existing product</span><h3>“Keep track of<br>restaurants.”</h3><p>Lists, maps, recommendations, and friends’ restaurant activity.</p><a class="text-link" href="https://beliapp.com/" target="_blank" rel="noopener">Beli’s published capabilities ↗</a></article><article class="positioning-ours"><span class="small-label">Mibly · Proposed direction</span><h3>“Catch up through<br>today’s meals.”</h3><p>A friend, a plate, a time, and a shared place—including home cooking.</p><a class="text-link" href="#design">See the design decisions ↓</a></article></div>
+    <p class="section-note">Beli already has maps and social features. The proposed difference is an everyday, map-first social habit—not the presence of a map. That habit remains a design hypothesis.</p>
+  </div></section>
+
+  <section class="section container" id="research">
+    <div class="section-heading"><p class="eyebrow">02 / Discover</p><h2>Look for the connection.<br>Keep the evidence in proportion.</h2><p class="section-lede">I used AI to organize a selected sample of Beli reviews. Two themes helped me look beyond choosing the next restaurant: staying connected and keeping a personal food history.</p></div>
+    <div class="evidence-grid"><div class="sample-card"><span class="small-label">Selected public reviews</span><strong class="sample-total">250</strong><p>125 App Store + 125 Google Play</p><div class="sample-split" role="img" aria-label="Equal sample: 125 App Store reviews and 125 Google Play reviews"><span>App Store</span><span>Google Play</span></div><p class="fineprint">25 reviews per star rating, per platform.<br>Collected October 2, 2026.</p></div><div class="theme-findings"><article><strong>26</strong><div><h3>Social connection</h3><p>Friends’ activity and food sharing were part of the appeal.</p></div></article><article><strong>23</strong><div><h3>Records & memories</h3><p>Personal history mattered alongside discovery.</p></div></article><p class="fineprint">Overlapping themes in the selected 250 reviews—not estimates of how all users feel.</p></div></div>
+    <details class="disclosure"><summary>Research method, sources & limits <span aria-hidden="true">+</span></summary><div><p>This was a deliberately star-balanced sample, not a representative survey. One AI analyst coded the complete review text with overlapping themes. There was no independent intercoder validation. Historical reviewer reports do not establish current product behavior.</p><p>Five AI-simulated interviews explored possible situations; they were not interviews with real participants. The evidence helped frame the opportunity, not validate demand for Mibly.</p><div class="resource-links"><a href="evidence/methodology.json">Sampling & coding method ↗</a><a href="evidence/stats.json">Theme counts & review IDs ↗</a></div></div></details>
+    <div class="question-block" id="define"><p class="eyebrow">03 / Define · The question I chose</p><p>How might everyday meals help<br><strong>friends feel a little closer?</strong></p><p class="define-note">AI helped compare patterns and possible framings. I chose to move beyond restaurant utility and center the ordinary social moment.</p></div>
+  </section>
+
+  <section class="section design-section" id="design"><div class="container">
+    <div class="section-heading"><p class="eyebrow">04 / Develop · Choose a direction</p><h2>People first.<br>Places in context.</h2><p class="section-lede">I explored restaurant-, feed-, and map-led ways into the product. The map-first direction made a friend’s everyday meal—not a ranked venue—the main unit of the experience.</p></div>
+    <div class="design-feature"><div class="feature-copy"><span class="step-number">01</span><h3>Make the map<br>the social homepage.</h3><p>The first version treated the map as a secondary tool. I moved friends’ food photos onto Home, with avatars, timestamps, and declared places visible together.</p><p>A Zenly-inspired illustrated world gives the experience personality. A Feed toggle keeps longer browsing familiar.</p><a class="text-link" href="#demo" data-jump-demo="map">Explore the map ↗</a></div><div class="design-visual map-visual"><div class="phone-crop"><img src="images/map.png" alt="The map-first Home screen with photo-and-avatar meal pins" width="1280" height="1000" loading="lazy"></div><div class="visual-caption"><strong>A little food world</strong><span>Illustrative terrain, not navigation-grade geography.</span></div></div></div>
+    <div class="design-feature reversed"><div class="feature-copy"><span class="step-number">02</span><h3>Give every social task<br>a clear place.</h3><p>My BeReal references helped clarify the surrounding structure: Home, Chat, Capture, Memories, and Profile. Mibly’s map stays distinctive; the navigation feels familiar.</p><p>Home’s people center handles discovery and requests. Friends of friends is an explicit scope, with mutual-friend context and opted-in restaurant posts.</p><a class="text-link" href="#demo" data-jump-demo="people">Find your people ↗</a></div><div class="social-diagram"><div class="people-preview screenshot-crop" style="--crop-width:361.58%;--crop-left:-130.79%;--crop-top:-56.38%;aspect-ratio:354/337"><img src="images/iterations/people-center.png" alt="People center with search, Discover, Requests, My friends, and Add friend controls" width="1280" height="1000" loading="lazy"></div><div class="nav-anatomy" aria-label="Five primary destinations"><span>Home</span><span>Chat</span><span class="capture-dot">Capture</span><span>Memories</span><span>Profile</span></div><p class="fineprint">One global Chat entry. One dedicated people center.</p></div></div>
+    <div class="design-feature"><div class="feature-copy"><span class="step-number">03</span><h3>Turn “that looks good”<br>into “let’s eat here.”</h3><p>A meal leads to a restaurant card. Copy its address, share the venue, or open Google Maps without digging through a conversation.</p><p>Sharing a place carries the restaurant name, address, and map link—not someone’s private post.</p><a class="text-link" href="#demo" data-jump-demo="restaurant">Try restaurant sharing ↗</a></div><div class="design-visual venue-visual"><div class="phone-crop"><img src="images/restaurant.png" alt="Kura restaurant details, including Google Maps, directions, copy, share, and address export" width="1280" height="1000" loading="lazy"></div><p class="fineprint">Sample restaurant record. The branch does not establish where the original photo was taken.</p></div></div>
+  </div></section>
+
+  <section class="section container" id="iterations">
+    <div class="section-heading"><p class="eyebrow">05 / Develop · Inspect, critique, revise</p><h2>The first version worked.<br>The hierarchy did not.</h2><p class="section-lede">Each working prototype made a different problem visible. I used those moments to sharpen the design, not just polish its appearance.</p></div>
+    <div class="iteration-tabs" role="group" aria-label="Explore design iterations"><button data-iteration="map" aria-pressed="true">Map as Home</button><button data-iteration="navigation" aria-pressed="false">Clearer navigation</button><button data-iteration="photos" aria-pressed="false">Real meal photos</button></div>
+    <div class="iteration-panel" id="iteration-map"><div class="iteration-description"><span class="small-label">01 / Information hierarchy</span><h3>A map panel became<br>the main experience.</h3><p>The early feed and contained map still felt like restaurant tools. Putting the meal pins directly on Home answered my central question at a glance.</p></div><div class="before-after"><figure><span class="version-tag">Before · Early prototype</span><div class="phone-crop"><img src="images/iterations/early-map.png" alt="Earlier Food Reals screen: a map panel above a meal list" width="1280" height="1000" loading="lazy"></div><figcaption>The map was a secondary view.</figcaption></figure><figure><span class="version-tag current">After · Mibly</span><div class="phone-crop"><img src="images/map.png" alt="Current Mibly screen: friends’ meals populate the entire Home map" width="1280" height="1000" loading="lazy"></div><figcaption>Friends’ meals lead Home.</figcaption></figure></div></div>
+    <div class="iteration-panel" id="iteration-navigation" hidden><div class="iteration-description"><span class="small-label">02 / Task clarity</span><h3>Two Chats.<br>No obvious way to add friends.</h3><p>I replaced the duplicate top Chat action with the people center. Chat stays in bottom navigation; search, requests, and friends now have their own destination.</p></div><div class="before-after component-comparison"><figure><span class="version-tag">Before · Iteration 4</span><div class="old-nav"><p class="crop-label">Home action</p><div class="screenshot-crop" style="--crop-width:364.68%;--crop-left:-132.48%;--crop-top:-241.07%;aspect-ratio:351/56"><img src="images/iterations/duplicate-chat-home.png" alt="Earlier Home header also had a Chat button" width="1280" height="1000" loading="lazy"></div><p class="crop-label">Bottom navigation</p><div class="screenshot-crop" style="--crop-width:348.77%;--crop-left:-124.8%;--crop-top:-1082.67%;aspect-ratio:367/75"><img src="images/iterations/duplicate-chat-home.png" alt="Earlier bottom navigation already included Chat" width="1280" height="1000" loading="lazy"></div></div><figcaption>Two entry points for one task.</figcaption></figure><figure><span class="version-tag current">After · Mibly</span><div class="screenshot-crop" style="--crop-width:361.58%;--crop-left:-130.79%;--crop-top:-56.38%;aspect-ratio:354/337"><img src="images/iterations/people-center.png" alt="Dedicated people center for Discover, Requests, and My friends" width="1280" height="1000" loading="lazy"></div><figcaption>A clear place to grow your circle.</figcaption></figure></div></div>
+    <div class="iteration-panel" id="iteration-photos" hidden><div class="iteration-description"><span class="small-label">03 / Content fidelity</span><h3>Less generic.<br>More like my own life.</h3><p>I replaced generated food imagery with my photos: home cooking, sushi, brunch, and shared dinners. The same pin component could now tell a more specific meal story.</p></div><div class="before-after photo-comparison"><figure><span class="version-tag">Before · Sample imagery</span><div class="screenshot-crop pin-crop"><img src="images/iterations/duplicate-chat-home.png" alt="Earlier Anika pin with generated food at APTEKA" width="1280" height="1000" loading="lazy"></div><figcaption>Generated meal imagery.</figcaption></figure><figure><span class="version-tag current">After · My photo</span><div class="screenshot-crop pin-crop"><img src="images/map.png" alt="Updated Anika pin with the designer’s real brunch photo" width="1280" height="1000" loading="lazy"></div><figcaption>A real brunch, in the same component.</figcaption></figure></div></div>
+    <p class="fineprint iteration-provenance">Actual saved prototype screenshots, with cropped UI details. Older screens retain the Food Reals name. <a href="images/credits.json">Visual provenance ↗</a></p>
+  </section>
+
+  <section class="section trust-section" id="privacy"><div class="container"><div class="section-heading"><p class="eyebrow">06 / A product principle</p><h2>Share a meal.<br>Not your every move.</h2><p class="section-lede">A social map can imply more than someone intended. I made the boundaries part of the core flow.</p></div><div class="trust-grid"><article><span class="trust-symbol" aria-hidden="true">⌂</span><h3>Home stays approximate.</h3><p>No home address or directions. A missing location gets no spatial pin.</p></article><article><span class="trust-symbol" aria-hidden="true">◎</span><h3>A wider circle is opt-in.</h3><p>Friends of friends see eligible restaurant posts—not home or private meals.</p></article><article><span class="trust-symbol" aria-hidden="true">◷</span><h3>A post is not live presence.</h3><p>Its time and place describe a shared meal, not where a person is right now.</p></article></div></div></section>
+
+  <section class="section container" id="demo">
+    <div class="section-heading"><p class="eyebrow">07 / Deliver · Prototype and test</p><h2>Take a look around<br>your little food world.</h2><p class="section-lede">I built the core journey as an interactive prototype, then checked navigation, audience rules, and sharing fallbacks. Choose a feature or explore the phone directly.</p></div>
+    <div class="demo-layout"><div class="demo-controls"><nav class="feature-nav" aria-label="Demo features">
+      <button data-feature="map" aria-pressed="false"><span>01</span>Today’s map<b aria-hidden="true">↗</b></button>
+      <button data-feature="feed" aria-pressed="false"><span>02</span>Meals & feed<b aria-hidden="true">↗</b></button>
+      <button data-feature="people" aria-pressed="false"><span>03</span>Friends & discovery<b aria-hidden="true">↗</b></button>
+      <button data-feature="restaurant" aria-pressed="false"><span>04</span>Restaurants & sharing<b aria-hidden="true">↗</b></button>
+      <button data-feature="capture" aria-pressed="false"><span>05</span>Capture a meal<b aria-hidden="true">↗</b></button>
+      <button data-feature="chat" aria-pressed="false"><span>06</span>Meal conversations<b aria-hidden="true">↗</b></button>
+      <button data-feature="memories" aria-pressed="false"><span>07</span>Memories<b aria-hidden="true">↗</b></button>
+      <button data-feature="profile" aria-pressed="false"><span>08</span>Your profile<b aria-hidden="true">↗</b></button>
+    </nav><div class="demo-current"><span class="small-label">On the phone</span><p data-current-screen role="status">Ready when you are.</p><p class="demo-description" data-feature-description>Start with the map, or pick any feature above.</p><div class="demo-examples" data-examples-for="feed" hidden><button data-scene="post">Restaurant meal ↗</button><button data-scene="home-meal">Home cooking ↗</button></div><div class="demo-examples" data-examples-for="people" hidden><button data-scene="extended">Friends of friends ↗</button></div></div><p class="fineprint">No sign-in. Demo changes are temporary.<br>Real accounts and message delivery are not connected.</p></div>
+      <div class="demo-column"><div class="demo-shell" id="demo-shell"><div class="demo-placeholder" id="demo-placeholder"><div class="phone-crop"><img src="images/map.png" alt="Preview of the Mibly interactive phone" width="1280" height="1000" loading="lazy"></div><button class="button primary-button" id="load-demo">Launch interactive demo ↗</button></div></div><div class="demo-toolbar"><button class="text-button" id="close-demo" hidden>Close demo</button><button class="text-button" id="reload-demo" hidden>Reload demo</button><a href="demo/?presentation=1" target="_blank" rel="noopener">Open separately ↗</a></div><p class="fineprint">Meal photos are mine. Names, timestamps, and visits are prototype scenarios.</p></div>
+    </div>
+    <noscript><p class="no-js-note">JavaScript enables the live demo and screen switching. <a href="demo/?presentation=1">Open the prototype</a>. The case study remains readable without it.</p></noscript>
+  </section>
+
+  <section class="section process-section process-gateway" id="process"><div class="container">
+    <div class="process-gateway-copy"><div><p class="eyebrow">A separate process reflection</p><h2>AI made iteration faster.<br>Judgment stayed with me.</h2></div><div><p>The useful loop was never one perfect prompt. It was evidence, a working version, a specific critique, and another version I could inspect. I documented what I tried, where AI helped, and where it could not replace design judgment or real people.</p><a class="button secondary-button" href="ai-process.html">Read the AI process reflection ↗</a></div></div>
+  </div></section>
+
+  <section class="section container" id="next">
+    <div class="section-heading"><p class="eyebrow">08 / Deliver · Evaluate and learn</p><h2>Would friends come back<br>for an ordinary meal?</h2><p class="section-lede">The prototype is functionally checked. The daily habit is still unproven. My next step is to put it in front of a real friend group.</p></div>
+    <div class="validation-grid"><article><span class="small-label">Understand</span><h3>Read the map correctly.</h3><p>Can people distinguish a shared meal location from someone’s current position?</p></article><article><span class="small-label">Participate</span><h3>Share without extra work.</h3><p>Is posting an everyday meal easy enough, and is the audience choice clear?</p></article><article><span class="small-label">Return</span><h3>Find a reason to check in.</h3><p>Do friends return for ordinary meals, beyond the novelty of the first visit?</p></article></div>
+    <p class="section-note">Planned participant evaluation. No adoption, retention, or usability improvement has been measured.</p>
+  </section>
+  <section class="closing"><div class="container"><p class="eyebrow">Mibly</p><h2>Good food.<br>Familiar faces.<br><span>Little everyday stories.</span></h2><div class="closing-actions"><a class="button primary-button" href="#demo">Explore Mibly ↗</a><a class="button secondary-button" href="../../#work">More work by Tony ↗</a></div></div></section>
+</main>
+<footer class="container"><div><a class="footer-name" href="../../">Tony Liu</a><p>Independent academic concept. Not affiliated with Beli, BeReal, or Zenly.<br>AI-assisted research, visual development, and implementation.</p></div><div class="footer-links"><a href="ai-process.html">AI process reflection</a><a href="images/credits.json">Visual credits</a><a href="evidence/methodology.json">Research method</a><a href="https://github.com/Toooonyliu/toooonyliu.github.io" target="_blank" rel="noopener">Portfolio repository ↗</a><a href="#main">Back to top ↑</a></div></footer>
+</body>
+</html>

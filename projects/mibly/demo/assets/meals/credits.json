@@ -1,0 +1,24 @@
+{
+  "source": "Original photos supplied by the designer in Project 2/Photo References. Originals retained unchanged.",
+  "preparation": "Web copies converted to JPEG with a maximum edge of 1440 pixels. EXIF/XMP/IPTC/comment metadata removed from web copies without modifying JPEG pixel data. No generated replacement photos.",
+  "scope": "Photos illustrate synthetic meal posts. Names, avatars, dates, times and restaurant branches in the prototype do not identify people or establish where a source photograph was taken.",
+  "files": {
+    "wellington.jpg": "IMG_9955.JPG",
+    "home-wings.jpg": "1791118686000_R0009356.JPG",
+    "lotus-rice.jpg": "1790349414000_R0009083.JPG",
+    "home-dinner.jpg": "1788265227000_R0008976.JPG",
+    "egg-soup.jpg": "1790349194000_R0009076.JPG",
+    "speckled-egg.jpg": "1791090727000_R0009180.JPG",
+    "korean-bbq.jpg": "IMG_9818.PNG",
+    "nasi-lemak.jpg": "IMG_9062.JPG",
+    "kura-sushi.jpg": "fxn 2026-10-05 200559367FF182F530.JPG",
+    "home-table.jpg": "6055.JPG",
+    "braised-pork.jpg": "fxn 2026-09-30 2013484E2FD44EE544.JPG"
+  },
+  "venueSources": {
+    "kura_sushi": "https://kurasushi.com/locations/pennsylvania",
+    "speckled_egg": "https://downtown.thespeckledeggpgh.com/",
+    "meat_potatoes": "https://meatandpotatoespgh.com/"
+  },
+  "unconfirmedPlaces": "Korean BBQ and nasi lemak have no exact venue or address in the demo. The Speckled Egg Downtown is an example branch, not verified photo metadata."
+}

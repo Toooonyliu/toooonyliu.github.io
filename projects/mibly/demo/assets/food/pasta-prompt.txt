@@ -1,0 +1,4 @@
+Built-in ImageGen; generated 2026-10-03.
+Reference: product/visual-v3/friends-v3.png; lower pasta photograph used for composition and style.
+Prompt: standalone 1000 x 800 landscape candid smartphone photograph of homemade tomato rigatoni in an ordinary off-white bowl on a lived-in kitchen table. Chunky tomato sauce, uneven parmesan, a few basil leaves, sauce on bowl edge, fork beside bowl and rumpled linen towel. Close oblique overhead shot, gentle window light, imperfect and appetizing home meal. No UI, text, labels, logos, watermark, people, studio styling, dramatic gloss, symmetry or excessive garnish.
+Generated output resized and compressed as pasta.jpg for the demo.

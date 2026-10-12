@@ -1,0 +1,3 @@
+Built-in ImageGen; generated 2026-10-03.
+Prompt: landscape casual daylight phone photograph of vegetable and grain salad in an everyday pale ceramic restaurant bowl. Mixed greens, tender grains, radish slices, roasted vegetables and dressing, loosely tossed. Plain metal fork and partial water glass on ordinary wooden table. Close oblique overhead seated angle, imperfect framing, soft uneven daylight, natural food texture. No UI, text, logos, labels, watermark, people, elaborate garnish, symmetrical arrangement or advertising styling.
+Generated output resized to 1200 x 850 as salad.jpg.

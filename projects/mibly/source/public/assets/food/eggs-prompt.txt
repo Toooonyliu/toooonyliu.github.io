@@ -1,0 +1,3 @@
+Built-in ImageGen; generated 2026-10-03.
+Prompt: landscape candid home breakfast phone photo of two fried eggs on rustic toast, ordinary slightly used off-white plate on kitchen table. Golden egg edges, toast, crumbs, faint yolk trace and plain fork. Casual close overhead smartphone view, imperfect off-center framing, soft ordinary morning daylight, believable warm-neutral food texture. No text, logo, brand, UI, labels, watermark, hands, people, studio styling, symmetry or elaborate garnish.
+Generated output resized to 1000 x 800 as eggs.jpg.

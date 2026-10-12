@@ -1,0 +1,4 @@
+Built-in ImageGen; generated 2026-10-03.
+Reference: product/visual-v3/friends-v3.png; screenshot's food region used as composition reference only.
+Prompt: standalone landscape candid phone photograph of three soup dumplings remaining in a bamboo steamer at a meal in progress. Wrinkled parchment, chili oil, scallions, resting black chopsticks at right, sauce bowl, partly finished side plate, glass of water. Tight casual oblique overhead view. Soft natural restaurant light, warm wood, real imperfect food textures and smartphone exposure. No UI, text, logos, watermark, faces, glossy advertising aesthetic, symmetry, or pristine staging.
+Generated output copied to dumplings.jpg; resized to 1200 x 850 and compressed as JPEG for the demo.

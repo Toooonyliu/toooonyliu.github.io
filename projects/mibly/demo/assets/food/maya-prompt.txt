@@ -1,0 +1,4 @@
+Built-in ImageGen; generated 2026-10-03.
+Reference: product/visual-v3/friends-v3.png; fictitious Maya avatar used as facial and appearance reference.
+Prompt: square natural outdoor portrait of friendly young adult East Asian woman with long straight dark hair, smiling naturally in casual neutral clothes. Roomy centered head-and-shoulders framing for circular profile crop, soft blurred greenery, gentle daylight, casual snapshot rather than corporate headshot. Match reference avatar. No UI, text, frame, watermark or circular cutout.
+Generated output resized to 400 x 400 as maya.jpg.
