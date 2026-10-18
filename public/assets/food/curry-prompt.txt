@@ -1,0 +1,3 @@
+Built-in ImageGen; generated 2026-10-03.
+Prompt: standalone candid smartphone photograph of cozy Thai pumpkin curry in a white bowl, warm orange coconut curry, pumpkin, tofu, bell pepper, basil; small side bowl of steamed rice on restaurant wooden table. Spoon in bowl, small rim drips. Close oblique overhead seated angle, slightly imperfect frame and real textures, soft natural warm window light. No UI, text, logos, watermark, people, hands, advertising styling, dramatic light or symmetry.
+Generated output resized to 1200 x 850 as curry.jpg.

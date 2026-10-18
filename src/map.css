@@ -1,0 +1,52 @@
+.friends-map{position:absolute;inset:0;overflow:hidden;background:#a9c5ab}
+.map-canvas{position:absolute;inset:0;touch-action:none;overflow:hidden;cursor:grab;background:linear-gradient(#68847922,#68847922),url('/assets/food/pittsburgh-world.png') center/cover}
+.map-canvas:active{cursor:grabbing}
+.map-canvas:focus-visible{outline:3px solid #d9f8af;outline-offset:-4px}
+.map-world{position:absolute;left:50%;top:45%;margin:-500px 0 0 -500px;width:1000px;height:1000px;transform-origin:50% 50%;will-change:transform}
+.map-world-art{position:absolute;left:-600px;top:-600px;width:2200px;height:2200px;pointer-events:none;user-select:none;max-width:none}
+.map-world:before{content:"";position:absolute;inset:-500px;background:inherit;pointer-events:none}
+.world-label{position:absolute;font-size:17px;font-weight:800;letter-spacing:3px;color:#284c3f;text-shadow:0 1px 5px #fff8}
+.label-north{left:285px;top:170px;transform:rotate(-9deg)}
+.food-app .world-pin{position:absolute;width:86px;min-height:105px;z-index:2;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%) scale(var(--pin-scale));transform-origin:center;cursor:pointer;filter:drop-shadow(0 5px 7px #25413650);color:#fff;padding:0;background:none;border:none}
+.world-pin.selected{z-index:4}
+.world-food{display:block;width:69px;height:72px;padding:3px;background:#fff;border-radius:18px;transform:rotate(-6deg);transition:transform .18s}
+.world-pin.selected .world-food{background:#defbab;transform:rotate(4deg) scale(1.08);box-shadow:0 0 0 3px #33543c}
+.world-food>img{width:100%;height:100%;border-radius:14px;object-fit:cover}
+.world-kind{position:absolute;right:-5px;top:-6px;background:#233c2e;border:2px solid #fff;color:#f3f8ed;width:23px;height:23px;border-radius:50%;display:grid;place-items:center}
+.world-avatar{position:absolute;left:-1px;top:49px;width:34px;height:34px;border:3px solid white;border-radius:50%;z-index:2;object-fit:cover}
+.world-person{font-size:11px;font-weight:750;background:#192b22;border:1px solid #fff6;border-radius:9px;margin-top:2px;padding:3px 7px 3px 14px;white-space:nowrap;line-height:1.25}
+.world-person>span{display:block;color:#c0d0c0;font-size:8px;font-weight:500}
+.world-place{max-width:155px;white-space:nowrap;color:#244434;background:#ffffffef;font-size:9px;font-weight:650;border-radius:7px;padding:2px 5px;margin-top:3px}
+.map-top-controls{position:absolute;z-index:5;top:154px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.map-day-picker{display:flex;gap:2px;background:#18241fde;backdrop-filter:blur(14px);border:1px solid #ffffff26;padding:4px;border-radius:25px;box-shadow:0 4px 12px #172e2420}
+.food-app .map-day-picker button{padding:9px 13px;border-radius:22px;font-size:12px;color:#d3ded6;font-weight:650}
+.food-app .map-day-picker button.active{background:#def7b6;color:#233324}
+.map-today-count{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:650;background:#f6faedeb;color:#264031;padding:9px;border-radius:20px;box-shadow:0 3px 8px #334d3220}
+.map-today-count>span{width:5px;height:5px;background:#507148;border-radius:50%}
+.map-zoom-controls{position:absolute;right:16px;top:215px;display:grid;background:#17271fe8;border:1px solid #ffffff30;backdrop-filter:blur(12px);border-radius:24px;padding:3px;box-shadow:0 6px 15px #0002;z-index:5}
+.food-app .map-zoom-controls button{display:grid;place-items:center;width:40px;height:42px;color:#f6f9f0;border-radius:50%}
+.map-zoom-controls button+button{border-top:1px solid #ffffff12}
+.map-bottom{position:absolute;left:16px;right:16px;bottom:108px;z-index:6;pointer-events:none}
+.map-bottom>*{pointer-events:auto}
+.map-moment-card{position:relative;padding:11px;border-radius:23px;background:#13241ef2;color:#fff;box-shadow:0 12px 30px #13221a44;border:1px solid #ffffff28;backdrop-filter:blur(18px)}
+.food-app .map-card-main{display:flex;width:100%;align-items:center;gap:13px;text-align:left}
+.map-card-food{width:86px;height:106px;border-radius:15px;object-fit:cover}
+.map-card-main>span{display:grid;gap:5px;flex:1;min-width:0;padding-right:10px}
+.map-card-main small{font-size:11px;color:#cbd5c8;font-weight:550}
+.map-card-main strong{font-size:18px;letter-spacing:-.45px;font-weight:680;line-height:1.12;max-width:205px}
+.map-card-main em{font-size:11px;display:flex;align-items:center;gap:3px;font-style:normal;color:#cce7b4}
+.map-card-cta{font-size:10px;display:flex;align-items:center;gap:5px;margin-top:2px;color:#f3f8ed}
+.food-app .map-card-close{position:absolute;right:4px;top:3px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#18271f;color:#b7c8b5;z-index:2}
+.map-friend-rail{margin-top:10px;background:#11221ed9;border:1px solid #ffffff20;border-radius:24px;backdrop-filter:blur(18px)}
+.map-friend-track{display:flex;gap:15px;padding:9px 15px 7px;justify-content:space-around;min-width:100%}
+.food-app .map-friend{display:grid;place-items:center;gap:3px;min-width:44px;flex-shrink:0}
+.map-friend>span{position:relative;border:2px solid transparent;border-radius:50%;padding:2px}
+.map-friend.active>span{border-color:#dcf5b5}
+.map-friend img{height:34px;width:34px;border-radius:50%;object-fit:cover}
+.map-friend b{position:absolute;right:-5px;top:-2px;background:#d8edb6;color:#18321e;min-width:17px;height:17px;display:grid;place-items:center;border-radius:50%;font-size:9px}
+.map-friend small{font-size:9px;color:#eff6e9}
+.food-app .map-posted-note{text-align:center;font-size:9px;color:#eaf2e3;text-shadow:0 1px 6px #17261b;margin:5px 0 0;background:#18251e80;border-radius:10px;max-width:290px;margin-left:auto;margin-right:auto;padding:2px}
+.map-invitation{padding:15px 17px;border-radius:22px;background:#13241eef;box-shadow:0 8px 20px #0002;display:grid;gap:3px;color:#fff}
+.map-invitation strong{font-size:16px;font-weight:650}
+.map-invitation span{font-size:11px;color:#bbcdb7}
+@media(prefers-reduced-motion:reduce){.world-food{transition:none}}

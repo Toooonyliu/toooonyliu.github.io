@@ -1,0 +1,30 @@
+.device-screen .bottom-sheet .meal-composer { padding-bottom:8px; }
+.device-screen .bottom-sheet .meal-composer .meal-photo-add { width:100%; min-height:132px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; border:1px dashed #69755f; border-radius:18px; background:#262e24; color:#cbdcbc; font-size:13px; }
+.device-screen .bottom-sheet .meal-composer-photo { position:relative; margin-bottom:18px; }
+.device-screen .bottom-sheet .meal-composer-photo>img { display:block; width:100%; height:190px; object-fit:cover; border-radius:18px; }
+.device-screen .bottom-sheet .meal-composer .meal-photo-replace { position:absolute; right:10px; bottom:10px; display:flex; align-items:center; gap:6px; border:1px solid #ffffff32; border-radius:18px; min-height:36px; padding:7px 11px; background:#17231fe6; color:#f3f5ee; font-size:12px; }
+.device-screen .bottom-sheet .meal-entry-label { display:block; margin:18px 0 9px; color:#d7e2cd; font-size:13px; }
+.device-screen .bottom-sheet .meal-composer input.meal-composer-title { font-size:17px; font-weight:600; border-color:#424c3c; background:#242b22; }
+.device-screen .bottom-sheet .meal-composer textarea.meal-composer-note { min-height:85px; margin-top:10px; border-color:#424c3c; background:#242b22; font-size:14px; line-height:1.65; resize:none; }
+.device-screen .bottom-sheet .meal-composer .meal-context>summary { gap:8px; list-style:none; }
+.device-screen .bottom-sheet .meal-composer .meal-context>summary::-webkit-details-marker { display:none; }
+.device-screen .bottom-sheet .meal-composer .meal-context>summary>svg:last-child { margin-left:auto; transition:transform .15s; }
+.device-screen .bottom-sheet .meal-composer .meal-context[open]>summary>svg:last-child { transform:rotate(180deg); }
+.device-screen .bottom-sheet .meal-composer .type-choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.device-screen .bottom-sheet .meal-composer .type-choices button { min-height:43px; font-size:12px!important; }
+.device-screen .bottom-sheet .meal-composer .select-label input { margin-top:6px; }
+.device-screen .bottom-sheet .meal-feeling-label { margin:18px 0 4px; color:#c2d0b7; font-size:12px; }
+.device-screen .bottom-sheet .meal-composer .rating-choices { margin-bottom:14px; }
+.device-screen .bottom-sheet .meal-composer .rating-choices button { min-height:78px; }
+.device-screen .bottom-sheet .meal-audience { display:flex; align-items:center; gap:10px; }
+.device-screen .bottom-sheet .meal-audience>span { color:#c5d1bd; font-size:12px; margin-right:auto; }
+.device-screen .bottom-sheet .meal-audience>div { display:flex; gap:5px; }
+.device-screen .bottom-sheet .meal-composer .meal-audience button { display:flex; align-items:center; gap:5px; min-height:40px; padding:8px 10px; border:1px solid #444f3c; border-radius:20px; color:#bccbb0; font-size:12px; }
+.device-screen .bottom-sheet .meal-composer .meal-audience button[aria-pressed=true] { border-color:#a5be8b; background:#304229; color:#e3f2d5; }
+.device-screen .bottom-sheet .meal-composer .meal-discovery-toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:42px; padding:8px 0; width:100%; color:#a9b99c; background:none; font-size:11px; text-align:left; }
+.device-screen .bottom-sheet .meal-discovery-check { display:grid; place-items:center; width:19px; height:19px; flex-shrink:0; border:1px solid #788b68; border-radius:6px; }
+.device-screen .bottom-sheet .meal-discovery-toggle[aria-pressed=true] .meal-discovery-check { background:#d6eeb8; border-color:#d6eeb8; color:#24391c; }
+.device-screen .bottom-sheet .meal-composer .meal-publish { margin-top:17px; min-height:48px; }
+.device-screen .bottom-sheet .meal-composer .meal-publish:disabled { opacity:.4; cursor:default; }
+.device-screen .bottom-sheet .meal-composer summary:focus-visible { outline:2px solid #d6eeb8; outline-offset:3px; border-radius:5px; }
+@media(prefers-reduced-motion:reduce) { .meal-composer .meal-context>summary>svg:last-child { transition:none; } }

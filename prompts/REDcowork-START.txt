@@ -1,0 +1,43 @@
+文件已上传。请基于这份完整源码继续 Mibly，不要重新生成一个新应用。先回答你之前提的两个问题，再说要做的事。
+
+你之前要确认的两件事（详见 docs/DATA-MODEL.txt）
+① 餐厅与餐食分层：餐食（Meal）是最小单位，餐厅（Venue）是独立目录，餐食通过 venueId 指向餐厅。聚合规则是同一 venueId = 同一家店，不按店名字符串或坐标匹配。“找那一餐”返回餐食，前端按 venueId 把同一家店的多条记录合成一张餐厅卡片，收藏针对餐厅。在家做的饭没有 venueId，单独成卡，不显示地点。这些已经实现。
+② 种子数据：朋友 15 条记录，每条都有一句生活化留言（如“爸妈来看我，带他们吃了这家”），覆盖餐厅、在家做、聚会、约会、庆祝、生病等场景；另有本人约 30 条记录（含私密）和非好友记录用于验证权限。DATA-MODEL.txt 第四节列出了主链路、聚合和边界的演示查询及预期结果。
+
+先读
+README.md、AGENTS.md、docs/AI-INTEGRATION.txt、docs/DATA-MODEL.txt、server/ 下全部文件、src/recall/ 下全部文件。
+
+要做的事
+
+1. 切到 WEB_APP 模式（React + Express），保留现有前端
+- 保留 React + TypeScript + Vite 工程、依赖锁文件、public/assets 下所有照片和手机素材。
+- 前端构建：npm run build，输出 dist/client。npm run check:runtime 必须通过，不要用更新哈希绕过。
+- 服务端：server/index.ts 是一个最小 Express 应用（POST /api/recall、GET /api/recall/health、静态文件 dist/client）。如果你的 WEB_APP 模板已有 Express 入口，把这两个路由挂到模板上即可，server/recall-service.ts、prompt.ts 不要改。
+- server 文件用 TypeScript，import 带 .ts 后缀，可以直接用 node --experimental-strip-types 运行（Node 22.6+）；也可以按模板改用 tsx。
+
+2. 把 server/llm.ts 接到 guard_sdk/ai（唯一需要你改的代码）
+- createPlatformChat() 现在按常见写法猜测：const { ai } = await import("guard_sdk/ai"); await ai.chat({ messages, temperature: 0 })。
+- 按平台真实的 ai.chat 签名修改这个函数，保持返回 { text: 模型输出文本, model?: 模型名 }。不要前端直连，不要手写 HTTP，不要引厂商 SDK。
+- 不要把调用挪到前端，不要改提示词的约束，不要删除 sanitize 和 validateModelResponse 校验。
+
+3. 在预览里用真实模型验证
+- 打开首页右上角“找那一餐”，标签应为“✦ AI 检索”。
+- 依次输入 DATA-MODEL.txt 第四节的查询，逐条告诉我：实际返回的记录、AI 理由、用时、是否符合预期。重点：
+  “Maya 带爸妈去的那家” → Maya · Meat & Potatoes
+  “有人庆祝拿到 offer 去吃的” → Jordan · Meat & Potatoes
+  “感冒的时候喝的那碗汤” → Eric · 一小碗蛋汤
+  “Maya 之前吃的寿司” → 一张 Kura 卡片，含 2 条记录
+  “Maya 吃过的日料，适合两个人吗” → Kura 卡片 + “适合两个人”列为原帖没写
+  “汽车保养” → 没找到
+- 如果结果不对，先看服务端日志：每次请求会打印 dropped（被校验丢弃的条数）；设置环境变量 MIBLY_DEBUG=1 可以打印模型原始输出，再决定改提示词还是改校验；改动前先告诉我原因。不要为了让结果好看而硬编码答案。
+- 运行 npm test（30 项）。
+
+4. 上线
+- 预览通过后点“上线”，在新的无痕窗口打开上线链接，再测一遍上面三条主链路。
+- 把上线链接给我。我会先提交一次保底，再继续打磨。
+
+约束
+- 不要改首页、五个入口、地图和发布流程；不要加聊天页、第六个导航、宣传横幅或 AI 星光大渐变。
+- AI 不可用时，界面要如实显示“AI 未连接”，只有用户主动点击才用关键词检索，结果标“未使用 AI”。
+- 不要把示例人物和记录说成真实用户数据。不要编造成功率、模型名称或用户测试。
+- 每一步只汇报：改了什么、实际检查结果、还有什么没完成。

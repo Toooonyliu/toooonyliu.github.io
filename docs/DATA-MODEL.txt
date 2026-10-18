@@ -1,0 +1,72 @@
+Mibly｜数据模型与种子数据
+回答两个动手前要定的问题：① 餐厅和餐食怎么分层、怎么聚合；② 种子数据覆盖哪些场景、保证主链路命中。
+代码依据：src/data.ts（users / venues / seedMeals / friendStories）、src/socialGraph.ts、server/recall-service.ts。
+
+一、数据分层
+
+1. 餐食 Meal（最小单位，一条朋友分享）
+id、userId（作者）、food / foodZh（标题）、note / noteZh（留言，朋友当时说的话）、date、time、
+type：restaurant 餐厅 / homemade 在家做 / delivery 外卖 / other 其他、
+venueId（只有 restaurant 才有）、audience：friends 朋友可见 / private 仅自己、photo。
+
+2. 餐厅 Venue（目录实体，与餐食分开）
+id、name、area（商圈级区域，如 South Side）、address、cuisine、url。共 9 家，在 venues 目录里维护。
+餐食只通过 venueId 指向餐厅，不在餐食里重复存店名和地址。
+
+3. 聚合规则
+- 同一家店 = 同一个 venueId。不按店名字符串或坐标去匹配，避免“Kura”和“Kura Revolving Sushi Bar”被拆成两家。
+- “找那一餐”返回的是餐食（原帖）。前端把命中的餐食按 venueId 分组：同一家店的多条记录合成一张餐厅卡片，标题是店名，下面列出每位朋友的那条记录和 AI 给的理由；“查看餐厅”“收藏”针对这家店，只出现一次。
+- 在家做的饭、外卖、其他类型没有 venueId，每条单独成卡，并显示“在家做的 · 不显示地点”，不补地址。
+- 收藏的对象是餐厅（venueId），不是某条餐食。
+
+4. 地点与隐私
+- 地图是插画示意，餐厅只到商圈级区域；地图标记表示“分享过的一餐”，不是朋友的实时位置。
+- 在家做的饭不生成地图标记，不出现精确住址。
+- 发给模型的候选只有：id、作者名、菜名、留言、日期时间、类型、餐厅名/区域/类型。没有照片、地址、坐标、受众标记和好友关系图。
+
+二、权限（服务端执行）
+
+- 默认范围“朋友”：已确认好友（maya、eric、anika、jordan）的 friends 可见记录，不含自己。
+- “自己”：本人全部记录，包括 private。“全部”：两者合并。
+- 他人的 private 记录、被隐藏的好友、未接受的好友申请（priya）、朋友的朋友，都不会进入候选，也不会发给模型。
+- 朋友的记录以服务端的 seedMeals 为准：浏览器只告诉服务端“我正在看哪些记录 ID”，内容由服务端从自己的副本重建，篡改的文字会被覆盖。浏览器只能额外提交“本人在这台设备上新发的记录”。
+- 演示没有账号系统，当前用户固定为 daniel。这是演示边界，正式产品需要登录与服务端数据库。
+
+三、种子数据：朋友的 15 条记录（主链路一定能命中）
+
+作者 · 类型 · 菜名 · 留言 · 餐厅
+Maya · 餐厅 · 在Kura再吃一盘 · 转着转着就叠了一摞盘子，Daniel 下次一起来。 · Kura Revolving Sushi Bar
+Maya · 餐厅 · 和朋友一起吃惠灵顿牛排 · 爸妈来看我，带他们吃了这家，他们很喜欢。 · Meat & Potatoes
+Maya · 其他 · 和朋友吃韩式烤肉 · 生日聚会，八个人围着烤盘。
+Maya · 在家 · 荷叶饭配热汤 · 周日在家做荷叶饭，配一锅热汤。
+Maya · 餐厅 · 在Kura再吃一盘 · 考完试奖励自己，吃了二十盘。 · Kura Revolving Sushi Bar
+Eric · 在家 · 一小碗蛋汤 · 感冒刚好，妈妈教的蛋汤，很暖胃。
+Eric · 餐厅 · 在The Speckled Egg慢慢吃早午餐 · 和室友赶在上课前吃的。 · The Speckled Egg
+Eric · 餐厅 · 在Kura再吃一盘 · 一个人坐吧台，很自在。 · Kura Revolving Sushi Bar
+Eric · 在家 · 忙碌一天后在家做饭 · 加班回家，随手炒了两个菜。
+Anika · 餐厅 · 在The Speckled Egg慢慢吃早午餐 · 周末睡到自然醒，慢慢吃一顿。 · The Speckled Egg
+Anika · 其他 · 午餐吃椰浆饭 · 同事教的马来西亚做法，椰香很浓。
+Anika · 餐厅 · 和朋友一起吃惠灵顿牛排 · 第一次约会，有点紧张但很开心。 · Meat & Potatoes
+Jordan · 餐厅 · 和朋友一起吃惠灵顿牛排 · 庆祝拿到实习 offer，奢侈一次。 · Meat & Potatoes
+Jordan · 在家 · 鸡翅与宅家夜晚 · 看球赛的晚上，鸡翅配可乐。
+Jordan · 在家 · 围着小餐桌吃晚饭 · 和室友们一起做饭，每人一道菜。
+另有 Daniel（自己）约 30 条记录，含若干 private；以及非好友 Chloe、Noah、Priya 的记录，用来验证权限。
+人物、日期和留言是虚构场景；照片全部是设计者本人拍摄的 11 张餐食照片。日期相对“今天”生成，演示时总是最近两周。
+
+四、演示查询与预期结果（用来检查真实模型）
+
+主链路（换了说法，关键词搜不到）
+- “Maya 带爸妈去的那家” → Maya · Meat & Potatoes（留言“爸妈来看我，带他们吃了这家”）
+- “有人庆祝拿到 offer 去吃的” → Jordan · Meat & Potatoes
+- “感冒的时候喝的那碗汤” → Eric · 一小碗蛋汤（在家做，不显示地点）
+- “Anika 第一次约会去的地方” → Anika · Meat & Potatoes
+- “看球的时候吃的” → Jordan · 鸡翅
+聚合
+- “Maya 之前吃的寿司” → 1 张 Kura 餐厅卡片，内含 Maya 的 2 条记录
+- “谁去过 Meat & Potatoes” → 1 张餐厅卡片，内含 Maya、Anika、Jordan 的 3 条记录
+边界
+- “Maya 吃过的日料，适合两个人吗” → Kura 卡片 + “原帖里没写，不做猜测：适合两个人”
+- “Maya 的小笼包” → 没找到（Maya 没发过小笼包）
+- “汽车保养” → 没找到
+- “那个” → 追问一句（clarify）
+- 范围切到“朋友”时，“自己做的红烧肉”不会返回自己的记录；切到“自己”才会。

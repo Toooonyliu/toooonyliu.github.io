@@ -1,0 +1,70 @@
+/* Quiet additions to the original Mibly UI, not a replacement theme. */
+.mibly-handoff .brand-row { min-height:43px; }
+.mibly-handoff .header-utilities { display:flex; align-items:center; gap:8px; }
+.mibly-handoff .recall-trigger { display:flex; align-items:center; gap:6px; min-height:43px; padding:0 12px; border-radius:24px; border:1px solid #ffffff26; background:#1b211de8; color:#e7eddc; font-size:12px; }
+.mibly-handoff .map-posted-note,.mibly-handoff .world-label { display:none; }
+.mibly-handoff .map-friend-rail { background:#11221ebd; }
+.device-screen .bottom-sheet .recall-panel { padding-bottom:22px; color:#f0f4ea; }
+.device-screen .bottom-sheet .recall-panel button { font:inherit; cursor:pointer; }
+.device-screen .bottom-sheet .recall-panel button:disabled { cursor:default; opacity:.45; }
+.device-screen .bottom-sheet .recall-panel button:focus-visible,.device-screen .bottom-sheet .recall-panel textarea:focus-visible,.device-screen .bottom-sheet .recall-panel summary:focus-visible { outline:2px solid #d6eeb8; outline-offset:3px; }
+.device-screen .bottom-sheet .recall-form { margin:3px 0 25px; }
+.device-screen .bottom-sheet .recall-input-label { display:block; color:#c7d1c0; font-size:13px; margin-bottom:12px; }
+.device-screen .bottom-sheet .recall-input-wrap { position:relative; border:1px solid #627357; border-radius:20px; background:#20251f; }
+.device-screen .bottom-sheet .recall-panel .recall-input-wrap textarea { border:0; border-radius:20px; background:transparent; color:#f0f4ea; width:100%; min-height:104px; padding:15px 55px 14px 15px; resize:none; font:400 16px/1.7 system-ui,sans-serif; }
+.device-screen .bottom-sheet .recall-panel textarea::placeholder { color:#a3b099; }
+.device-screen .bottom-sheet .recall-panel .recall-submit { position:absolute; right:10px; bottom:10px; display:grid; place-items:center; width:40px; height:40px; padding:0; border:0; border-radius:50%; background:#d6eeb8; color:#1d3020; }
+.device-screen .bottom-sheet .recall-scope { display:flex; align-items:center; gap:6px; margin-top:12px; }
+.device-screen .bottom-sheet .recall-scope button { min-height:36px; padding:7px 13px; border-radius:19px; border:1px solid #394137; color:#bdc7b7; background:#1a201a; font-size:12px; }
+.device-screen .bottom-sheet .recall-scope button[aria-pressed=true] { color:#e7f4d9; border-color:#a4bd88; background:#30402a; }
+.device-screen .bottom-sheet .recall-mode { margin-left:auto; color:#a7b69d; font-size:10px; white-space:nowrap; }
+.device-screen .bottom-sheet .recall-start>p { font-size:13px; color:#b5c0ac; margin:0 0 12px; }
+.device-screen .bottom-sheet .recall-panel .recall-example { display:flex; align-items:center; gap:10px; width:100%; min-height:49px; border:0; border-bottom:1px solid #30382c; background:transparent; color:#dce6d3; font-size:14px; text-align:left; }
+.device-screen .bottom-sheet .recall-example svg:last-child { margin-left:auto; }
+.device-screen .bottom-sheet .recall-start>small { display:block; margin-top:20px; color:#9ca992; font-size:11px; line-height:1.7; }
+.device-screen .bottom-sheet .recall-pending,.device-screen .bottom-sheet .recall-error { padding:15px 0; font-size:14px; line-height:1.65; }
+.device-screen .bottom-sheet .recall-pending button,.device-screen .bottom-sheet .recall-error button { display:inline-flex; align-items:center; gap:6px; min-height:44px; border:0; background:none; color:#d6eeb8; padding:5px 12px 5px 0; font-size:13px; }
+.device-screen .bottom-sheet .recall-error>p { color:#f0bda8; }
+.device-screen .bottom-sheet .recall-result-label { display:flex; justify-content:space-between; margin:0 0 15px; font-size:14px; }
+.device-screen .bottom-sheet .recall-clarification,.device-screen .bottom-sheet .recall-empty { color:#c2cdb8; font-size:14px; line-height:1.7; margin:12px 0 20px; }
+.device-screen .bottom-sheet .recall-unknown { padding:12px 14px; background:#2c3024; border:1px solid #5c6249; border-radius:14px; margin:0 0 18px; }
+.device-screen .bottom-sheet .recall-unknown>span { color:#e1e7c8; font-size:12px; font-weight:650; }
+.device-screen .bottom-sheet .recall-unknown p { color:#bdc6aa; font-size:12px; line-height:1.65; margin:6px 0 0; }
+.device-screen .bottom-sheet .recall-card { border:1px solid #384131; border-radius:21px; background:#1b211a; overflow:hidden; margin-bottom:14px; }
+.device-screen .bottom-sheet .recall-panel .recall-card-main { display:flex; gap:13px; width:100%; text-align:left; background:transparent; color:inherit; border:0; padding:14px; align-items:center; }
+.device-screen .bottom-sheet .recall-card-main>img,.device-screen .bottom-sheet .recall-no-photo { width:96px; height:112px; border-radius:14px; flex:none; object-fit:cover; }
+.device-screen .bottom-sheet .recall-no-photo { display:grid; place-items:center; background:#303c2a; color:#b5c7a4; }
+.device-screen .bottom-sheet .recall-card-main>span:not(.recall-no-photo) { display:grid; gap:7px; min-width:0; }
+.device-screen .bottom-sheet .recall-card-main small { color:#aebb9f; font-size:11px; line-height:1.5; }
+.device-screen .bottom-sheet .recall-card-main strong { font-size:16px; font-weight:650; line-height:1.4; overflow-wrap:anywhere; }
+.device-screen .bottom-sheet .recall-card-main em { color:#bdcdb0; font-size:12px; font-style:normal; line-height:1.45; }
+.device-screen .bottom-sheet .recall-evidence { padding:0 14px; color:#c2d4b0; font-size:12px; }
+.device-screen .bottom-sheet .recall-evidence summary { padding:5px 0 12px; min-height:32px; cursor:pointer; }
+.device-screen .bottom-sheet .recall-evidence blockquote { border-left:2px solid #8ba66d; padding:2px 0 2px 10px; margin:0 0 10px; line-height:1.7; color:#c5cfba; overflow-wrap:anywhere; }
+.device-screen .bottom-sheet .recall-card-actions { display:flex; align-items:center; gap:10px; margin:0 14px; border-top:1px solid #353e30; }
+.device-screen .bottom-sheet .recall-card-actions>button { display:flex; align-items:center; gap:5px; border:0; background:transparent; color:#d6eeb8; min-height:46px; padding:8px 0; font-size:12px; }
+.device-screen .bottom-sheet .recall-card-actions>button:first-child { margin-right:auto; }
+.device-screen .bottom-sheet .recall-card-actions>.recall-save { justify-content:center; min-width:38px; }
+.device-screen .bottom-sheet .meal-composer .photo-options { margin-top:0; }
+.device-screen .bottom-sheet .meal-composer .upload-preview { margin-top:0; }
+.device-screen .bottom-sheet .meal-composer .optional-details { border-top:1px solid #354031; margin-top:15px; padding-top:3px; }
+.device-screen .bottom-sheet .meal-composer .optional-details>summary { min-height:44px; display:flex; align-items:center; color:#c5d7b5; font-size:13px; cursor:pointer; }
+.device-screen .bottom-sheet .meal-composer .composer-audience { margin-top:18px; }
+.device-screen .bottom-sheet .meal-composer .rating-choices { margin-top:12px; }
+.device-screen .bottom-sheet .recall-result-label small { color:#9ca992; font-size:11px; font-weight:400; align-self:center; }
+.device-screen .bottom-sheet .recall-mode { display:inline-flex; align-items:center; gap:4px; }
+.device-screen .bottom-sheet .recall-mode.is-ai { color:#d6eeb8; }
+.device-screen .bottom-sheet .recall-pending p { display:flex; align-items:center; gap:7px; color:#dce6d3; margin:0; }
+.device-screen .bottom-sheet .recall-pending p svg { color:#d6eeb8; flex:none; }
+.device-screen .bottom-sheet .recall-reason { color:#e5eedb; font-size:13px; font-style:normal; line-height:1.55; }
+.device-screen .bottom-sheet .recall-reason svg { color:#b9d99a; margin-right:4px; vertical-align:-1px; }
+.device-screen .bottom-sheet .recall-venue-card .recall-venue-head { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:14px 14px 4px; border:0; background:transparent; color:inherit; text-align:left; }
+.device-screen .bottom-sheet .recall-venue-head>span { display:grid; gap:4px; min-width:0; }
+.device-screen .bottom-sheet .recall-venue-head strong { font-size:16px; font-weight:650; }
+.device-screen .bottom-sheet .recall-venue-head small { color:#aebb9f; font-size:11px; }
+.device-screen .bottom-sheet .recall-venue-head em { flex:none; font-style:normal; font-size:11px; color:#d6eeb8; border:1px solid #4a5a3f; border-radius:12px; padding:3px 9px; }
+.device-screen .bottom-sheet .recall-sub { border-top:1px solid #2c3428; margin:0 14px; }
+.device-screen .bottom-sheet .recall-sub .recall-card-main { padding:12px 0; }
+.device-screen .bottom-sheet .recall-sub .recall-card-main>img,.device-screen .bottom-sheet .recall-sub .recall-no-photo { width:72px; height:84px; }
+.device-screen .bottom-sheet .recall-sub .recall-evidence { padding:0; }
+@media(prefers-reduced-motion:reduce) { .recall-panel * { scroll-behavior:auto!important; } }

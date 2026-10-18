@@ -1,0 +1,41 @@
+Mibly｜代码结构
+
+这是原网站 React + TypeScript + Vite 工程的独立副本，加一个 Express 服务端，适配 REDcowork 的 WEB_APP 模式。
+
+src/
+  App.tsx / main.tsx / styles.css    原手机运行框架，保持不变（受 check:runtime 保护）
+  mobile/                           原安全区、键盘、滚动、底部面板等组件，保持不变
+  Prototype.tsx                     主状态、五入口、餐食/餐厅/收藏；打开“找那一餐”并传入可见记录与好友关系
+  data.ts                           用户、餐厅目录、餐食种子数据；friendStories 给朋友记录补留言
+  FriendsMap.tsx / SocialViews.tsx  原地图与 Chat / Memories / Profile
+  socialGraph.ts                    原好友、可见性规则
+  recall/
+    RecallPanel.tsx                 输入、范围、AI 状态、结果按餐厅聚合、理由与原文、错误与降级
+    adapter.ts                      请求 /api/recall 与 /api/recall/health；不含模型、密钥或提示词
+    engine.ts                       关键词检索（降级用）、recallPlan 硬条件解析、validateModelResponse 校验
+    recall.css                      找那一餐的样式
+
+server/
+  index.ts                          Express：POST /api/recall、GET /api/recall/health、静态文件
+  recall-service.ts                 authorize 鉴权 → recallPlan 硬条件 → 调模型 → sanitize/校验
+  prompt.ts                         系统提示词与用户消息格式
+  llm.ts                            唯一调用模型的地方：createPlatformChat()（guard_sdk/ai）；createStandIn() 仅本地开发
+
+tests/
+  recall-engine.test.mjs            22 项：关键词规则、硬条件、私密范围、校验器
+  recall-server.test.mjs            8 项：服务端鉴权、提示词最小化、伪造引用/未知 ID 丢弃、JSON 重试、clarify、替身标注
+
+数据流
+浏览器可见记录（去掉照片）→ POST /api/recall → 服务端按自身数据重建并鉴权 → 范围/点名朋友/否定/不支持条件 → 最多 60 条候选 → 平台大模型 → 逐条核对 ID、引用和规则 → 返回 → 浏览器再核对 → 按 venueId 聚合渲染 → 原帖 / 餐厅 / 收藏。
+
+关键取舍
+1. 没有新增聊天页或第六个导航入口；找那一餐是首页右上角的按需入口。
+2. 模型只返回原帖 ID、逐字引用和一句理由，不能生成餐厅卡片或执行操作。
+3. 同一家店按 venueId 聚合成一张卡片；在家做的饭单独成卡、不显示地点。
+4. AI 不可用时不偷偷降级：界面写明“AI 未连接”，由用户选择关键词检索，结果标“未使用 AI”。
+5. 原始素材与受保护运行时不改。
+
+构建与部署
+npm ci → npm run build（输出 dist/client）→ npm start（Express 在 PORT 或 3000 端口，同时提供页面和 API）。
+如果 REDcowork 的 WEB_APP 模板自带 Express 入口：把 server/index.ts 里的两个路由挂到模板的服务器上，静态目录指向 dist/client，recall-service.ts / prompt.ts 不需要改。
+资源使用根路径 /assets/...；部署到子路径需要同时调整 Vite base。
