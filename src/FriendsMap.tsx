@@ -6,7 +6,7 @@ import { placeName } from "./SocialViews";
 import { PersonAvatar } from "./People";
 import type { Circle } from "./socialGraph";
 import "./map.css";
-import { createRealMap, homeCircle, pinIcon, realPins, L } from "./realMap";
+import { createRealMap, realPins, type RealMap } from "./realMap";
 
 type Props = { lang: Lang; meals: Meal[]; today: string; currentUserId: string; onMeal: (meal: Meal) => void; focusMealId?: string | null; scope:Circle;onPerson:(id:string)=>void;onFeed:()=>void };
 type Camera = { x: number; y: number; zoom: number };
@@ -28,7 +28,7 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
   const [renderer, setRenderer] = useState<"real" | "art">("real");
   const [fallbackNote, setFallbackNote] = useState(false);
   const realEl = useRef<HTMLDivElement>(null);
-  const real = useRef<ReturnType<typeof createRealMap> | null>(null);
+  const real = useRef<RealMap | null>(null);
   const [width, setWidth] = useState(390);
   const canvas = useRef<HTMLDivElement>(null);
   const cameraRef = useRef(camera);
@@ -67,7 +67,7 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
     if (renderer !== "real" || !realEl.current) return;
     const handle = createRealMap(realEl.current, ok => { if (!ok) { setRenderer("art"); setFallbackNote(true); window.setTimeout(() => setFallbackNote(false), 4000); } });
     real.current = handle;
-    const resize = new ResizeObserver(() => handle.map.invalidateSize()); resize.observe(realEl.current);
+    const resize = new ResizeObserver(() => handle.resize()); resize.observe(realEl.current);
     return () => { resize.disconnect(); handle.dispose(); real.current = null; };
   }, [renderer]);
   const pointsInfo = () => {
@@ -97,7 +97,7 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
   };
   const select=(id:string,recenter=false)=>{
     setSelectedId(id);
-    if(recenter&&renderer==="real"&&real.current){const pin=realPins(locatedMeals).find(p=>p.meal.id===id); if(pin)real.current.map.flyTo(pin.latlng,15,{duration:.6});}
+    if(recenter&&renderer==="real"&&real.current){const pin=realPins(locatedMeals).find(p=>p.meal.id===id); if(pin)real.current.flyTo(pin.lnglat);}
     if(recenter){const pin=pins.find(pin=>pin.meal.id===id); if(pin)setView({x:-(pin.x-500)*base,y:-(pin.y-500)*base,zoom:1});}
   };
   const title=(meal:Meal)=>lang==="zh"&&meal.foodZh?meal.foodZh:meal.food;
@@ -106,17 +106,12 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
   const placeLabel = (meal: Meal) => meal.type === "homemade" ? t("Home · approx. area", "在家 · 大致区域") : placeName(meal, lang);
   const fitAll = (animate = true) => {
     const handle = real.current; if (!handle) return;
-    const points = realPins(locatedMeals).map(p => p.latlng);
-    if (points.length) handle.map.fitBounds(L.latLngBounds(points), { padding: [80, 50], maxZoom: 15, animate });
+    handle.fitAll(realPins(locatedMeals).map(p => p.lnglat), animate);
   };
   useEffect(() => {
     const handle = real.current; if (renderer !== "real" || !handle) return;
-    handle.layer.clearLayers();
-    for (const pin of realPins(locatedMeals)) {
-      if (pin.approximate) homeCircle(pin.latlng).addTo(handle.layer);
-      L.marker(pin.latlng, { icon: pinIcon(pin, { person: author(pin.meal), time: time(pin.meal), place: placeLabel(pin.meal) }, selected?.id === pin.meal.id), keyboard: true, title: `${author(pin.meal)} · ${title(pin.meal)}`, riseOnHover: true, zIndexOffset: selected?.id === pin.meal.id ? 1000 : 0 })
-        .on("click", () => select(pin.meal.id)).addTo(handle.layer);
-    }
+    handle.setPins(realPins(locatedMeals).map(pin => ({ pin, selected: selected?.id === pin.meal.id, onClick: () => select(pin.meal.id),
+      label: { person: author(pin.meal), time: time(pin.meal), place: placeLabel(pin.meal), title: title(pin.meal) } })));
   }, [renderer, day, selectedId, lang, meals]);
   useEffect(() => { if (renderer === "real") window.setTimeout(() => fitAll(false), 50); }, [renderer, day]);
   return <section className={`friends-map ${renderer === "real" ? "is-real" : ""}`} aria-label={t("Your friends’ food map","朋友的美食地图")}>
@@ -144,7 +139,7 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
     </div>
     </>}
     <div className="map-top-controls"><div className="map-day-picker">{[0,-1].map(offset=><button key={offset} aria-pressed={dayOffset===offset} className={dayOffset===offset?"active":""} onClick={()=>{setDayOffset(offset);setSelectedId(null);setView({x:0,y:0,zoom:1});}}>{offset===0?t("Today","今天"):t("Yesterday","昨天")}</button>)}</div></div>
-    <div className="map-zoom-controls"><button aria-label={t("Zoom in","放大地图")} disabled={renderer==="art"&&camera.zoom>=2.7} onClick={()=>renderer==="real"?real.current?.map.zoomIn():setView({...camera,zoom:camera.zoom+.25})}><Plus size={20}/></button><button aria-label={t("Zoom out","缩小地图")} disabled={renderer==="art"&&camera.zoom<=.82} onClick={()=>renderer==="real"?real.current?.map.zoomOut():setView({...camera,zoom:camera.zoom-.25})}><Minus size={20}/></button><button aria-label={t("Show everyone","显示所有人")} onClick={()=>renderer==="real"?fitAll():setView({x:0,y:0,zoom:1})}><Crosshair size={20}/></button></div>
+    <div className="map-zoom-controls"><button aria-label={t("Zoom in","放大地图")} disabled={renderer==="art"&&camera.zoom>=2.7} onClick={()=>renderer==="real"?real.current?.zoomIn():setView({...camera,zoom:camera.zoom+.25})}><Plus size={20}/></button><button aria-label={t("Zoom out","缩小地图")} disabled={renderer==="art"&&camera.zoom<=.82} onClick={()=>renderer==="real"?real.current?.zoomOut():setView({...camera,zoom:camera.zoom-.25})}><Minus size={20}/></button><button aria-label={t("Show everyone","显示所有人")} onClick={()=>renderer==="real"?fitAll():setView({x:0,y:0,zoom:1})}><Crosshair size={20}/></button></div>
     <div className="map-bottom">
       {selected?<article className="map-moment-card"><button className="map-card-close" aria-label={t("Close meal preview","关闭餐食预览")} onClick={()=>setSelectedId(null)}><X size={17}/></button><button className="map-card-main" onClick={()=>onMeal(selected)}><img className="map-card-food" src={selected.photo||users.find(u=>u.id===selected.userId)?.avatar} alt=""/><span><small>{author(selected)} · {time(selected)}</small><strong>{title(selected)}</strong><em>{selected.type==="homemade"?<House size={13}/>:<MapPin size={13}/>} {placeName(selected,lang)}</em><span className="map-card-cta">{t("Open food story","查看这一餐")}<ArrowUpRight size={14}/></span></span></button><button className="map-all-posts" onClick={()=>onPerson(selected.userId)}>{t(`See all ${author(selected)}’s posts`,`查看${author(selected)}的全部动态`)}<CaretRight size={14}/></button></article>:dayMeals.length===0?<button className="map-invitation" onClick={onFeed}><strong>{t("No meals here today","今天还没有餐食分享")}</strong><span>{t("Browse more food stories","浏览更多餐食动态")}<CaretRight size={14}/></span></button>:null}
       <Carousel className="map-friend-rail" contentClassName="map-friend-track" ariaLabel={t("Friends on the map","地图上的朋友")}>

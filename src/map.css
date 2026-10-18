@@ -51,13 +51,11 @@
 .map-invitation span{font-size:11px;color:#bbcdb7}
 @media(prefers-reduced-motion:reduce){.world-food{transition:none}}
 
-/* ---- Real street map (Leaflet) ---- */
-.friends-map .real-map{position:absolute;inset:0;background:#0d1a14;z-index:0}
-/* Dark gray tiles tinted toward Mibly's forest green. */
-.friends-map .real-map .leaflet-tile-pane{filter:sepia(.45) hue-rotate(58deg) saturate(1.5) brightness(1.18) contrast(1.02)}
-.friends-map .real-map .leaflet-control-attribution{background:#0b1510b3;color:#9fb29a;font-size:8.5px;padding:1px 6px;border-radius:8px 0 0 0;margin-bottom:96px}
-.friends-map .real-map .leaflet-control-attribution a{color:#c6d8bd}
-.friends-map .real-map .leaflet-div-icon,.friends-map .real-map .real-pin-host{background:none;border:0}
+/* ---- Interactive cartoon map (MapLibre, Zenly-like) ---- */
+.friends-map .real-map{position:absolute;inset:0;background:#f6f0e2;z-index:0}
+.friends-map .real-map .maplibregl-ctrl-bottom-right{bottom:168px;right:6px}
+.friends-map .real-map .maplibregl-ctrl-attrib{background:#ffffffcc;font-size:9px;border-radius:10px}
+.friends-map .real-map .real-pin-host{background:none;border:0;padding:0;cursor:pointer}
 .real-pin{position:relative;display:flex;flex-direction:column;align-items:center;width:86px;color:#fff;cursor:pointer;filter:drop-shadow(0 5px 7px #0007);transform:scale(.86);transform-origin:50% 40%}
 .real-pin.selected{transform:scale(1)}
 .real-pin .world-food{display:block;width:62px;height:64px;padding:3px;background:#fff;border-radius:16px;transform:rotate(-5deg)}
@@ -69,10 +67,9 @@
 .real-pin.approximate .world-food>img{border-radius:50%}
 .friends-map .map-fallback-note{position:absolute;z-index:7;left:20px;right:20px;top:172px;margin:0;padding:8px 12px;border-radius:12px;background:#18241fe6;color:#e2ebdb;font-size:11.5px;text-align:center}
 /* The art canvas is replaced, so the illustrated-map label rules don't apply. */
-.friends-map.is-real{background:#0d1a14}
+.friends-map.is-real{background:#f6f0e2}
 .friends-map .real-map.zoom-far .real-pin{transform:scale(.62)}
 .friends-map .real-map.zoom-far .real-pin.selected{transform:scale(.8)}
 .friends-map .real-map.zoom-far .real-pin .world-person,.friends-map .real-map.zoom-far .real-pin .world-place{display:none}
 .friends-map .real-map.zoom-far .real-pin.selected .world-person{display:block}
 .friends-map .real-map.zoom-world .real-pin{transform:scale(.45)}
-.friends-map .real-map .leaflet-control-attribution{margin-bottom:164px}

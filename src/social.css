@@ -167,3 +167,12 @@
 .social-profile .profile-grid button{position:relative;aspect-ratio:1;background:#1b1f1c;display:grid;place-items:center;color:#8d988b;padding:0;border:0}
 .social-profile .profile-grid img{width:100%;height:100%;object-fit:cover}
 .social-profile .profile-grid span{position:absolute;left:6px;bottom:5px;font-size:10px;font-weight:650;color:#fff;text-shadow:0 1px 4px #000a}
+/* Light, cartoon street map: header switches to dark text on a cream haze. */
+.social-app.is-map:has(.friends-map.is-real) .app-header{background:linear-gradient(#f6f0e2f2 0%,#f6f0e2b8 62%,#f6f0e200 100%)}
+.social-app.is-map:has(.friends-map.is-real) .brand{color:#2b2a40}
+.social-app.is-map:has(.friends-map.is-real) .brand span{color:#ff6f9c}
+.social-app.is-map:has(.friends-map.is-real) .brand-group .circle-picker{background:#ffffffd9;border-color:#e7dcc6;color:#2b2a40}
+.social-app.is-map:has(.friends-map.is-real) .recall-trigger{background:#ffffffe6;border-color:#e7dcc6;color:#2b2a40}
+.social-app.is-map:has(.friends-map.is-real) .circle-header-action{background:#ffffffe6;color:#2b2a40}
+.device-screen:has(.friends-map.is-real) .status-bar{color:#2b2a40}
+.device-screen:has(.friends-map.is-real) .status-icons{filter:none}
