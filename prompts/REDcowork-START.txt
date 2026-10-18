@@ -1,43 +1,20 @@
-文件已上传。请基于这份完整源码继续 Mibly，不要重新生成一个新应用。先回答你之前提的两个问题，再说要做的事。
+源码已按你给我的 WEB_APP 模板结构改好，并推到了 GitHub（同一分支 mibly-redcowork，已更新）。请用它覆盖 /workspace，不要再手工改造旧文件。
 
-你之前要确认的两件事（详见 docs/DATA-MODEL.txt）
-① 餐厅与餐食分层：餐食（Meal）是最小单位，餐厅（Venue）是独立目录，餐食通过 venueId 指向餐厅。聚合规则是同一 venueId = 同一家店，不按店名字符串或坐标匹配。“找那一餐”返回餐食，前端按 venueId 把同一家店的多条记录合成一张餐厅卡片，收藏针对餐厅。在家做的饭没有 venueId，单独成卡，不显示地点。这些已经实现。
-② 种子数据：朋友 15 条记录，每条都有一句生活化留言（如“爸妈来看我，带他们吃了这家”），覆盖餐厅、在家做、聚会、约会、庆祝、生病等场景；另有本人约 30 条记录（含私密）和非好友记录用于验证权限。DATA-MODEL.txt 第四节列出了主链路、聚合和边界的演示查询及预期结果。
+仓库现在的结构（和 /app/skills/guard-skill/templates/node-express 一致）：
+- app/server.js：已打包好的生产服务端（CommonJS，Node 18+ 可直接运行），require("../guard_sdk/ai") 调用平台模型，提供 /health、/healthz、/api/recall/health、POST /api/recall，最后挂载 ../static。
+- static/：已构建好的前端（Vite base "./"，资源全是相对路径，适配 /f/<appId>/ 和 /s/<appId>/）。
+- install.sh / start.sh / health.sh：按模板写好（start.sh 执行 node app/server.js，读取 APP_PORT）。
+- package.json：运行时依赖只有 express；npm run build 会重新生成 static/ 和 app/server.js；npm test 用 tsx（Node 18+）。
+- server/*.ts 是服务端源码，src/ 是前端源码。
+- 仓库里没有 guard_sdk/ 和 ai.properties，这两样用你工作区已有的（guard 生成的）。
 
-先读
-README.md、AGENTS.md、docs/AI-INTEGRATION.txt、docs/DATA-MODEL.txt、server/ 下全部文件、src/recall/ 下全部文件。
+请按顺序做：
+1. 备份当前工作区的 guard_sdk/ 和 ai.properties（以及其他 guard 生成的文件）到 /tmp/guard-backup/。
+2. 下载 https://codeload.github.com/Toooonyliu/toooonyliu.github.io/tar.gz/refs/heads/mibly-redcowork ，解压后把 toooonyliu.github.io-mibly-redcowork/ 里的全部内容覆盖到 /workspace（旧的 server/index.ts 等多余文件可以删掉或移到 /workspace/_old/）。
+3. 把 guard_sdk/ 和 ai.properties 放回 /workspace 根目录。确认 .redcowork-app.json 是 WEB_APP。
+4. 运行：sh install.sh；npm ci（装 dev 依赖用于测试）；npm test（应 30 项通过）。不需要重新构建；如果 guard verify 要求构建，就运行 npm run build（Node 20.19 即可）。
+5. 用平台的方式启动并注册预览（start.sh / redcowork-preview）。
+6. 在预览中验证：打开“找那一餐”，标签显示“✦ AI 检索”；输入“Maya 带爸妈去的那家”，应返回 Maya · Meat & Potatoes 那条原帖。再试“Maya 之前吃的寿司”（应是一张 Kura 卡片，含 2 条记录）和“汽车保养”（应没找到）。
+7. 停下来汇报：每一步的结果、预览地址、三条查询的实际结果和用时、服务端日志里的 [recall] 行。先不要上线。
 
-要做的事
-
-1. 切到 WEB_APP 模式（React + Express），保留现有前端
-- 保留 React + TypeScript + Vite 工程、依赖锁文件、public/assets 下所有照片和手机素材。
-- 前端构建：npm run build，输出 dist/client。npm run check:runtime 必须通过，不要用更新哈希绕过。
-- 服务端：server/index.ts 是一个最小 Express 应用（POST /api/recall、GET /api/recall/health、静态文件 dist/client）。如果你的 WEB_APP 模板已有 Express 入口，把这两个路由挂到模板上即可，server/recall-service.ts、prompt.ts 不要改。
-- server 文件用 TypeScript，import 带 .ts 后缀，可以直接用 node --experimental-strip-types 运行（Node 22.6+）；也可以按模板改用 tsx。
-
-2. 把 server/llm.ts 接到 guard_sdk/ai（唯一需要你改的代码）
-- createPlatformChat() 现在按常见写法猜测：const { ai } = await import("guard_sdk/ai"); await ai.chat({ messages, temperature: 0 })。
-- 按平台真实的 ai.chat 签名修改这个函数，保持返回 { text: 模型输出文本, model?: 模型名 }。不要前端直连，不要手写 HTTP，不要引厂商 SDK。
-- 不要把调用挪到前端，不要改提示词的约束，不要删除 sanitize 和 validateModelResponse 校验。
-
-3. 在预览里用真实模型验证
-- 打开首页右上角“找那一餐”，标签应为“✦ AI 检索”。
-- 依次输入 DATA-MODEL.txt 第四节的查询，逐条告诉我：实际返回的记录、AI 理由、用时、是否符合预期。重点：
-  “Maya 带爸妈去的那家” → Maya · Meat & Potatoes
-  “有人庆祝拿到 offer 去吃的” → Jordan · Meat & Potatoes
-  “感冒的时候喝的那碗汤” → Eric · 一小碗蛋汤
-  “Maya 之前吃的寿司” → 一张 Kura 卡片，含 2 条记录
-  “Maya 吃过的日料，适合两个人吗” → Kura 卡片 + “适合两个人”列为原帖没写
-  “汽车保养” → 没找到
-- 如果结果不对，先看服务端日志：每次请求会打印 dropped（被校验丢弃的条数）；设置环境变量 MIBLY_DEBUG=1 可以打印模型原始输出，再决定改提示词还是改校验；改动前先告诉我原因。不要为了让结果好看而硬编码答案。
-- 运行 npm test（30 项）。
-
-4. 上线
-- 预览通过后点“上线”，在新的无痕窗口打开上线链接，再测一遍上面三条主链路。
-- 把上线链接给我。我会先提交一次保底，再继续打磨。
-
-约束
-- 不要改首页、五个入口、地图和发布流程；不要加聊天页、第六个导航、宣传横幅或 AI 星光大渐变。
-- AI 不可用时，界面要如实显示“AI 未连接”，只有用户主动点击才用关键词检索，结果标“未使用 AI”。
-- 不要把示例人物和记录说成真实用户数据。不要编造成功率、模型名称或用户测试。
-- 每一步只汇报：改了什么、实际检查结果、还有什么没完成。
+约束：不要修改 src/、server/、static/、app/ 里的代码；有报错先原样告诉我。

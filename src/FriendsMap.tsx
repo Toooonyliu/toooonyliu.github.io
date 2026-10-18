@@ -96,7 +96,7 @@ export default function FriendsMap({ lang, meals, today, currentUserId, onMeal, 
       if(event.key==="+"||event.key==="="||event.key==="-"){event.preventDefault();setView({...camera,zoom:camera.zoom+(event.key==="-"?-.2:.2)});}
     }}>
       <div className="map-world" data-zoom={camera.zoom.toFixed(2)} style={{transform:`translate(${camera.x}px,${camera.y}px) scale(${base*camera.zoom})`}}>
-        <img className="map-world-art" src="/assets/food/pittsburgh-world.png" alt="" draggable={false}/>
+        <img className="map-world-art" src="./assets/food/pittsburgh-world.png" alt="" draggable={false}/>
         {pins.map(({meal,x,y})=>{
           const user=users.find(user=>user.id===meal.userId)||users[0];
           const Icon=meal.type==="homemade"?House:meal.type==="restaurant"?ForkKnife:MapPin;

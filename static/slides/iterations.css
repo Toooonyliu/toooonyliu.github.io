@@ -1,0 +1,35 @@
+/* Historical evidence only. All source screenshots remain unmodified. */
+.iter-crop{position:relative;overflow:hidden;isolation:isolate;flex-shrink:0;background:#17251f}
+.iter-crop img{position:absolute;max-width:none!important;width:var(--iter-image-width)!important;height:auto!important;left:var(--iter-image-left);top:var(--iter-image-top);display:block;pointer-events:none}
+.iter-define{height:100%;min-height:0;display:grid;grid-template-columns:.85fr 1.15fr;gap:5vw;align-items:center}
+.iter-define h2{font-size:clamp(43px,4.2vw,69px)}
+.iter-question{font-size:clamp(26px,2.5vw,40px);line-height:1.25;letter-spacing:-.035em;margin-top:34px;padding-left:22px;border-left:3px solid #738c5f}
+.iter-decision{font-size:20px;line-height:1.45;color:var(--soft);max-width:390px;margin-top:28px}
+.iter-source-caption{font-size:12px;line-height:1.5;color:var(--soft);margin-top:27px}
+.iter-screens{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;justify-items:center;min-height:0;height:100%}
+.iter-phone{margin:0;width:min(100%,28vh);max-width:276px}
+.iter-phone .iter-crop{width:100%;background:transparent;border-radius:13%/6.5%}
+.iter-phone figcaption{font-size:14px;line-height:1.4;color:var(--soft);margin-top:15px;text-align:center}
+.iter-develop{height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.iter-heading{margin-bottom:28px}
+.iter-heading .eyebrow{margin-bottom:12px}
+.iter-heading h2{font-size:clamp(39px,4vw,64px)}
+.iter-studies{display:grid;grid-template-columns:1.06fr 1fr;gap:5vw;align-items:start}
+.iter-study{min-width:0;border-top:1px solid var(--line);padding-top:17px}
+.iter-study h3{font-size:24px;margin-bottom:20px}
+.iter-comparison{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.iter-detail{margin:0;min-width:0}
+.iter-version{font-size:13px;font-weight:630;color:var(--soft);margin-bottom:14px}
+.iter-crop-label{font-size:12px;color:var(--soft);line-height:1.4;margin-bottom:8px}
+.iter-nav-old{display:grid;gap:20px}
+.iter-nav-old .iter-crop{border-radius:7px;width:100%}
+.iter-people-crop{width:min(100%,215px);border-radius:9px}
+.iter-detail-caption{font-size:14px;line-height:1.4;margin-top:12px;color:var(--soft)}
+.iter-photo-study .iter-comparison{gap:24px}
+.iter-pin-crop{width:min(100%,205px);border-radius:10px}
+.iter-photo-note{font-size:16px;line-height:1.45;color:var(--soft);margin-top:24px}
+.iter-develop-source{margin-top:22px}
+@media(min-width:1700px){.iter-studies{gap:7vw}.iter-study h3{font-size:29px}.iter-comparison{gap:30px}.iter-people-crop{width:min(100%,260px)}.iter-pin-crop{width:min(100%,245px)}.iter-detail-caption,.iter-version{font-size:17px}.iter-crop-label{font-size:15px}.iter-source-caption{font-size:14px}.iter-photo-note{font-size:19px}.iter-decision{font-size:24px}}
+@media(max-height:780px){.iter-define h2{font-size:48px}.iter-question{margin-top:25px;font-size:31px}.iter-decision{margin-top:22px;font-size:20px}.iter-source-caption{margin-top:20px}.iter-phone{width:min(100%,27vh)}.iter-heading{margin-bottom:22px}.iter-heading h2{font-size:46px}.iter-study h3{font-size:22px;margin-bottom:16px}.iter-studies{gap:4vw}.iter-version{margin-bottom:12px}.iter-photo-note{margin-top:20px}}
+@media(max-width:1000px){.iter-define{grid-template-columns:.85fr 1.15fr;gap:25px}.iter-define h2{font-size:39px}.iter-question{font-size:26px}.iter-decision{font-size:18px}.iter-screens{gap:12px}.iter-phone figcaption{font-size:12px}.iter-studies{gap:30px}.iter-study h3{font-size:20px}.iter-comparison{gap:12px}.iter-detail-caption{font-size:12px}.iter-heading h2{font-size:40px}.iter-crop-label{font-size:11px}.iter-photo-note{font-size:14px}}
+@media(max-width:680px){.iter-define{display:flex;flex-direction:column;align-items:stretch;gap:30px}.iter-screens{height:auto;gap:20px}.iter-phone{width:100%}.iter-studies{grid-template-columns:1fr;gap:30px}.iter-heading h2{font-size:36px}.iter-develop{height:auto}.iter-source-caption{font-size:12px}.iter-detail-caption{font-size:14px}.iter-study h3{font-size:22px}.iter-comparison{gap:20px}.iter-photo-note{font-size:16px}.iter-people-crop,.iter-pin-crop{width:min(100%,260px)}}

@@ -1,0 +1,4 @@
+Built-in ImageGen; generated 2026-10-03.
+Reference: product/visual-v2/friends-v2.png; lower breakfast photograph used for composition.
+Prompt: landscape candid phone photo of partly eaten everything bagel with egg, bacon and cheese on crumpled white wrapper on cafe table. Bite missing, crumbs, imperfect wrapper. Unbranded clear plastic iced latte cup at right, plain tan napkin. Casual oblique overhead view, warm natural window light, imperfect real-life breakfast. No text or branding anywhere, no UI, labels, watermark, people or glossy advertising styling.
+Generated output resized to 1200 x 850 as breakfast.jpg.

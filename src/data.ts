@@ -36,7 +36,7 @@ export type Venue = {
 };
 export const tr = (lang: Lang, en: string, zh: string) =>
   lang === "zh" ? zh : en;
-const img = (name: string) => `/assets/food/${name}.jpg`;
+const img = (name: string) => `./assets/food/${name}.jpg`;
 export const users: User[] = [
   { id: "maya", name: "Maya Chen", avatar: img("maya") },
   { id: "daniel", name: "Daniel Park", avatar: img("daniel") },
@@ -68,9 +68,9 @@ const venue = (
     encodeURIComponent(name + " " + address),
 });
 export const venues: Venue[] = [
-  { ...venue("kura_sushi", "Kura Revolving Sushi Bar", "South Side", "415 Cinema Dr, Pittsburgh, PA 15203", "Japanese · Sushi", null, "dumplings"), photo: "/assets/meals/kura-sushi.jpg" },
-  { ...venue("speckled_egg", "The Speckled Egg", "Downtown", "501 Grant Street, Pittsburgh, PA 15219", "Breakfast & brunch", null, "eggs"), photo: "/assets/meals/speckled-egg.jpg" },
-  { ...venue("meat_potatoes", "Meat & Potatoes", "Downtown", "649 Penn Avenue, Pittsburgh, PA 15222", "American · Gastropub", null, "grilled"), photo: "/assets/meals/wellington.jpg" },
+  { ...venue("kura_sushi", "Kura Revolving Sushi Bar", "South Side", "415 Cinema Dr, Pittsburgh, PA 15203", "Japanese · Sushi", null, "dumplings"), photo: "./assets/meals/kura-sushi.jpg" },
+  { ...venue("speckled_egg", "The Speckled Egg", "Downtown", "501 Grant Street, Pittsburgh, PA 15219", "Breakfast & brunch", null, "eggs"), photo: "./assets/meals/speckled-egg.jpg" },
+  { ...venue("meat_potatoes", "Meat & Potatoes", "Downtown", "649 Penn Avenue, Pittsburgh, PA 15222", "American · Gastropub", null, "grilled"), photo: "./assets/meals/wellington.jpg" },
   venue(
     "everyday_noodles",
     "Everyday Noodles",
@@ -394,17 +394,17 @@ seedMeals.push(
 // Keep stable IDs for saved replies and reactions. Meal dates, authors and branches
 // are demonstration scenarios, not claims about the people in the source photos.
 const realStories: Partial<Meal>[] = [
-  { food: "One more plate at Kura", foodZh: "在Kura再吃一盘", type: "restaurant", venueId: "kura_sushi", photo: "/assets/meals/kura-sushi.jpg" },
-  { food: "A slow brunch at The Speckled Egg", foodZh: "在The Speckled Egg慢慢吃早午餐", type: "restaurant", venueId: "speckled_egg", photo: "/assets/meals/speckled-egg.jpg" },
-  { food: "Wellington with friends", foodZh: "和朋友一起吃惠灵顿牛排", type: "restaurant", venueId: "meat_potatoes", photo: "/assets/meals/wellington.jpg" },
-  { food: "Braised pork, made at home", foodZh: "自己做的红烧肉", type: "homemade", photo: "/assets/meals/braised-pork.jpg" },
-  { food: "A little bowl of egg soup", foodZh: "一小碗蛋汤", type: "homemade", photo: "/assets/meals/egg-soup.jpg" },
-  { food: "Dinner around our little table", foodZh: "围着小餐桌吃晚饭", type: "homemade", photo: "/assets/meals/home-table.jpg" },
-  { food: "Wings and a night in", foodZh: "鸡翅与宅家夜晚", type: "homemade", photo: "/assets/meals/home-wings.jpg" },
-  { food: "Home cooking after a long day", foodZh: "忙碌一天后在家做饭", type: "homemade", photo: "/assets/meals/home-dinner.jpg" },
-  { food: "Lotus-leaf rice and soup", foodZh: "荷叶饭配热汤", type: "homemade", photo: "/assets/meals/lotus-rice.jpg" },
-  { food: "Korean BBQ with friends", foodZh: "和朋友吃韩式烤肉", type: "other", photo: "/assets/meals/korean-bbq.jpg" },
-  { food: "Nasi lemak for lunch", foodZh: "午餐吃椰浆饭", type: "other", photo: "/assets/meals/nasi-lemak.jpg" },
+  { food: "One more plate at Kura", foodZh: "在Kura再吃一盘", type: "restaurant", venueId: "kura_sushi", photo: "./assets/meals/kura-sushi.jpg" },
+  { food: "A slow brunch at The Speckled Egg", foodZh: "在The Speckled Egg慢慢吃早午餐", type: "restaurant", venueId: "speckled_egg", photo: "./assets/meals/speckled-egg.jpg" },
+  { food: "Wellington with friends", foodZh: "和朋友一起吃惠灵顿牛排", type: "restaurant", venueId: "meat_potatoes", photo: "./assets/meals/wellington.jpg" },
+  { food: "Braised pork, made at home", foodZh: "自己做的红烧肉", type: "homemade", photo: "./assets/meals/braised-pork.jpg" },
+  { food: "A little bowl of egg soup", foodZh: "一小碗蛋汤", type: "homemade", photo: "./assets/meals/egg-soup.jpg" },
+  { food: "Dinner around our little table", foodZh: "围着小餐桌吃晚饭", type: "homemade", photo: "./assets/meals/home-table.jpg" },
+  { food: "Wings and a night in", foodZh: "鸡翅与宅家夜晚", type: "homemade", photo: "./assets/meals/home-wings.jpg" },
+  { food: "Home cooking after a long day", foodZh: "忙碌一天后在家做饭", type: "homemade", photo: "./assets/meals/home-dinner.jpg" },
+  { food: "Lotus-leaf rice and soup", foodZh: "荷叶饭配热汤", type: "homemade", photo: "./assets/meals/lotus-rice.jpg" },
+  { food: "Korean BBQ with friends", foodZh: "和朋友吃韩式烤肉", type: "other", photo: "./assets/meals/korean-bbq.jpg" },
+  { food: "Nasi lemak for lunch", foodZh: "午餐吃椰浆饭", type: "other", photo: "./assets/meals/nasi-lemak.jpg" },
 ];
 const featuredStories: Record<string, number> = {
   "maya-dumplings": 0, "anika-salad": 1, "jordan-noodles": 2,

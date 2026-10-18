@@ -15,21 +15,24 @@
 
 - `src/`：React + TypeScript 前端（原五入口、地图、动态、发布、回忆、收藏）。
 - `src/recall/`：找那一餐的界面（RecallPanel）、请求服务端（adapter）、关键词规则与校验（engine）。
-- `server/`：Express 服务端。`recall-service.ts` 鉴权、硬条件、调用模型、校验；`prompt.ts` 提示词；`llm.ts` 唯一接模型的地方；`index.ts` 路由与静态文件。
+- `server/`：服务端源码（TypeScript）。`recall-service.ts` 鉴权、硬条件、调用模型、校验；`prompt.ts` 提示词；`llm.ts` 包装平台 SDK `guard_sdk/ai`；`app.ts` 路由；`platform-entry.ts` 生产入口。
+- `app/server.js`：由 `npm run build` 打包出的生产服务端（CommonJS，平台执行 `node app/server.js`）。
+- `static/`：前端构建产物（Vite，`base: "./"`，适配 `/f/<appId>/`、`/s/<appId>/` 子路径）。
+- `install.sh` / `start.sh` / `health.sh`：按 REDcowork WEB_APP 模板编写。`guard_sdk/` 与 `ai.properties` 由平台的 guard 工具生成，不在仓库里。
 - `public/assets/`：设计者的餐食照片、插画地图、手机外框素材。
 - `docs/`：产品说明正文（9 页）、数据模型、AI 说明、视觉、视频脚本、验收记录。
 - `prompts/`：给 REDcowork AI 的两段提示词。
 
 ## 运行
 
-需要 Node.js 22.6+。
+构建需要 Node.js 20.19+，运行只需 Node 18+ 和 express。
 
 ```sh
 npm ci
-npm test                    # 30 项测试
-npm run build               # 前端输出到 dist/client
+npm test                    # 30 项测试（tsx，Node 18+）
+npm run build               # 前端 → static/，服务端 → app/server.js（构建需要 Node 20.19+）
 npm run start:stand-in      # 本地开发：用关键词规则扮演模型，界面标“开发替身”
-npm start                   # 正式：需要平台的 guard_sdk/ai；没有时界面显示“AI 未连接”
+npm start                   # 正式：node app/server.js，读取 ../guard_sdk/ai；没有时界面显示“AI 未连接”
 ```
 
 ## 当前边界

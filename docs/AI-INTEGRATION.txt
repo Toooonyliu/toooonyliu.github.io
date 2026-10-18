@@ -55,16 +55,15 @@ AI 不负责：推荐新餐厅、补全店名地址价格、判断好不好吃�
 
 7. guard_sdk/ai 接线（REDcowork 需要确认的唯一一处）
 
-server/llm.ts 的 createPlatformChat() 按常见写法猜测为：
-  const { ai } = await import("guard_sdk/ai");
-  const result = await ai.chat({ messages, temperature: 0 });
-返回文本从 result.content / result.text / result.message.content / result.choices[0].message.content 中取。
-如果平台实际签名不同，只改这个函数，保持返回 { text, model }。其他文件不需要改。
+平台 SDK（guard_sdk/ai.js，CommonJS）的真实签名：chat(messages, { system, maxTokens, thinking }) → Promise<string>。messages 只能含 user/assistant，系统提示词单独传 system。SDK 自己读取 ai.properties，代码里没有密钥。
+server/llm.ts 的 createGuardChat(ai) 按这个签名包装：拆出 system、maxTokens 2000、不开 thinking；SDK 没有取消接口，所以请求超时后服务端停止等待（18 秒）。
+生产入口 server/platform-entry.ts 用 require("../guard_sdk/ai") 加载 SDK，打包成 app/server.js，由 start.sh 执行。
 
 8. 本地开发
 
 npm run build && npm run start:stand-in   → http://localhost:3000，后端用关键词规则扮演模型，界面全程标“开发替身 · 关键词”，不会冒充 AI。
-npm run build && npm start                → 没有 guard_sdk 时 /api/recall 返回 503，界面显示“AI 未连接”。
+npm run build && npm start                → 没有 ../guard_sdk/ai 时 /api/recall 返回 503，界面显示“AI 未连接”。
+已在本地模拟平台环境验证：npm ci --omit=dev 只装 express；用与平台同签名的 SDK 替身，经 /s/<id>/ 子路径代理访问，页面、图片和 AI 检索都正常。
 npm test                                   → 30 项测试，其中 8 项是服务端测试（鉴权、提示词最小化、伪造引用/未知 ID 被丢弃、JSON 重试、clarify 规则、替身标注）。服务端测试用脚本化的模型回复，真实模型效果必须在 REDcowork 预览里验证。
 
 9. 能力边界（说明和视频里要讲）

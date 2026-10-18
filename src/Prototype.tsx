@@ -155,7 +155,7 @@ function readState(): State {
             ...p.meals.filter((meal: Meal) => !currentFriendIds.has(meal.id)).map((meal: Meal) => {
               // Upgrade untouched built-in media, never replace a user upload.
               const replacement = seedMeals.find(seed => seed.id === meal.id);
-              return replacement && legacySeedFoods.has(meal.food) && meal.photo?.startsWith("/assets/food/")
+              return replacement && legacySeedFoods.has(meal.food) && meal.photo?.includes("assets/food/")
                 ? { ...meal, food: replacement.food, foodZh: replacement.foodZh, photo: replacement.photo,
                     type: replacement.type, venueId: replacement.venueId, place: replacement.place,
                     placeZh: replacement.placeZh } : meal;

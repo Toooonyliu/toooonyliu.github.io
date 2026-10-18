@@ -1,37 +1,45 @@
 /**
  * The ONE place that talks to a language model.
  *
- * REDcowork (WEB_APP mode) provides real model calls on the backend through
- * guard_sdk/ai (ai.chat). The platform does not allow calling a provider from
- * the browser, hand-written HTTP to a provider, or vendor SDKs. If the real
- * guard_sdk/ai signature differs from the guess below, change only
- * createPlatformChat(); everything else depends on the Chat type.
+ * REDcowork WEB_APP provides the model through the platform SDK in
+ * guard_sdk/ai.js (CommonJS, copied in by `guard`):
+ *   chat(messages, { system, maxTokens, thinking }) -> Promise<string>
+ * messages may only contain user/assistant turns; the system prompt is passed
+ * separately. The SDK reads ai.properties itself; no key exists in this code.
  */
 export type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 export type Chat = (messages: ChatMessage[], options: { signal?: AbortSignal }) => Promise<{ text: string; model?: string }>;
 export type LlmEngine = { kind: "platform" | "stand-in"; chat: Chat } | { kind: "unavailable"; reason: string };
 
-function textOf(result: unknown): string {
-  if (typeof result === "string") return result;
-  const r = result as Record<string, any> | null;
-  return r?.content ?? r?.text ?? r?.message?.content ?? r?.choices?.[0]?.message?.content ?? r?.data?.content ?? "";
+type GuardAi = {
+  chat: (messages: { role: "user" | "assistant"; content: string }[], options?: { system?: string | null; maxTokens?: number; thinking?: boolean }) => Promise<string>;
+  isAiEnabled?: () => boolean;
+};
+
+function abortable<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return promise;
+  if (signal.aborted) return Promise.reject(new Error("aborted"));
+  // The SDK has no cancellation hook; stop waiting when the request is abandoned.
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new Error("aborted"));
+    signal.addEventListener("abort", onAbort, { once: true });
+    promise.then(value => { signal.removeEventListener("abort", onAbort); resolve(value); },
+      error => { signal.removeEventListener("abort", onAbort); reject(error); });
+  });
 }
 
-export async function createPlatformChat(): Promise<LlmEngine> {
-  const moduleName = "guard_sdk/ai";
-  try {
-    const mod: any = await import(/* @vite-ignore */ moduleName);
-    const ai = mod.ai ?? mod.default ?? mod;
-    if (typeof ai?.chat !== "function") return { kind: "unavailable", reason: "guard_sdk/ai has no chat()" };
-    const chat: Chat = async (messages, { signal }) => {
-      // temperature 0: retrieval should be repeatable, not creative.
-      const result = await ai.chat({ messages, temperature: 0, signal });
-      return { text: textOf(result), model: (result as any)?.model };
-    };
-    return { kind: "platform", chat };
-  } catch (error) {
-    return { kind: "unavailable", reason: error instanceof Error ? error.message : String(error) };
-  }
+/** Wraps the platform SDK module (the result of require("../guard_sdk/ai")). */
+export function createGuardChat(ai: unknown): LlmEngine {
+  const sdk = ai as GuardAi | null;
+  if (!sdk || typeof sdk.chat !== "function") return { kind: "unavailable", reason: "guard_sdk/ai has no chat()" };
+  if (typeof sdk.isAiEnabled === "function" && !sdk.isAiEnabled()) return { kind: "unavailable", reason: "AI is not configured (no ai.properties)" };
+  const chat: Chat = async (messages, { signal }) => {
+    const system = messages.filter(m => m.role === "system").map(m => m.content).join("\n\n") || null;
+    const turns = messages.filter((m): m is { role: "user" | "assistant"; content: string } => m.role !== "system");
+    const text = await abortable(sdk.chat(turns, { system, maxTokens: 2000, thinking: false }), signal);
+    return { text: typeof text === "string" ? text : String(text ?? "") };
+  };
+  return { kind: "platform", chat };
 }
 
 /**

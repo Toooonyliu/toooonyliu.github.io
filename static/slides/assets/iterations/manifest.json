@@ -1,0 +1,41 @@
+{
+  "purpose": "Historical prototype evidence for the Mibly process presentation",
+  "assetTreatment": "All images are unchanged file copies. HTML and CSS viewport crops remove surrounding whitespace or expose a UI component. No screenshot pixels were reconstructed or retouched.",
+  "captures": [
+    {
+      "asset": "early-feed.png",
+      "source": "demo/qa/iteration4-before-home.png",
+      "stage": "Prototype before iteration 4",
+      "kind": "Actual browser screenshot",
+      "use": "Define slide, early feed screen"
+    },
+    {
+      "asset": "early-map.png",
+      "source": "demo/qa/iteration4-before-map.png",
+      "stage": "Prototype before iteration 4",
+      "kind": "Actual browser screenshot",
+      "use": "Define slide, early secondary map panel"
+    },
+    {
+      "asset": "duplicate-chat-home.png",
+      "source": "demo/qa/iteration5-01-before-home.png",
+      "stage": "Iteration 4 captured before iteration 5 changes",
+      "kind": "Actual browser screenshot containing generated sample food imagery",
+      "use": "Develop slide, Home Chat action, bottom navigation, generated meal pin"
+    },
+    {
+      "asset": "people-center.png",
+      "source": "demo/qa/mibly-community-05-people.png",
+      "stage": "Current Mibly after social-flow changes and rename",
+      "kind": "Actual browser screenshot",
+      "use": "Develop slide, search and friend controls"
+    },
+    {
+      "asset": "mibly-home.png",
+      "source": "demo/qa/mibly-home.png",
+      "stage": "Current Mibly with designer-supplied meal photos",
+      "kind": "Actual browser screenshot with illustrative map and synthetic demo scenarios",
+      "use": "Develop slide, The Speckled Egg real-photo meal pin"
+    }
+  ]
+}
