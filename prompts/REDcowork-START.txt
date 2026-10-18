@@ -1,20 +1,8 @@
-源码已按你给我的 WEB_APP 模板结构改好，并推到了 GitHub（同一分支 mibly-redcowork，已更新）。请用它覆盖 /workspace，不要再手工改造旧文件。
+作品已改成纯前端版本并推到 GitHub（分支 mibly-redcowork）。AI 改为浏览器端运行，不再需要服务端、guard_sdk 或 ai.properties。请只做部署，不要读源码、不要修改代码。
 
-仓库现在的结构（和 /app/skills/guard-skill/templates/node-express 一致）：
-- app/server.js：已打包好的生产服务端（CommonJS，Node 18+ 可直接运行），require("../guard_sdk/ai") 调用平台模型，提供 /health、/healthz、/api/recall/health、POST /api/recall，最后挂载 ../static。
-- static/：已构建好的前端（Vite base "./"，资源全是相对路径，适配 /f/<appId>/ 和 /s/<appId>/）。
-- install.sh / start.sh / health.sh：按模板写好（start.sh 执行 node app/server.js，读取 APP_PORT）。
-- package.json：运行时依赖只有 express；npm run build 会重新生成 static/ 和 app/server.js；npm test 用 tsx（Node 18+）。
-- server/*.ts 是服务端源码，src/ 是前端源码。
-- 仓库里没有 guard_sdk/ 和 ai.properties，这两样用你工作区已有的（guard 生成的）。
-
-请按顺序做：
-1. 备份当前工作区的 guard_sdk/ 和 ai.properties（以及其他 guard 生成的文件）到 /tmp/guard-backup/。
-2. 下载 https://codeload.github.com/Toooonyliu/toooonyliu.github.io/tar.gz/refs/heads/mibly-redcowork ，解压后把 toooonyliu.github.io-mibly-redcowork/ 里的全部内容覆盖到 /workspace（旧的 server/index.ts 等多余文件可以删掉或移到 /workspace/_old/）。
-3. 把 guard_sdk/ 和 ai.properties 放回 /workspace 根目录。确认 .redcowork-app.json 是 WEB_APP。
-4. 运行：sh install.sh；npm ci（装 dev 依赖用于测试）；npm test（应 30 项通过）。不需要重新构建；如果 guard verify 要求构建，就运行 npm run build（Node 20.19 即可）。
-5. 用平台的方式启动并注册预览（start.sh / redcowork-preview）。
-6. 在预览中验证：打开“找那一餐”，标签显示“✦ AI 检索”；输入“Maya 带爸妈去的那家”，应返回 Maya · Meat & Potatoes 那条原帖。再试“Maya 之前吃的寿司”（应是一张 Kura 卡片，含 2 条记录）和“汽车保养”（应没找到）。
-7. 停下来汇报：每一步的结果、预览地址、三条查询的实际结果和用时、服务端日志里的 [recall] 行。先不要上线。
-
-约束：不要修改 src/、server/、static/、app/ 里的代码；有报错先原样告诉我。
+1. 下载 https://codeload.github.com/Toooonyliu/toooonyliu.github.io/tar.gz/refs/heads/mibly-redcowork ，解压到 /tmp/mibly-src。
+2. 新建 /workspace/site（如已存在先移到 /workspace/_old/），把 /tmp/mibly-src/toooonyliu.github.io-mibly-redcowork/site/ 里的全部内容原样拷进去。site/ 里只有 index.html、assets/、models/、slides/，全是静态文件，不要再加 package.json 或任何服务端文件。
+3. 把 /workspace/.redcowork-app.json 改成 {"appType":"STATIC_SITE","buildMode":"STATIC_SITE"}。
+4. 停掉之前在 3030 端口运行的 node app/server.js（用 kill），然后用纯静态方式注册预览，projectPath 指向 /workspace/site：redcowork-preview start 3030 /workspace/site（如需先在该目录起静态服务，用 python3 -m http.server 3030）。
+5. 验证：预览首页能看到地图和餐食照片；打开右上角“找那一餐”，标签从“AI 模型加载中 xx%”变成“AI 检索 · 本机运行”；输入“Maya 带爸妈去的那家”应返回 Maya · Meat & Potatoes。确认 models/bge-small-zh-v1.5/model_int8.onnx（约 23.9 MB）和 assets/ort-wasm-simd-threaded-*.wasm（约 13.5 MB）都返回 200。
+6. 汇报每一步结果和预览地址。不要上线，我来点上线。

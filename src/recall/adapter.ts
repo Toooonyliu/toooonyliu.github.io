@@ -1,55 +1,93 @@
-import { localDay } from "../data.ts";
-import type { RecallRequest } from "./engine.ts";
+import { semanticRecall, warmRecords, type Embed } from "./semantic.ts";
+import { createOrtEmbedder } from "./embedder.ts";
+import type { RecallRecord, RecallRequest, RecallResponse } from "./engine.ts";
 
 /**
- * Browser side of "找那一餐". The language model runs on the server
- * (REDcowork WEB_APP, guard_sdk/ai). The browser sends the question and the
- * records it is showing; the server re-authorizes them against its own copy,
- * calls the model, verifies every ID and quote, and returns the result.
- * No key, prompt or provider call exists in this bundle.
+ * "找那一餐" AI, fully in the browser (REDcowork only publishes pure-frontend
+ * works). A Chinese retrieval model, bge-small-zh-v1.5 (int8 ONNX, ~24 MB),
+ * runs through onnxruntime-web (WebAssembly). Model, vocabulary and runtime are
+ * served from the same site: no API key, no server, no third-party CDN, and the
+ * question and friends' posts never leave the device.
  */
-export type RecallMeta = { engine: "platform" | "stand-in" | "none"; model?: string; elapsedMs: number; candidates: number; dropped: number };
-export type RecallNetwork = { friends: string[]; hidden: string[] };
-export type EngineStatus = "checking" | "platform" | "stand-in" | "unavailable";
+export type ModelState =
+  | { status: "idle" }
+  | { status: "loading"; loaded: number; total: number }
+  | { status: "ready"; loadMs: number }
+  | { status: "error"; message: string };
+export type RecallMeta = { engine: "on-device"; elapsedMs: number; candidates: number };
 
-const BASE = (import.meta.env.BASE_URL || "/").replace(/\/?$/, "/");
+export const MODEL_INFO = {
+  name: "bge-small-zh-v1.5",
+  variant: "int8 ONNX · 512-d",
+  runtime: "onnxruntime-web 1.27.0 (WebAssembly)",
+  modelBytes: 23_937_398,
+};
+const BASE = (import.meta.env.BASE_URL || "./").replace(/\/?$/, "/");
+const MODEL_DIR = `${BASE}models/bge-small-zh-v1.5/`;
 
-export class RecallHttpError extends Error {
-  constructor(readonly code: "model_unavailable" | "model_failed" | "timeout" | "bad_request" | "network", message: string = code) { super(message); }
+let state: ModelState = { status: "idle" };
+const listeners = new Set<(state: ModelState) => void>();
+const setState = (next: ModelState) => { state = next; listeners.forEach(listener => listener(next)); };
+export const getModelState = () => state;
+export function subscribeModel(listener: (state: ModelState) => void) { listeners.add(listener); return () => { listeners.delete(listener); }; }
+
+async function fetchWithProgress(url: string, expected: number): Promise<Uint8Array> {
+  const response = await fetch(url);
+  if (!response.ok || !response.body) throw new Error(`model file ${response.status}`);
+  // Static hosts may answer a missing file with index.html (200): reject non-binary responses.
+  if ((response.headers.get("content-type") || "").includes("text/html")) throw new Error("model file missing");
+  const total = Number(response.headers.get("content-length")) || expected;
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); loaded += value.length;
+    setState({ status: "loading", loaded, total });
+  }
+  const bytes = new Uint8Array(loaded);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  return bytes;
 }
 
-export async function checkEngine(signal?: AbortSignal): Promise<EngineStatus> {
-  try {
-    const response = await fetch(`${BASE}api/recall/health`, { signal });
-    if (!response.ok) return "unavailable";
-    const body = await response.json() as { engine?: string };
-    return body.engine === "platform" || body.engine === "stand-in" ? body.engine : "unavailable";
-  } catch { return "unavailable"; }
+let embedderPromise: Promise<Embed> | null = null;
+/** Starts (or reuses) the one-time model download; called when the panel opens. */
+export function loadModel(): Promise<Embed> {
+  if (embedderPromise) return embedderPromise;
+  const started = performance.now();
+  setState({ status: "loading", loaded: 0, total: MODEL_INFO.modelBytes });
+  embedderPromise = (async () => {
+    if (typeof WebAssembly !== "object") throw new Error("WebAssembly unavailable");
+    const [ort, model, vocab] = await Promise.all([
+      import("onnxruntime-web/wasm"),
+      fetchWithProgress(`${MODEL_DIR}model_int8.onnx`, MODEL_INFO.modelBytes),
+      fetch(`${MODEL_DIR}vocab.txt`).then(r => { if (!r.ok || (r.headers.get("content-type") || "").includes("text/html")) throw new Error(`vocab ${r.status}`); return r.text(); }),
+    ]);
+    ort.env.wasm.numThreads = 1; // no cross-origin isolation on static hosts
+    const embed = await createOrtEmbedder(ort, model, vocab, { executionProviders: ["wasm"] });
+    await embed(["预热"]);
+    setState({ status: "ready", loadMs: Math.round(performance.now() - started) });
+    return embed;
+  })().catch(error => {
+    embedderPromise = null;
+    setState({ status: "error", message: error instanceof Error ? error.message : String(error) });
+    throw error;
+  });
+  return embedderPromise;
 }
 
-export async function searchWithModel(request: RecallRequest, network: RecallNetwork, signal: AbortSignal): Promise<{ raw: unknown; meta: RecallMeta }> {
-  let response: Response;
-  try {
-    response = await fetch(`${BASE}api/recall`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      signal,
-      body: JSON.stringify({
-        query: request.query, scope: request.scope, lang: request.lang, today: localDay(new Date()),
-        // Photos are stripped before this point; the server rebuilds friends' records itself.
-        records: request.records.map(({ photo: _photo, ...record }) => record),
-        network,
-      }),
-    });
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") throw error;
-    throw new RecallHttpError("network");
-  }
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({})) as { error?: string };
-    const code = body.error === "model_unavailable" || body.error === "timeout" || body.error === "bad_request" ? body.error : "model_failed";
-    throw new RecallHttpError(code);
-  }
-  const body = await response.json() as { result?: unknown; meta?: RecallMeta };
-  return { raw: body.result, meta: body.meta ?? { engine: "none", elapsedMs: 0, candidates: 0, dropped: 0 } };
+/** Pre-computes record vectors while the user types, so the first search is fast. */
+export async function warm(records: RecallRecord[]) {
+  const embed = await loadModel();
+  await warmRecords(records, embed);
+}
+
+export async function searchOnDevice(request: RecallRequest, signal: AbortSignal): Promise<{ raw: RecallResponse; meta: RecallMeta }> {
+  const embed = await loadModel();
+  if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+  const started = performance.now();
+  const raw = await semanticRecall(request, embed, signal);
+  return { raw, meta: { engine: "on-device", elapsedMs: Math.round(performance.now() - started), candidates: request.records.length } };
 }
