@@ -53,7 +53,7 @@
 
 /* ---- Real street map (Leaflet) ---- */
 .friends-map .real-map{position:absolute;inset:0;background:#0d1a14;z-index:0}
-/* CARTO dark tiles tinted toward Mibly's forest green. */
+/* Dark gray tiles tinted toward Mibly's forest green. */
 .friends-map .real-map .leaflet-tile-pane{filter:sepia(.45) hue-rotate(58deg) saturate(1.5) brightness(1.18) contrast(1.02)}
 .friends-map .real-map .leaflet-control-attribution{background:#0b1510b3;color:#9fb29a;font-size:8.5px;padding:1px 6px;border-radius:8px 0 0 0;margin-bottom:96px}
 .friends-map .real-map .leaflet-control-attribution a{color:#c6d8bd}

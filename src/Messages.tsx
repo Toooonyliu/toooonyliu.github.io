@@ -111,7 +111,7 @@ export default function MessagesView({ lang, today, currentUserId, friends, inco
   </section>;
 }
 
-function ThreadSheet({ lang, currentUserId, thread, messages, meals, when, name, onClose, onSend, onMeal }: {
+function ThreadSheet({ lang, today, currentUserId, thread, messages, meals, when, name, onClose, onSend, onMeal }: {
   lang: Lang; today: string; currentUserId: string; thread: Props["openThread"]; messages: ThreadMessage[]; meals: Meal[];
   when: (iso: string) => string; name: (id: string) => string; onClose: () => void;
   onSend: Props["onSend"]; onMeal: (id: string) => void;
@@ -135,12 +135,12 @@ function ThreadSheet({ lang, currentUserId, thread, messages, meals, when, name,
   return <BottomSheet open onOpenChange={open => { if (!open) { keyboard.hide(); onClose(); } }} title={friend?.name || ""} snap={.94}>
     <div className="thread">
       <button className="sheet-close" aria-label={t("Close", "关闭")} onClick={() => { keyboard.hide(); onClose(); }}><X size={21}/></button>
-      <div className="thread-head"><PersonAvatar id={thread.friendId} className="thread-head-avatar"/><span><strong>{friend?.name}</strong><small>{t("Friends · sees your shared meals", "好友 · 能看到你分享的餐食")}</small></span></div>
+      <div className="thread-head"><PersonAvatar id={thread.friendId} className="thread-head-avatar"/><span><small>{t("Friends · sees your shared meals", "好友 · 能看到你分享的餐食")}</small></span></div>
       <div className="thread-body">
         {!messages.length && <p className="thread-empty"><ChatCircleDots size={26}/>{t("Start from a meal you both care about.", "从一顿饭聊起吧。")}</p>}
         {messages.map((m, i) => { const mine = m.from === currentUserId; const meal = meals.find(x => x.id === m.mealId); const showTime = i === 0 || messages[i - 1].at.slice(0, 13) !== m.at.slice(0, 13);
           return <div key={m.id} className={`bubble-row ${mine ? "mine" : ""}`}>
-            {showTime && <time className="bubble-time">{when(m.at)}{m.at.split("T")[0] !== messages[0]?.at.split("T")[0] || i === 0 ? ` ${m.at.slice(11, 16)}` : ""}</time>}
+            {showTime && <time className="bubble-time">{m.at.startsWith(today) ? m.at.slice(11, 16) : `${when(m.at)} ${m.at.slice(11, 16)}`}</time>}
             {meal && card(meal)}
             <p className="bubble">{m.text}</p>
           </div>; })}

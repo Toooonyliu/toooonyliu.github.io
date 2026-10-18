@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { type Meal, users } from "./data";
 
 /**
- * Real, zoomable street map (Leaflet + CARTO dark raster tiles, © OpenStreetMap).
+ * Real, zoomable street map (Leaflet + Esri World Dark Gray Canvas tiles).
  * Restaurants sit at their real catalog addresses. Home-cooked meals never get a
  * precise point: they are drawn as a ~400 m neighbourhood circle. If tiles cannot
  * load (e.g. blocked network), the caller falls back to the illustrated map.
@@ -57,10 +57,13 @@ export function createRealMap(element: HTMLElement, onTiles: (ok: boolean) => vo
   map.attributionControl.setPrefix(false);
   let loaded = 0, failed = 0, decided = false;
   const decide = (ok: boolean) => { if (!decided) { decided = true; onTiles(ok); } };
-  const tiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-    subdomains: "abcd", maxZoom: 19, crossOrigin: true,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>',
+  // Esri World Dark Gray Canvas (keyless, attribution required); labels are a separate overlay.
+  const esri = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+  const tiles = L.tileLayer(`${esri}World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`, {
+    maxZoom: 19, maxNativeZoom: 16, crossOrigin: true,
+    attribution: 'Tiles © <a href="https://www.esri.com" target="_blank" rel="noreferrer">Esri</a> — Esri, HERE, Garmin, © OpenStreetMap contributors',
   });
+  L.tileLayer(`${esri}World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 19, maxNativeZoom: 16, crossOrigin: true, pane: "overlayPane", className: "map-labels" }).addTo(map);
   tiles.on("tileload", () => { loaded++; if (loaded >= 2) decide(true); });
   tiles.on("tileerror", () => { failed++; if (failed >= 4 && loaded === 0) decide(false); });
   tiles.addTo(map);

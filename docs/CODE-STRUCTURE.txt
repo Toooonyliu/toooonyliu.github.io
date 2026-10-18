@@ -3,7 +3,7 @@ Mibly｜代码结构（纯前端）
 src/
   App.tsx / main.tsx / styles.css / mobile/   原手机运行框架（check:runtime 保护）
   Prototype.tsx      主状态与五个入口：首页（地图/动态）、消息、记一餐、回忆、我的
-  FriendsMap.tsx     朋友餐食地图：真实街道地图（realMap.ts，Leaflet + CARTO 底图），加载失败回退插画地图
+  FriendsMap.tsx     朋友餐食地图：真实街道地图（realMap.ts，Leaflet + Esri 深灰底图），加载失败回退插画地图
   Messages.tsx       消息：互动 + 私信，私信可引用一顿饭；演示对话为虚构，对方不会自动回复
   SocialViews.tsx    回忆、我的
   data.ts            用户、餐厅目录、餐食种子数据（朋友记录带生活化留言）
