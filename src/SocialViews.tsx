@@ -78,12 +78,14 @@ export function ProfileView({ meals, lang, onMeal, today, onSaved, onPicks, onCo
   const todayMeals=meals.filter(m=>m.date===today);
   const t=(en:string,zh:string)=>lang==="zh"?zh:en;
   return <section className="social-profile">
-    <div className="profile-cover"><img src={user.avatar} alt={user.name}/><div><span className="profile-city"><MapPin size={13}/>Pittsburgh</span><h2>{user.name.split(" ")[0]}</h2><p>@{user.name.toLowerCase().replaceAll(" ","")} <LockSimple size={13}/></p></div></div>
+    <div className="profile-compact"><img src={user.avatar} alt={user.name}/><div><h2>{user.name}</h2><p>@{user.name.toLowerCase().replaceAll(" ","")} <LockSimple size={12}/> · <MapPin size={12}/>Pittsburgh</p></div></div>
     <p className="profile-bio">{t("Good food. Familiar faces. Little everyday stories.","好吃的食物，熟悉的朋友，日常的小故事。")}</p>
     <div className="profile-stats"><button onClick={onFriends}><strong>{friendCount}</strong>{t("friends","朋友")}</button><span><strong>{meals.length}</strong>{t("memories","回忆")}</span><span><strong>{savedCount}</strong>{t("saved places","收藏地点")}</span></div>
     <h3>{t("Today’s meals","今天的餐食")}</h3>
     <Carousel ariaLabel={t("Your meals today","你今天的餐食")} className="profile-today-rail" contentClassName="profile-today-track">{todayMeals.map(meal=><button className="profile-today-card" key={meal.id} onClick={()=>onMeal(meal)}>{meal.photo?<img src={meal.photo} alt=""/>:<ForkKnife size={28}/>}<span><strong>{foodName(meal,lang)}</strong><small>{placeName(meal,lang)}</small><em>{meal.time}</em></span><ChatCircle size={19}/></button>)}</Carousel>
     {!todayMeals.length&&<button className="profile-add" onClick={onCompose}><ForkKnife size={23}/>{t("What’s on your plate today?","今天吃了什么？")}</button>}
+    <h3>{t("Recent meals","最近的餐食")}</h3>
+    <div className="profile-grid">{[...meals].sort((x,y)=>(y.date+y.time).localeCompare(x.date+x.time)).slice(0,9).map(meal=><button key={meal.id} onClick={()=>onMeal(meal)} aria-label={foodName(meal,lang)}>{meal.photo?<img src={meal.photo} alt=""/>:<ForkKnife size={22}/>}<span>{meal.date.slice(5).replace("-","/")}</span></button>)}</div>
     <h3>{t("Your food world","你的美食世界")}</h3><button className="profile-link" onClick={onSaved}><BookmarkSimple size={23}/><span><strong>{t("Saved places","收藏地点")}</strong><small>{t("For your next good meal","留给下一次好好吃饭")}</small></span><CaretRight size={20}/></button><button className="profile-link" onClick={onPicks}><ForkKnife size={23}/><span><strong>{t("Help me pick a place","帮我选一家")}</strong><small>{t("Ideas from your circle","来自朋友们的灵感")}</small></span><ArrowUpRight size={20}/></button>
   </section>;
 }

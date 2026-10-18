@@ -13,6 +13,8 @@ type Props = {
   currentUserId: string;
   records: RecallRecord[];
   network: RecallNetwork;
+  /** "mine" when opened from Memories (search your own meals). */
+  defaultScope?: RecallRequest["scope"];
   saved: string[];
   onClose: () => void;
   onMeal: (id: string) => void;
@@ -31,7 +33,7 @@ const EXAMPLES = [
   ["The soup when someone had a cold", "感冒的时候喝的那碗汤"],
 ] as const;
 
-export default function RecallPanel({ open, covered, lang, currentUserId, records, network, saved, onClose, onMeal, onVenue, onSave }: Props) {
+export default function RecallPanel({ open, covered, lang, currentUserId, records, network, defaultScope = "friends", saved, onClose, onMeal, onVenue, onSave }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<RecallRequest["scope"]>("friends");
   const [response, setResponse] = useState<RecallResponse | null>(null);
@@ -56,6 +58,7 @@ export default function RecallPanel({ open, covered, lang, currentUserId, record
   useEffect(() => { cancel(); setResponse(null); setMeta(null); setError(""); }, [scope, records, lang, currentUserId]);
   useEffect(() => {
     if (!open) { cancel(); return; }
+    setScope(defaultScope);
     const abort = new AbortController();
     checkEngine(abort.signal).then(status => { if (!abort.signal.aborted) setEngine(status); });
     return () => abort.abort();
@@ -175,7 +178,7 @@ export default function RecallPanel({ open, covered, lang, currentUserId, record
         </div>
         {response.clarification && <p className="recall-clarification">{response.clarification}</p>}
         {!groups.length && response.status !== "clarify" && <p className="recall-empty">{t("Nothing in the posts you can see matches this. Try a friend's name or a dish, or change the scope.", "你能看到的记录里没有符合的。可以补一个朋友的名字或菜名，或换个查找范围。")}</p>}
-        {response.unresolved.length > 0 && <div className="recall-unknown"><span>{t("Not in the posts, so not guessed", "原帖里没写，不做猜测")}</span><p>{response.unresolved.join(" · ")}</p></div>}
+        {response.unresolved.length > 0 && groups.length > 0 && <div className="recall-unknown"><span>{t("Not in the posts, so not guessed", "原帖里没写，不做猜测")}</span><p>{response.unresolved.join(" · ")}</p></div>}
 
         {groups.map(group => group.venue && group.hits.length > 1
           ? <article className="recall-card recall-venue-card" key={group.key}>

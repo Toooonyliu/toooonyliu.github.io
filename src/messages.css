@@ -1,0 +1,58 @@
+/* 消息 tab: activity + private threads. Same dark-green language as the rest of Mibly. */
+.social-app .messages{padding-bottom:120px}
+.social-app .messages-section{font-size:13px;font-weight:650;color:#9fb29a;letter-spacing:.2px;margin:6px 0 8px}
+.social-app .messages-section+div{margin-bottom:22px}
+.social-app .messages-activity{background:#121613;border:1px solid #ffffff0d;border-radius:20px;padding:4px 14px}
+.social-app .activity-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0;border-bottom:1px solid #ffffff0a;color:#f2f5ee}
+.social-app .activity-row:last-child{border-bottom:0}
+.social-app .activity-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.social-app .activity-icon{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#d6eeb8;color:#1d3020;flex:none}
+.social-app .activity-text{flex:1;min-width:0;display:grid;gap:3px}
+.social-app .activity-text strong{font-size:14px;font-weight:680}
+.social-app .activity-text strong em{font-style:normal;font-weight:450;color:#c6d0c3}
+.social-app .activity-text small{font-size:12px;color:#9aa598;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.social-app .activity-row>img{width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none}
+.social-app .activity-row>svg{color:#9aa598;flex:none}
+.social-app .thread-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 0;border-bottom:1px solid #ffffff09;color:#f2f5ee}
+.social-app .thread-avatar{position:relative;flex:none}
+.social-app .thread-avatar .chat-avatar{width:52px;height:52px}
+.social-app .thread-avatar b{position:absolute;right:1px;top:1px;width:11px;height:11px;border-radius:50%;background:#ff5c57;border:2px solid #080a09}
+.social-app .thread-text{flex:1;min-width:0;display:grid;gap:4px}
+.social-app .thread-text strong{font-size:15px;font-weight:680}
+.social-app .thread-text small{font-size:12.5px;color:#a3ada1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.social-app .thread-meta{display:grid;justify-items:end;gap:6px;flex:none}
+.social-app .thread-meta time{font-size:11px;color:#8d988b}
+.social-app .thread-meta img{width:34px;height:34px;border-radius:9px;object-fit:cover}
+
+/* Thread sheet */
+.bottom-sheet .thread{display:flex;flex-direction:column;min-height:calc(100% - 8px);padding-bottom:6px}
+.bottom-sheet .thread-head{display:flex;align-items:center;gap:10px;padding:0 0 12px;border-bottom:1px solid #ffffff12;margin-top:-6px}
+.bottom-sheet .thread-head-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover}
+.bottom-sheet .thread-head span{display:grid;gap:2px}
+.bottom-sheet .thread-head strong{font-size:15px}
+.bottom-sheet .thread-head small{font-size:11px;color:#9aa598}
+.bottom-sheet .thread-body{flex:1;display:flex;flex-direction:column;gap:8px;padding:14px 0 10px}
+.bottom-sheet .thread-empty{display:grid;justify-items:center;gap:8px;color:#9aa598;text-align:center;margin:40px 0 !important}
+.bottom-sheet .bubble-row{display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:82%}
+.bottom-sheet .bubble-row.mine{align-self:flex-end;align-items:flex-end}
+.bottom-sheet .bubble-time{align-self:center;font-size:10.5px;color:#7f8a7e;margin:6px 0 2px;width:100%;text-align:center}
+.bottom-sheet .bubble-row.mine .bubble-time{align-self:center}
+.bottom-sheet .bubble{margin:0 !important;padding:9px 13px;border-radius:18px 18px 18px 6px;background:#262b27;color:#f2f5ee;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.bottom-sheet .bubble-row.mine .bubble{background:#d6eeb8;color:#16261a;border-radius:18px 18px 6px 18px}
+.bottom-sheet .thread-meal{display:flex !important;align-items:center;gap:9px;padding:6px 10px 6px 6px !important;border-radius:14px;background:#151916 !important;border:1px solid #ffffff14 !important;text-align:left;max-width:240px}
+.bottom-sheet .thread-meal img{width:42px;height:42px;border-radius:10px;flex:none}
+.bottom-sheet .thread-meal span{display:grid;gap:2px;min-width:0}
+.bottom-sheet .thread-meal strong{font-size:12.5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bottom-sheet .thread-meal small{font-size:10.5px;color:#9aa598;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bottom-sheet .thread-compose{position:sticky;bottom:0;background:#1b1d22;padding-top:8px;border-top:1px solid #ffffff10}
+.bottom-sheet .thread-quote{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bottom-sheet .thread-quote>span{font-size:11px;color:#b9d99a;flex:none}
+.bottom-sheet .thread-quote>button:last-child{width:28px;height:28px;display:grid;place-items:center;color:#9aa598}
+.bottom-sheet .thread-suggest>span{display:block;font-size:11px;color:#9aa598;margin-bottom:6px}
+.bottom-sheet .thread-suggest>div{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.bottom-sheet .thread-suggest>div button{display:flex !important;align-items:center;gap:6px;flex:none;padding:4px 10px 4px 4px !important;border-radius:16px;background:#23282a !important;font-size:12px !important;color:#dfe6da !important;white-space:nowrap}
+.bottom-sheet .thread-suggest img{width:24px;height:24px;border-radius:50%}
+.bottom-sheet .thread-input{display:flex;gap:8px;align-items:center}
+.bottom-sheet .thread-input input{border-radius:22px !important;background:#262b27 !important;border-color:#3a423a !important;min-height:44px}
+.bottom-sheet .thread-input button{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#d6eeb8 !important;color:#16261a !important}
+.bottom-sheet .thread-note{font-size:10.5px;color:#7f8a7e;text-align:center;margin:8px 0 0 !important}

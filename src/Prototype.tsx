@@ -55,12 +55,14 @@ import {
   typeLabel,
   tr,
   DEMO_TODAY,
+  localDay,
 } from "./data";
 import FriendsMap from "./FriendsMap";
 import RecallPanel from "./recall/RecallPanel";
 import type { RecallRecord } from "./recall/engine";
 import MealComposer from "./MealComposer";
-import { ChatView, MemoriesView, ProfileView } from "./SocialViews";
+import { MemoriesView, ProfileView } from "./SocialViews";
+import MessagesView, { seedThreads, type Threads } from "./Messages";
 import { PersonAvatar, PeopleCenter, ConnectionButton, MutualLabel } from "./People";
 import { initialNetwork, readNetwork, canReadMeal, circleMeals, type Circle, type Network, updateConnection } from "./socialGraph";
 import { VenueActions } from "./VenueActions";
@@ -79,6 +81,7 @@ type State = {
   lang: Lang;
   reactions: Record<string, string>;
   network: Network;
+  threads: Threads;
 };
 type ShareData = {
   version: 1;
@@ -127,7 +130,19 @@ const initial = (): State => ({
   lang: "zh",
   reactions: {},
   network: initialNetwork(),
+  threads: seedThreads(TODAY),
 });
+/** Threads from storage; older saves had per-meal replies, which become messages in that friend's thread. */
+function readThreads(p: { threads?: unknown; replies?: Record<string, Reply[]>; meals?: Meal[] }): Threads {
+  if (p.threads && typeof p.threads === "object" && !Array.isArray(p.threads)) return p.threads as Threads;
+  const threads = seedThreads(TODAY);
+  for (const [mealId, replies] of Object.entries(p.replies || {})) {
+    const meal = (p.meals || []).find(m => m.id === mealId) || seedMeals.find(m => m.id === mealId);
+    if (!meal || meal.userId === ME || !Array.isArray(replies)) continue;
+    threads[meal.userId] = [...(threads[meal.userId] || []), ...replies.map(r => ({ id: r.id, from: ME, text: r.text, at: (r.time || "").slice(0, 16) || `${TODAY}T12:00`, mealId }))];
+  }
+  return threads;
+}
 function readState(): State {
   // Presentation rehearsals never read or overwrite the main demo's local data.
   if (PRESENTATION) return initial();
@@ -152,7 +167,10 @@ function readState(): State {
           ...p,
           meals: [
             ...currentFriendSeeds,
-            ...p.meals.filter((meal: Meal) => !currentFriendIds.has(meal.id)).map((meal: Meal) => {
+            ...p.meals.filter((meal: Meal) => !currentFriendIds.has(meal.id))
+              // Saved by an older build that used root paths; the app now lives under a sub-path.
+              .map((meal: Meal) => meal.photo?.startsWith("/assets/") ? { ...meal, photo: "." + meal.photo } : meal)
+              .map((meal: Meal) => {
               // Upgrade untouched built-in media, never replace a user upload.
               const replacement = seedMeals.find(seed => seed.id === meal.id);
               return replacement && legacySeedFoods.has(meal.food) && meal.photo?.includes("assets/food/")
@@ -164,6 +182,7 @@ function readState(): State {
           sent: Array.isArray(p.sent) ? p.sent : [],
           reactions: p.reactions || {},
           network: readNetwork(p.network),
+          threads: readThreads(p),
         };
       }
   } catch {}
@@ -248,6 +267,8 @@ export default function Prototype() {
   const [meMode, setMeMode] = useState<"memories" | "places">("memories");
   const [sheet, setSheet] = useState<Sheet>(null);
   const [recallOpen, setRecallOpen] = useState(false);
+  const [thread, setThread] = useState<{ friendId: string; quoteMealId?: string } | null>(null);
+  const [recallScope, setRecallScope] = useState<"friends" | "mine">("friends");
   const [toast, setToast] = useState("");
   const [storageError, setStorageError] = useState(false);
   const [guest, setGuest] = useState<ShareData | null>(readGuest);
@@ -367,6 +388,12 @@ export default function Prototype() {
     keyboard.hide();
     setSheet(null);
   };
+  const sendMessage = (friendId: string, text: string, mealId?: string) => {
+    const now = new Date();
+    const at = `${localDay(now)}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    setState(s => ({ ...s, threads: { ...s.threads, [friendId]: [...(s.threads[friendId] || []), { id: crypto.randomUUID(), from: ME, text, at, ...(mealId ? { mealId } : {}) }] } }));
+  };
+  const messageAbout = (friendId: string, mealId?: string) => { navigate("chat"); setThread({ friendId, quoteMealId: mealId }); };
   const navigate = (next: typeof tab) => {
     photoRequest.current += 1;
     keyboard.hide();
@@ -800,14 +827,11 @@ export default function Prototype() {
           </button>
         ) : null}
         <div className="post-actions">
-          <button onClick={() => open({ kind: "meal", id: m.id })}>
+          <button onClick={() => m.userId === ME || !state.network.friends.includes(m.userId) ? open({ kind: "meal", id: m.id }) : messageAbout(m.userId, m.id)}>
             <ChatCircle size={22} />
             {m.userId === ME
               ? t("View meal", "查看记录")
               : t("Ask " + u.name.split(" ")[0], "问问" + u.name.split(" ")[0])}
-            {(state.replies[m.id]?.length || 0) > 0 ? (
-              <span className="reply-count">{state.replies[m.id].length}</span>
-            ) : null}
           </button>
           {v ? (
             <button
@@ -885,36 +909,17 @@ export default function Prototype() {
   return (
     <div className={`food-app social-app mibly-handoff ${!guest && tab === "friends" && mode === "map" ? "is-map" : ""}`} data-language={lang} data-iteration="5-recall" data-tab={tab} data-mode={mode}>
       {!guest && tab === "friends" && mode === "map" ? <FriendsMap key={circle} lang={lang} meals={homeMeals} today={TODAY} currentUserId={ME} scope={circle} focusMealId={circle==="friends"?mapFocusMealId:null} onMeal={m => open({kind:"meal", id:m.id})} onPerson={id=>showPersonPosts(id)} onFeed={()=>{setMode("feed");setFeedRange("all");setFriendFilter("");}}/> : null}
-      <header className="app-header">
-        <div className="brand-row">
-          <button
-            className="brand"
-            onClick={() => { navigate("friends"); setMode("map"); }}
-            aria-label="Mibly home"
-          >
-            Mibly<span>.</span>
-          </button>
+      <header className={`app-header ${!guest && tab !== "friends" ? "compact-header" : ""}`}>
+        {guest || tab === "friends" ? <div className="brand-row">
+          <div className="brand-group">
+            <button className="brand" onClick={() => { navigate("friends"); setMode("map"); }} aria-label="Mibly home">Mibly<span>.</span></button>
+            {!guest && <button className="circle-picker" aria-label={t("Choose people to see","选择动态范围")} onClick={()=>open({kind:"audience"})}><span>{circle==="friends"?t("Friends","朋友"):t("Friends of friends","朋友的朋友")}</span><CaretDown size={13}/></button>}
+          </div>
           <div className="header-utilities">
-          {!guest && <button className="recall-trigger" aria-label={t("Find that meal", "找那一餐")} onClick={() => { keyboard.hide(); setSheet(null); setRecallOpen(true); }}><MagnifyingGlass size={19}/><span>{t("Find a meal", "找那一餐")}</span></button>}
+          {!guest && <button className="recall-trigger" aria-label={t("Find that meal", "找那一餐")} onClick={() => { keyboard.hide(); setSheet(null); setRecallScope("friends"); setRecallOpen(true); }}><MagnifyingGlass size={19}/><span>{t("Find a meal", "找那一餐")}</span></button>}
           {guest ? (
-            <button
-              className="small-pill"
-              onClick={() => {
-                location.hash = "";
-                setGuest(null);
-              }}
-            >
-              {t("Explore demo", "体验Demo")}
-              <ArrowUpRight size={16} />
-            </button>
-          ) : tab === "me" || tab === "profile" ? (
-            <button
-              aria-label={t("Settings", "设置")}
-              className="profile-trigger"
-              onClick={() => open({ kind: "settings" })}
-            >
-              <Avatar id={ME} />
-              <GearSix size={14} />
+            <button className="small-pill" onClick={() => { location.hash = ""; setGuest(null); }}>
+              {t("Explore demo", "体验Demo")}<ArrowUpRight size={16} />
             </button>
           ) : (
             <button className="circle-header-action" aria-label={t("Add friends","添加朋友")} onClick={()=>open({kind:"people"})}>
@@ -922,49 +927,38 @@ export default function Prototype() {
             </button>
           )}
           </div>
-        </div>
+        </div> : null}
         {!guest ? (
           <div className="page-title-row">
-            {tab==="friends"?<button className="circle-picker" aria-label={t("Choose people to see","选择动态范围")} onClick={()=>open({kind:"audience"})}><span>{circle==="friends"?t("My friends","我的朋友"):t("Friends of friends","朋友的朋友")}</span><CaretDown size={16}/></button>:<h1>
-              {tab === "chat"
-                  ? t("Chat", "聊天")
-                  : tab === "memories"
-                    ? t("Memories", "回忆")
-                    : tab === "profile"
-                      ? t("Your profile", "你的主页")
-                : tab === "today"
-                  ? t("Today’s pick", "今天吃什么")
-                  : meMode === "memories"
-                    ? t("Your food memories", "你的美食回忆")
-                    : t("Your saved places", "你的餐厅收藏")}
+            {tab==="friends"?<div className="segmented" aria-label={t("Friends view", "朋友视图")}>
+                <button aria-pressed={mode === "map"} className={mode === "map" ? "active" : ""} onClick={() => setMode("map")}>{t("Map", "地图")}</button>
+                <button aria-pressed={mode === "feed"} className={mode === "feed" ? "active" : ""} onClick={() => setMode("feed")}>{t("Feed", "动态")}</button>
+              </div>:<h1>
+              {tab === "chat" ? t("Messages", "消息")
+                : tab === "memories" ? t("Memories", "回忆")
+                : tab === "profile" ? t("Profile", "我的")
+                : tab === "today" ? t("Today’s pick", "今天吃什么")
+                : meMode === "memories" ? t("Your food memories", "你的美食回忆") : t("Your saved places", "你的餐厅收藏")}
             </h1>}
-            {tab === "friends" ? (
-              <div
-                className="segmented"
-                aria-label={t("Friends view", "朋友视图")}
-              >
-                <button
-                  aria-pressed={mode === "map"}
-                  className={mode === "map" ? "active" : ""}
-                  onClick={() => setMode("map")}
-                >
-                  {t("Map", "地图")}
-                </button>
-                <button aria-pressed={mode === "feed"} className={mode === "feed" ? "active" : ""} onClick={() => setMode("feed")}>
-                  {t("Feed", "动态")}
-                </button>
+            {tab === "chat" ? (
+              <div className="title-actions">
+                <button className="circle-header-action" aria-label={t("Add friends","添加朋友")} onClick={()=>open({kind:"people"})}><UserPlus size={21} />{state.network.incoming.length>0&&<span className="request-dot">{state.network.incoming.length}</span>}</button>
               </div>
             ) : tab === "me" || tab === "memories" ? (
-              <span className="private-note">
-                <LockSimple size={13} />
-                {t("Only you", "仅自己")}
-              </span>
+              <div className="title-actions">
+                <span className="private-note"><LockSimple size={13} />{t("Only you", "仅自己")}</span>
+                {tab === "memories" && <button className="circle-header-action" aria-label={t("Search my meals", "搜索我的餐食")} onClick={() => { keyboard.hide(); setSheet(null); setRecallScope("mine"); setRecallOpen(true); }}><MagnifyingGlass size={20}/></button>}
+              </div>
+            ) : tab === "profile" ? (
+              <div className="title-actions">
+                <button aria-label={t("Settings", "设置")} className="circle-header-action" onClick={() => open({ kind: "settings" })}><GearSix size={21} /></button>
+              </div>
             ) : null}
           </div>
         ) : null}
       </header>
       {!guest&&tab==="friends"&&mode==="feed"&&<div className="feed-filter-bar"><div className="feed-time-tabs">{(["today","week","all"] as const).map(value=><button key={value} className={feedRange===value?"active":""} aria-pressed={feedRange===value} onClick={()=>setFeedRange(value)}>{value==="today"?t("Today","今天"):value==="week"?t("This week","近7天"):t("All posts","全部动态")}</button>)}</div>{friendFilter&&<button className="friend-filter-chip" onClick={()=>setFriendFilter("")}>{users.find(u=>u.id===friendFilter)?.name.split(" ")[0]}<X size={13}/></button>}</div>}
-      {!guest && tab === "memories" && <div className="memory-tabs-fixed"><div className="segmented full memory-view-picker">{(["moments","calendar","recaps"] as const).map(value=><button key={value} className={memoryView===value?"active":""} aria-pressed={memoryView===value} onClick={()=>{keyboard.hide();setMemoryView(value);}}>{value==="moments"?t("Moments","回忆"):value==="calendar"?t("Calendar","日历"):t("Recaps","回顾")}</button>)}</div></div>}
+      {!guest && tab === "memories" && <div className="memory-tabs-fixed"><div className="segmented full memory-view-picker">{(["moments","calendar","recaps"] as const).map(value=><button key={value} className={memoryView===value?"active":""} aria-pressed={memoryView===value} onClick={()=>{keyboard.hide();setMemoryView(value);}}>{value==="moments"?t("All","全部"):value==="calendar"?t("Calendar","日历"):t("Recaps","回顾")}</button>)}</div></div>}
       {!(!guest && tab === "friends" && mode === "map") && <MobileScroll
         key={guest ? "guest" : tab + "-" + mode}
         className="app-screen"
@@ -1035,7 +1029,9 @@ export default function Prototype() {
               </div>
             )
           ) : tab === "chat" ? (
-            <ChatView meals={publicMeals} lang={lang} onMeal={m=>open({kind:"meal",id:m.id})} replies={state.replies} currentUserId={ME}/>
+            <MessagesView lang={lang} today={TODAY} currentUserId={ME} friends={state.network.friends.filter(id=>!state.network.hidden.includes(id))} incoming={state.network.incoming}
+              meals={readableMeals} threads={state.threads} openThread={thread} onOpenThread={setThread} onSend={sendMessage}
+              onMeal={id=>open({kind:"meal",id})} onPeople={()=>open({kind:"people"})}/>
           ) : tab === "memories" ? (
             <MemoriesView meals={myMeals} lang={lang} today={TODAY} view={memoryView} onMeal={m=>open({kind:"meal",id:m.id})}/>
           ) : tab === "profile" ? (
@@ -1487,7 +1483,7 @@ export default function Prototype() {
             return (
               <button
                 key={x}
-                aria-label={[t("Home", "首页"), t("Chat", "聊天"), "", t("Memories", "回忆"), t("Profile", "我的")][i]}
+                aria-label={[t("Home", "首页"), t("Messages", "消息"), "", t("Memories", "回忆"), t("Profile", "我的")][i]}
                 aria-current={active ? "page" : undefined}
                 className={active ? "active" : ""}
                 onClick={() => {navigate(x); if(x === "friends")setMode("map");}}
@@ -1495,7 +1491,7 @@ export default function Prototype() {
                 {x === "profile" ? <Avatar id={ME}/> : <Icon size={23} weight={active ? "fill" : "regular"} />}
                 <span>
                   {
-                    [t("Home", "首页"), t("Chat", "聊天"), "", t("Memories", "回忆"), t("Profile", "我的")][
+                    [t("Home", "首页"), t("Messages", "消息"), "", t("Memories", "回忆"), t("Profile", "我的")][
                       i
                     ]
                   }
@@ -1515,7 +1511,7 @@ export default function Prototype() {
           {toast}
         </div>
       ) : null}
-      <RecallPanel open={recallOpen} covered={!!sheet} lang={lang} currentUserId={ME}
+      <RecallPanel open={recallOpen} covered={!!sheet} lang={lang} currentUserId={ME} defaultScope={recallScope}
         records={recallRecords} network={state.network} saved={state.saved} onClose={() => setRecallOpen(false)}
         onMeal={id => open({ kind: "meal", id })} onVenue={id => open({ kind: "venue", id })} onSave={save}/>
       <BottomSheet
@@ -1598,61 +1594,7 @@ export default function Prototype() {
               </button>
             ) : null}
             <div className="detail-reactions">{[{id:"love",Icon:Heart,en:"Looks good",zh:"看着好吃"},{id:"want",Icon:ForkKnife,en:"Want a bite",zh:"想尝一口"},{id:"wow",Icon:Sparkle,en:"Love this",zh:"喜欢这餐"}].map(({id,Icon,en,zh})=><button key={id} aria-pressed={state.reactions[selectedMeal.id]===id} className={state.reactions[selectedMeal.id]===id?"selected":""} onClick={()=>setState(s=>({...s,reactions:{...s.reactions,[selectedMeal.id]:s.reactions[selectedMeal.id]===id?"":id}}))}><Icon size={18} weight={state.reactions[selectedMeal.id]===id?"fill":"regular"}/>{t(en,zh)}</button>)}</div>
-            {selectedMeal.userId===ME||state.network.friends.includes(selectedMeal.userId)?<><h3>{t("Conversation", "聊聊这一餐")}</h3>
-            {(state.replies[selectedMeal.id] || []).map((r) => (
-              <div className="reply" key={r.id}>
-                <Avatar id={ME} />
-                <div>
-                  <strong>Daniel</strong>
-                  <p>{r.text}</p>
-                </div>
-              </div>
-            ))}
-            {!state.replies[selectedMeal.id]?.length ? (
-              <p className="muted">
-                {t(
-                  "Was it spicy? What should I order? Start with something specific.",
-                  "辣不辣？应该点什么？从一个具体的问题开始。",
-                )}
-              </p>
-            ) : null}
-            <div className="reply-compose">
-              <KeyboardInput
-                aria-label={t("Your reply", "你的回复")}
-                placeholder={t("Ask about this meal…", "聊聊这一餐…")}
-                maxLength={500}
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-              />
-              <button
-                className="icon-button"
-                aria-label={t("Send reply", "发送回复")}
-                disabled={!reply.trim()}
-                onClick={() => {
-                  const r = {
-                    id: crypto.randomUUID(),
-                    text: reply.trim(),
-                    time: new Date().toISOString(),
-                  };
-                  setState((s) => ({
-                    ...s,
-                    replies: {
-                      ...s.replies,
-                      [selectedMeal.id]: [
-                        ...(s.replies[selectedMeal.id] || []),
-                        r,
-                      ],
-                    },
-                  }));
-                  setReply("");
-                  keyboard.hide();
-                  tell(t("Reply added in this demo", "回复已保存到本地演示"));
-                }}
-              >
-                <PaperPlaneTilt size={21} />
-              </button>
-            </div>
-            </>:<p className="conversation-lock"><LockSimple size={16}/>{t("Connect as friends to start a conversation. Reactions and restaurant sharing are still available.","成为好友后再开始聊天；现在仍可回应或分享餐厅。")}</p>}
+            {selectedMeal.userId===ME?null:state.network.friends.includes(selectedMeal.userId)?<button className="primary wide detail-message" onClick={()=>messageAbout(selectedMeal.userId, selectedMeal.id)}><ChatCircle size={19}/>{t(`Message ${users.find(u=>u.id===selectedMeal.userId)?.name.split(" ")[0]} about this meal`,`私信 ${users.find(u=>u.id===selectedMeal.userId)?.name.split(" ")[0]}，聊聊这一餐`)}</button>:<p className="conversation-lock"><LockSimple size={16}/>{t("Connect as friends to start a conversation. Reactions and restaurant sharing are still available.","成为好友后再开始聊天；现在仍可回应或分享餐厅。")}</p>}
             {selectedMeal.userId === ME ? (
               <button
                 className="text-button danger"

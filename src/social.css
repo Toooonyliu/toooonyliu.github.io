@@ -140,3 +140,30 @@
 .device-screen:has(.social-app) .composer .type-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .device-screen:has(.social-app) .composer .type-choices button{min-height:44px}
 @media(prefers-reduced-motion:reduce){.social-app *{scroll-behavior:auto!important}}
+
+/* ---- 2026-10-18 layout pass: one header row of controls, single titles on inner tabs ---- */
+.social-app .brand-group{display:flex;align-items:center;gap:10px;min-width:0}
+.food-app.social-app .brand-group .circle-picker{font-size:12px;font-weight:650;letter-spacing:0;min-height:28px;padding:4px 10px;border-radius:14px;background:#ffffff14;border:1px solid #ffffff1f;color:#e6eee0;gap:4px}
+.social-app.is-map .brand-group .circle-picker{background:#132c23cc;backdrop-filter:blur(12px)}
+.social-app .title-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.social-app .title-actions .private-note{margin:0}
+.social-app .compact-header{min-height:0;padding-bottom:10px}
+.social-app .compact-header .page-title-row{margin-top:0;min-height:44px;align-items:center}
+.social-app .compact-header .page-title-row h1{font-size:28px;letter-spacing:-.8px}
+.social-app[data-tab="chat"] .app-screen,.social-app[data-tab="profile"] .app-screen,.social-app[data-tab="today"] .app-screen,.social-app[data-tab="me"] .app-screen{top:114px}
+.social-app[data-tab="memories"] .memory-tabs-fixed{top:114px}
+.social-app[data-tab="memories"] .app-screen{top:176px}
+/* Map overlays sit on the same row as the Map/Feed switch; the friend count chip is gone (the avatar rail already says who ate). */
+.friends-map .map-top-controls{top:121px;left:auto;right:20px;justify-content:flex-end}
+.friends-map .map-zoom-controls{top:178px}
+/* Content scrolling under the floating nav fades out instead of peeking below it. */
+.social-app:not(.is-map)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(#080a0900,#080a09 62%);pointer-events:none;z-index:14}
+/* Profile: food first. Compact identity row instead of a full-screen portrait. */
+.social-profile .profile-compact{display:flex;align-items:center;gap:14px;margin:4px 0 12px}
+.social-profile .profile-compact img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #d6eeb8}
+.social-profile .profile-compact h2{font-size:22px;font-weight:720;margin:0 0 4px;letter-spacing:-.4px}
+.social-profile .profile-compact p{display:flex;align-items:center;gap:4px;margin:0;font-size:12px;color:#a3ada1}
+.social-profile .profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:16px;overflow:hidden;margin-bottom:8px}
+.social-profile .profile-grid button{position:relative;aspect-ratio:1;background:#1b1f1c;display:grid;place-items:center;color:#8d988b;padding:0;border:0}
+.social-profile .profile-grid img{width:100%;height:100%;object-fit:cover}
+.social-profile .profile-grid span{position:absolute;left:6px;bottom:5px;font-size:10px;font-weight:650;color:#fff;text-shadow:0 1px 4px #000a}
