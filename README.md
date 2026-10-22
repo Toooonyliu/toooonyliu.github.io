@@ -8,6 +8,7 @@ Tony Liu's portfolio of product, UX and game design work, hand-built in HTML, CS
 | --- | --- | --- |
 | **One Cut Atlas** (Project 2) | Pixel-art travel and sword-duel game with an AI backend | [Play](https://toooonyliu.github.io/projects/one-cut-atlas/) · [README](projects/one-cut-atlas/README.md) · [Walkthrough](https://toooonyliu.github.io/projects/one-cut-atlas/presentation.html) · [Prompt log](projects/one-cut-atlas/prompt_log.md) · [Backend](https://github.com/Toooonyliu/OneCutAtlas_Backend) |
 | **Mibly** | Map-first social food product-design case study with a separate AI process reflection | [Case study](https://toooonyliu.github.io/projects/mibly/) · [AI process](https://toooonyliu.github.io/projects/mibly/ai-process.html) · [README](projects/mibly/README.md) |
+| **Nail the Moment** | Manicure-history, 3D-design and AR-preview case study with animated feature demonstrations | [Case study](https://toooonyliu.github.io/projects/nail-the-moment/) · [README](projects/nail-the-moment/README.md) |
 | **Ask (速问)** (HW3, HW4) | Bilingual Xiao Liu Ren reading with live lunisolar calendar data and a Flask backend | [Live](https://toooonyliu.github.io/projects/xiaoliuren/) · [README](projects/xiaoliuren/README.md) · [HW4 notes](projects/xiaoliuren/HW4.md) |
 | **Flighty, a new chapter** | Product-design case study with a working prototype | [Case study](https://toooonyliu.github.io/projects/flighty/) · [README](projects/flighty/README.md) |
 | **Kangaroo Crossing** | Crossy Road-inspired arcade browser game | [Play](https://toooonyliu.github.io/games/kangaroo-crossing/) · [README](games/kangaroo-crossing/README.md) |
@@ -40,6 +41,7 @@ projects/one-cut-atlas/       One Cut Atlas frontend (see its README)
 projects/xiaoliuren/          Ask (速问), HW3 and HW4
 projects/flighty/             Flighty case study, prototype and documents
 projects/mibly/               Mibly case study, AI reflection, prototype and source
+projects/nail-the-moment/     Nail the Moment case study and animated feature demonstrations
 games/kangaroo-crossing/      Kangaroo Crossing
 favicon*                      Site icons
 *-session-log.md              Development session logs
