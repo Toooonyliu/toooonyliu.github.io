@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Duowen is Tony Liu’s AI support tool for turning design recordings into editable, timestamped evidence.">
+  <title>Duowen · Tony Liu</title>
+  <link rel="icon" href="../../favicon-tl.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to case study</a>
+<header class="wrap site-nav"><a class="wordmark" href="../../">Tony Liu</a><nav class="nav-links" aria-label="Project navigation"><a href="#design">Design</a><a href="ai-process.html">AI process</a><a href="#recording">Recording decks</a></nav></header>
+<main id="main">
+  <section class="wrap hero" aria-labelledby="title">
+    <p class="eyebrow">Duowen 多问 · CMU AI Augmented Design</p>
+    <h1 id="title">What did they say, exactly?</h1>
+    <p class="lede">I built a transcript workspace for design critiques and playtests. It lets me find a moment, check it against the audio, and bring several sessions into one analysis.</p>
+    <div class="actions"><a class="button primary" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Try Duowen ↗</a><a class="button" href="#recording">See the recording decks ↓</a></div>
+    <figure><img class="screen" src="images/transcript.jpg" alt="Duowen showing a timestamped transcript with two speakers, an audio player, and a Send to AI button" width="1280" height="900" fetchpriority="high"><figcaption>Duowen’s recording view, shown with a synthetic playtest transcript.</figcaption></figure>
+  </section>
+  <dl class="meta wrap"><div><dt>My role</dt><dd>Product design, prototyping, evaluation</dd></div><div><dt>Timeline</dt><dd>Four-week course project · 2026</dd></div><div><dt>AI backend</dt><dd>Deepgram Nova-3</dd></div><div><dt>Outcome</dt><dd>Working web prototype</dd></div></dl>
+  <section class="section wrap" id="design">
+    <p class="eyebrow">Design process</p>
+    <h2>Make the evidence easier to reuse.</h2>
+    <p class="section-lede">In Flighty and Mibly, I practiced tracing design decisions back to their evidence. I wanted that same trail for spoken feedback, where the wording and who said it can change what I take away.</p>
+    <div class="phase-grid">
+      <article><p class="eyebrow">Discover</p><h3>Look at my own workflow</h3><p>I used my earlier projects as the starting point. The task I wanted to improve was revisiting what someone actually said when I needed to make a decision later.</p></article>
+      <article><p class="eyebrow">Define</p><h3>Find, verify, compare</h3><p>My target was a 30–40 minute critique or playtest. I needed readable text, speaker labels I could correct, and a direct way back to the audio.</p></article>
+      <article><p class="eyebrow">Develop</p><h3>Make the transcript the workspace</h3><p>I explored a recording library, a focused workspace, and a notebook for batches. I kept the library for organization and moved reading, listening, and editing into the transcript itself.</p></article>
+      <article><p class="eyebrow">Deliver</p><h3>Test the handoff</h3><p>Deepgram transcribes uploaded audio. Duowen connects the returned text, speaker labels, and timestamps to a browser editor and player. Projects give related recordings a place to stay together.</p></article>
+    </div>
+    <div class="actions" style="margin-top:24px"><a href="../flighty/">Project 1 · Flighty ↗</a><a href="../mibly/">Project 2 · Mibly ↗</a></div>
+  </section>
+  <section class="section wrap two-col" id="workflow">
+    <div class="copy feature-copy"><p class="eyebrow">The workflow</p><h2>One place to review. One file to take with me.</h2><ol><li>Drop in a recording and open its transcript.</li><li>Search for a passage, click a sentence to listen, and correct the wording or speaker.</li><li>Group related sessions in a Project. Download one Markdown attachment and copy the editable analysis prompt separately.</li></ol><p style="margin-top:16px">I attach the file in Claude or ChatGPT and ask for themes with recording titles and timestamps, so I know where to check a claim.</p></div>
+    <figure class="pack-shot"><img class="screen" src="images/project-pack.jpg" alt="The project’s Send to AI dialog lists included recordings, individual Markdown downloads, and a separate analysis prompt" width="600" height="738" loading="lazy"><figcaption>A synthetic project used to check the export. Each recording can also be downloaded on its own.</figcaption></figure>
+  </section>
+  <section class="section dark"><div class="wrap two-col">
+    <div class="copy"><p class="eyebrow">What worked in testing</p><h2>A working workflow, with a clear next test.</h2></div>
+    <div class="copy"><p>I checked real transcription, speaker separation, and click-to-play on the live prototype. I also checked the new recording action, project Markdown download, and prompt copying on the production site.</p><p class="muted">The ten-recording export check used synthetic transcripts. I still want to run full-length sessions through upload and cross-session analysis, and test the flow on a physical phone.</p><div class="actions"><a class="button primary" href="ai-process.html">Read my AI process ↗</a></div></div>
+  </div></section>
+  <section class="section wrap" id="recording"><p class="eyebrow">For the course videos</p><h2>Recording decks</h2><p class="section-lede">Each deck opens with a timer. Press N for the talk track and suggested timing for each slide.</p><div class="materials"><a href="demo/slides/product.html"><strong>Project deck ↗</strong><span>3:30 target · design, user need, and walkthrough</span></a><a href="demo/slides/process.html"><strong>AI process deck ↗</strong><span>2:45 target · what I tried, where AI helped, and where it fell short</span></a></div></section>
+</main>
+<footer class="wrap"><a href="../../">Tony Liu</a> · <a href="https://github.com/Toooonyliu/Duowen/tree/claude/tender-wozniak-a6q7cj">Duowen on GitHub</a></footer>
+</body>
+</html>

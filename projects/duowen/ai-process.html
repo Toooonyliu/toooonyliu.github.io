@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Tony Liu’s reflection on researching, prototyping, and testing Duowen with AI.">
+  <title>Designing Duowen with AI · Tony Liu</title>
+  <link rel="icon" href="../../favicon-tl.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to reflection</a>
+<header class="wrap site-nav"><a class="wordmark" href="./">Duowen 多问</a><nav class="nav-links" aria-label="Project navigation"><a href="./">Case study</a><a href="demo/slides/process.html">Process deck</a><a href="../../">Tony Liu</a></nav></header>
+<main class="wrap reading" id="main">
+  <section class="hero"><p class="eyebrow">AI process reflection</p><h1>Designing Duowen with AI</h1><p class="section-lede">The coding agents helped me get from an idea to something I could use. Using it made the next design decisions clearer.</p></section>
+  <section class="section copy"><p class="eyebrow">Discover &amp; Define</p><h2>Start with a task I actually do.</h2><p>I reflected on Flighty and Mibly, where I had to connect design decisions to evidence. AI helped me compare transcription tools and simulate possible workflows. The simulations were useful for generating questions. My own need to find and verify spoken feedback gave me the scope for this project.</p></section>
+  <section class="section copy"><p class="eyebrow">Develop</p><h2>Build alternatives I can react to.</h2><p>I explored a library, a focus workspace, and a batch notebook. The early transcript read like a list of controls. I asked Claude to study the low-friction feel of Wispr Flow, then used the prototype to decide what to keep. I wanted a document I could read, with playback and correction available right where I needed them.</p><p>I tried WhisperX during development and shipped the web prototype with Deepgram Nova-3. The model supplies the words, timings, and speaker groups. I designed the ways to review and correct that output.</p></section>
+  <section class="section copy"><p class="eyebrow">Deliver</p><h2>Make the handoff visible.</h2><p>When I mapped how I would compare several sessions, the goal became clearer. I needed to carry the recordings into the same analysis. I asked Claude to build Projects. In the next round, I asked Codex to make Send to AI visible and separate the Markdown attachment from the prompt, so I could see which recordings were included and revise the task independently.</p><p>Codex checked the real download and clipboard, and I reviewed the local version before approving the Vercel release. I used Codex to check the UI at desktop and simulated phone widths. The ten-transcript test checked the export structure using synthetic material.</p></section>
+  <section class="section copy"><p class="eyebrow">Reflection</p><h2>Keep checking the source.</h2><p>AI helped me compare options, build revisions, and test interactions. It could produce a polished prototype before the workflow made sense. I had to try the flow myself, notice the hidden action, and decide what the user should see first. Speech recognition can also misassign a speaker, which is why the original audio stays within reach.</p><p>My next test is to compare a set of real playtests in an AI chat and check whether each cited moment holds up against the audio.</p></section>
+  <section class="section copy"><h2>Recording materials</h2><div class="materials"><a href="demo/slides/product.html"><strong>Project deck ↗</strong><span>3:30 target</span></a><a href="demo/slides/process.html"><strong>AI process deck ↗</strong><span>2:45 target</span></a></div></section>
+</main>
+<footer class="wrap"><a href="./">Back to the case study</a> · <a href="https://github.com/Toooonyliu/Duowen/blob/claude/tender-wozniak-a6q7cj/codex-session-log.md">Codex prompt log ↗</a></footer>
+</body>
+</html>
