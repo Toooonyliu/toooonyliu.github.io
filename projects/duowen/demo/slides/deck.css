@@ -16,10 +16,6 @@ body.dark,.dark .deck-main,.dark .deck-header,.dark .deck-footer{background:var(
 .dark .deck-image figcaption{color:#d9ede7}
 .slide-link{display:inline-flex;margin-top:22px;color:#245963;font-weight:650;text-underline-offset:4px}
 .dark .slide-link{color:#d2ebe5}
-.points{display:grid;gap:12px;margin:20px 0 0;padding-left:1.15em;font-size:clamp(16px,1.65vw,23px);line-height:1.4}
-.cue-card{border-top:1px solid var(--line);padding-top:18px}
-.cue-card p+p{margin-top:12px}
-.cue-card p{font-size:clamp(16px,1.6vw,22px)}
 @media (max-width:800px),(max-height:650px){
   .deck-main{overflow-y:auto}
   .slide{height:auto;min-height:100%}
@@ -32,20 +28,108 @@ body.dark,.dark .deck-main,.dark .deck-header,.dark .deck-footer{background:var(
   .slide .deck-image img{max-height:35vh}
   .slide .lead{margin-top:12px}
 }
-.deck-evidence{display:grid;gap:0;margin:clamp(16px,3vh,30px) 0 0;max-width:980px}
-.deck-evidence>div{display:grid;grid-template-columns:minmax(125px,.7fr) minmax(0,1.7fr);gap:12px 28px;padding:clamp(10px,1.8vh,17px) 0;border-top:1px solid var(--line)}
-.deck-evidence dt{font-weight:680;font-size:clamp(16px,1.7vw,23px)}
-.deck-evidence dd{margin:0;color:var(--soft);font-size:clamp(16px,1.65vw,22px)}
-@media(max-width:520px){.deck-evidence>div{grid-template-columns:1fr;gap:3px}}
-.presentation-flow{display:grid;gap:15px;margin:0;padding:0;list-style:none}
-.presentation-flow li{padding:18px 20px;border-block-start:1px solid #84a5a8;color:#f4f9f6;font-size:clamp(20px,2.6vw,37px);line-height:1.2}
-.presentation-flow li+li::before{content:'↓';color:#b4dcd4;margin-right:14px}
-.persona-example{border-left:3px solid #245963;padding-left:23px}
-.persona-example p,.plan-comparison p{font-size:clamp(16px,1.8vw,23px);line-height:1.45;margin-top:8px;color:var(--soft)}
+.plan-comparison p{font-size:clamp(16px,1.8vw,23px);line-height:1.45;margin-top:8px;color:var(--soft)}
 .plan-comparison>div{padding:18px 0;border-top:1px solid var(--line)}
-.deck-evidence .selected-model{border-left:4px solid #245963;background:#e2efeb;padding-inline:14px}
-.selected-model dt{color:#184c53}
-.slide:has(.dw-demo) .split{grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)}
-@media(max-width:800px){.slide:has(.dw-demo) .split{grid-template-columns:1fr}}
 .plan-comparison .duowen-plan{border-left:4px solid #245963;background:#e2efeb;padding-inline:16px}
-.plan-comparison .plan-price{font-size:clamp(14px,1.35vw,18px);margin-top:4px}
+
+/* Project deck typography and app screenshots. */
+body[data-deck="product"] .slide .split {
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+}
+body[data-deck="product"] .deck-image img {
+  max-height: min(65vh, calc(100dvh - var(--header) - var(--footer) - 96px));
+}
+body[data-deck="product"] .cover .deck-image img {
+  border: 5px solid #ffffff36;
+  box-shadow: 0 18px 50px #071f2766;
+}
+.visual-phrase {
+  margin-top: 22px;
+  font-size: clamp(21px, 2.3vw, 34px);
+  line-height: 1.35;
+  color: var(--soft);
+}
+.support-phrase {
+  margin-top: 12px;
+  color: var(--soft);
+  font-size: clamp(15px, 1.55vw, 21px);
+}
+.scenario-visual {
+  margin: 0;
+  padding: clamp(22px, 3.5vw, 52px);
+  background: #e2efeb;
+  border-top: 4px solid #245963;
+  color: #153e45;
+}
+.scenario-visual strong {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(66px, 10vw, 148px);
+  line-height: .9;
+  letter-spacing: -.07em;
+}
+.scenario-visual strong span {
+  font-family: inherit;
+  font-size: .33em;
+  letter-spacing: 0;
+  margin-left: .22em;
+}
+.scenario-visual figcaption {
+  margin-top: 15px;
+  font-size: clamp(18px, 2vw, 29px);
+}
+.scenario-visual p {
+  margin-top: 9px;
+  font-size: clamp(14px, 1.5vw, 20px);
+  color: #35585b;
+}
+.plan-comparison small {
+  display: block;
+  margin-top: 5px;
+  color: var(--soft);
+}
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: clamp(24px, 5vh, 48px) 0 20px;
+  padding: 0;
+  list-style: none;
+}
+.workflow-steps li {
+  border-top: 3px solid #245963;
+  padding: 18px 0;
+}
+.workflow-steps strong,
+.workflow-steps span {
+  display: block;
+}
+.workflow-steps strong {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(24px, 3.2vw, 46px);
+}
+.workflow-steps span {
+  margin-top: 6px;
+  color: var(--soft);
+  font-size: clamp(16px, 1.7vw, 22px);
+}
+.project-outcomes {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  color: #e0eeea;
+  font-size: clamp(17px, 2vw, 26px);
+}
+.project-outcomes strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #b4dcd4;
+  font-size: .72em;
+}
+@media (max-width:720px) {
+  body[data-deck="product"] .slide .split {grid-template-columns: 1fr}
+  body[data-deck="product"] .deck-image img {max-height: 39vh}
+  .workflow-steps {grid-template-columns: 1fr; gap: 0}
+  .workflow-steps li {padding: 10px 0}
+}

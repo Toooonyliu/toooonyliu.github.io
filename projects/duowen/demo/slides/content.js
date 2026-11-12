@@ -2,7 +2,6 @@
   const app = 'https://duowen-sandbox-trial.vercel.app/';
   const link = (url, label) => '<a class="slide-link" href="' + url + '" target="_blank" rel="noopener">' + label + ' ↗</a>';
   const shot = (file, description) => '<figure class="deck-image"><img src="../../images/' + file + '" alt="' + description + '"><figcaption>Synthetic playtest data</figcaption></figure>';
-  const bullets = items => '<ul class="points">' + items.map(item => '<li>' + item + '</li>').join('') + '</ul>';
   const paragraph = text => '<p class="lead">' + text + '</p>';
   const notes = (text, cue = '') => '<p>' + text + '</p>' + (cue ? '<p class="cue">' + cue + '</p>' : '');
   const start = '<button class="start" data-start>Start presentation <span aria-hidden="true">↗</span></button><p class="start-hint">Click to start the timer. Advance when ready.</p>';
@@ -18,5 +17,5 @@
   }
   const builders = {product:window.DUOWEN_PRODUCT, process:window.DUOWEN_PROCESS};
   const key = document.body.dataset.deck;
-  window.DUOWEN_DECKS = {[key]:builders[key]({app, link, shot, bullets, paragraph, cover, slide})};
+  window.DUOWEN_DECKS = {[key]:builders[key]({app, link, shot, cover, slide})};
 })();
