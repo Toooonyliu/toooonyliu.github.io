@@ -9,19 +9,19 @@ window.DUOWEN_PROCESS = ({cover, slide}) => {
           `<i style="--wave-height:${height}%"></i>`).join('')}</div>
         ${stages([['Record','Capture'],['Transcript','Review'],['AI chat','Share']])}
       </figure>`,
-      talk:'Duowen is a website that turns recorded classes and critiques into transcripts I can check before sharing them with AI. I built it so I could go back to the exact wording of design feedback.'}),
+      talk:'Duowen is a website that turns recordings of classes and design critiques into transcripts I can check and share with AI. I built it to revisit the exact feedback before deciding what to change.'}),
     slide({title:'Making transcription work on the website', section:'Define · The job I gave the agents', seconds:25,
       body:stages([['Upload','A real audio or video file'],['Transcribe','Turn speech into text'],['Show','Who spoke and when']]),
-      talk:'The biggest thing I asked Claude and Codex to do was help me find a transcription tool and get it working on the website. I needed the site to take a real audio or video file and show me the words, who said them, and when.'}),
+      talk:'The hardest part was making the website transcribe a real upload. I asked Claude and Codex to help me find a tool, try it, and connect it to the website. I needed the result to show the words, who said them, and when.'}),
     slide({title:'WhisperX and Deepgram', section:'Develop · Trying two ways to transcribe', seconds:27,
       body:stages([['Skill','Instructions for the agent'],['WhisperX','Transcription on my Mac'],['Deepgram','Transcription on the live site']]),
-      talk:'I asked the agents to look for free transcription skills. A skill tells the agent how to run a tool. We tried WhisperX, which turns speech into text with timestamps. It crashed on my Mac, and the agent helped me get it running. For the live site, I chose Deepgram, a service that transcribes recordings online. Claude helped me deploy with it enabled.'}),
+      talk:'I asked the agents to find free transcription skills, which give them instructions for using tools. We tried WhisperX, a tool that turns speech into text with timestamps. It crashed on my Mac, and an agent helped me fix the setup. For the live site, I chose Deepgram to transcribe files on its servers. Claude helped me get that working on Vercel.'}),
     slide({title:'What people wanted to check', section:'Evaluate · In-person playtest', seconds:27,
       body:`<dl class="process-comparison">
         <div><dt>My starting point</dt><dd>Get the transcript into an AI chat</dd></div>
         <div><dt>Playtest feedback</dt><dd>See who said what and when. Catch mistakes first.</dd></div>
       </dl>`,
-      talk:'I was focused on getting the transcript into AI. In an in-person playtest, I gave people transcript files to try. They wanted to look through them first. They wanted to see who spoke when, and spot anything that looked wrong before sending it on. That made the review step much more important to me.'}),
+      talk:'I gave people the transcript files to try in person. I’d been focused on getting the text into an AI chat. They wanted to read it first, see who said what and when, and spot anything that looked wrong. That told me the review step had to be easy.'}),
     slide({title:'Review before sending', section:'Design · The review screen', seconds:30,
       body:`<ul class="process-review-actions">
         <li>Scan speaker turns</li><li>Replay a line</li><li>Correct the text</li>
@@ -30,12 +30,12 @@ window.DUOWEN_PROCESS = ({cover, slide}) => {
         <img src="../../images/transcript.jpg" alt="Duowen review screen with color-coded speaker turns, timestamps, a player, and Send to AI">
         <figcaption>Duowen review screen · Example transcript</figcaption>
       </figure>`,
-      talk:'Here’s what that looks like in Duowen. The colors separate speakers, and each turn has a timestamp. If a line looks wrong, I can click to hear it and edit the text. Then Send to AI is right here, so I can share the version I’ve checked.',
+      talk:'On this screen, the colors separate speakers, and the timestamps show when each person spoke. If something looks off, I can click the line, hear the original audio, and fix the text. Then I can use Send to AI with a transcript I’ve checked.',
       cue:'Point to a speaker label, its timestamp, and then Send to AI.'}),
     slide({title:'Testing with a real recording', section:'Deliver · Live test', seconds:21, closing:true,
       body:`${stages([['Live upload','90-second clip'],['Transcript','Two speaker labels'],['Playback','Jump to a line']])}
         <p class="process-next"><strong>Next test</strong> Review and correct a full class recording</p>`,
-      talk:'On the live site, a real ninety-second upload came back with two speaker labels. Clicking a line played the matching audio. My next test is a full class recording. I want to see which mistakes people spot and whether they can fix them before sharing.',
+      talk:'A real ninety-second upload returned two speaker labels, and clicking a line played the matching audio. AI helped me build and debug that path. I still had to listen back and see what people needed from the transcript. My next test is a full class recording.',
       cue:'Click Finish to stop the timer.'}),
   ]};
 };
