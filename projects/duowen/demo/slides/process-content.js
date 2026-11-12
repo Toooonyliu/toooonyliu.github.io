@@ -3,20 +3,19 @@ window.DUOWEN_PROCESS = ({cover, slide}) => {
     <li><span>${label}</span><strong>${detail}</strong></li>`).join('')}</ol>`;
 
   return {label:'AI process video', target:'2–3 min · Aim 2:25', min:120, max:180, slides:[
-    cover({title:'How I built Duowen', lead:'Revisiting design feedback with AI.', section:'AI process video', seconds:15,
+    cover({title:'How I built Duowen', lead:'Turn recordings into transcripts you can check and share with AI.', section:'AI process video', seconds:15,
       image:`<figure class="process-cover-visual" aria-label="Review a recording before sharing it with AI">
         <div class="process-waveform" aria-hidden="true">${[22, 39, 62, 28, 82, 50, 98, 63, 32, 66, 87, 44, 60, 27, 48, 22].map(height =>
           `<i style="--wave-height:${height}%"></i>`).join('')}</div>
         ${stages([['Record','Capture'],['Transcript','Review'],['AI chat','Share']])}
       </figure>`,
-      talk:'I built Duowen for a moment in my design process: going back to feedback after a class or a critique, then bringing it into an AI conversation.'}),
-    slide({title:'Revisiting feedback after a critique', section:'Discover & Define', seconds:25,
-      body:'<p class="visual-phrase">I need the exact wording to decide what to change.</p>' +
-        stages([['Find','The feedback'],['Check','The original audio'],['Share','The context with AI']]),
-      talk:'When I work from my notes, I can miss the exact wording that matters for my next design decision. I wanted to drop in the recording, find the part I needed, and check it against the audio before I asked AI what to do next.'}),
-    slide({title:'Getting transcription to work', section:'Develop · Building with AI', seconds:27,
-      body:stages([['Research','Free transcription skills'],['Prototype','WhisperX on my Mac'],['Deploy','Deepgram on Vercel']]),
-      talk:'I asked coding agents to find free transcription skills and check what they actually ran. They helped me get WhisperX working on my Mac after it crashed. For the live site, I picked Deepgram, and Claude helped me deploy with the Vercel build setting that connects the site to Deepgram.'}),
+      talk:'Duowen is a website that turns recorded classes and critiques into transcripts I can check before sharing them with AI. I built it so I could go back to the exact wording of design feedback.'}),
+    slide({title:'Making transcription work on the website', section:'Define · The job I gave the agents', seconds:25,
+      body:stages([['Upload','A real audio or video file'],['Transcribe','Turn speech into text'],['Show','Who spoke and when']]),
+      talk:'The biggest thing I asked Claude and Codex to do was help me find a transcription tool and get it working on the website. I needed the site to take a real audio or video file and show me the words, who said them, and when.'}),
+    slide({title:'WhisperX and Deepgram', section:'Develop · Trying two ways to transcribe', seconds:27,
+      body:stages([['Skill','Instructions for the agent'],['WhisperX','Transcription on my Mac'],['Deepgram','Transcription on the live site']]),
+      talk:'I asked the agents to look for free transcription skills. A skill tells the agent how to run a tool. We tried WhisperX, which turns speech into text with timestamps. It crashed on my Mac, and the agent helped me get it running. For the live site, I chose Deepgram, a service that transcribes recordings online. Claude helped me deploy with it enabled.'}),
     slide({title:'What people wanted to check', section:'Evaluate · In-person playtest', seconds:27,
       body:`<dl class="process-comparison">
         <div><dt>My starting point</dt><dd>Get the transcript into an AI chat</dd></div>
