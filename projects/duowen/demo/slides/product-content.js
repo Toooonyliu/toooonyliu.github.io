@@ -1,27 +1,30 @@
 window.DUOWEN_PRODUCT = ({app, link, shot, cover, slide}) => {
-  const plans = '<div class="plan-comparison">' +
-    '<div><h3>Otter Basic</h3><p><strong>30 min</strong> per transcription · 3 lifetime imports</p><small>Pro · $8.49/month on annual billing</small></div>' +
-    '<div><h3>Notta Free</h3><p><strong>3 min</strong> per recording · export on Pro</p><small>Pro · $8.17/month on annual billing</small></div>' +
-    '<div class="duowen-plan"><h3>Duowen prototype</h3><p><strong>100 MiB</strong> per file · no subscription</p></div></div>';
+  const competitors = `<dl class="competitor-list">
+    <div><dt>Otter</dt><dd>Searchable meeting notes · AI summaries</dd></div>
+    <div><dt>Notta</dt><dd>Audio and video transcription · editing and export</dd></div>
+    <div><dt>Fireflies</dt><dd>Meeting capture · summaries and action items</dd></div>
+  </dl>`;
   const market = slide({
-    title:'The cost of getting a transcript', section:'Define · Competitive gap', seconds:31,
-    body:'<p class="visual-phrase">Long uploads.<br>Export limits.</p>',
-    side:plans,
-    talk:'I looked at tools that already do speaker labeling. Otter Basic limits each transcription to thirty minutes and gives you three lifetime imports. Notta Free caps each conversation at three minutes, and transcript export starts on Pro. Both have AI connectors. Duowen’s prototype has no subscription and currently accepts files up to 100 MiB. I wanted a short path from a saved recording to the chat I already use.'
+    title:'Transcription tools I looked at', section:'Define · Competitive analysis', seconds:31,
+    body:'<p class="visual-phrase">From a transcript to the next project decision.</p>',
+    side:competitors,
+    talk:'I looked at Otter for searchable meeting notes, Notta for turning saved audio and video into editable transcripts, and Fireflies for capturing meetings and tracking follow-ups. These products helped me see what people can do once they have a transcript. I built Duowen around Alex’s recurring workflow. He can check the source, then bring reviewed context into the AI chat he already uses.'
   });
-  market.notes += '<p>The upload limit is by file size. For example, a 40-minute MP3 at 128 kbps is roughly 37 MiB. That fits the file limit, but successful transcription of a full class has yet to be verified. Deepgram usage is billed separately to the service account.</p><p>Sources (published US dollar prices): ' +
-    '<a href="https://help.otter.ai/hc/en-us/articles/360047538094-Conversation-import-and-app-limits-on-the-Basic-free-plan">Otter Basic limits</a> · <a href="https://otter.ai/pricing">Otter plans</a> · ' +
-    '<a href="https://www.notta.ai/en/pricing">Notta plans</a> · ' +
-    '<a href="https://help.otter.ai/hc/en-us/articles/35287607569687-Otter-MCP-Server">Otter connector</a> · ' +
-    '<a href="https://www.notta.ai/en/features/notta-mcp">Notta connector</a></p>';
+  market.notes += '<p>Product references · ' +
+    '<a href="https://otter.ai/">Otter</a> · ' +
+    '<a href="https://www.notta.ai/en/tools/audio-to-text-converter">Notta</a> · ' +
+    '<a href="https://fireflies.ai/">Fireflies</a></p>';
   return {label:'Project video', target:'3–4 min · Aim 3:30', min:180, max:240, slides:[
     cover({title:'Duowen 多闻', lead:'From recordings to reviewed context for AI.', section:'Project video', seconds:14,
       image:shot('transcript.jpg','Duowen recording view with timestamps, speaker labels, and audio player'),
       talk:'Duowen is a browser tool for turning an audio or video recording into a transcript I can review and bring to ChatGPT or Claude.'}),
     slide({title:'Who it’s for', section:'Discover · Persona and scenario', seconds:27,
-      body:'<p class="visual-phrase">Alex, a design student</p><p class="support-phrase">Classes · critiques · group discussions</p>',
-      side:'<figure class="scenario-visual"><strong>40<span>min</span></strong><figcaption>One critique recording</figcaption><p>Feedback · rationale · next decision</p></figure>',
-      talk:'Alex represents students like me. Say Alex has a forty-minute recording of a class or team discussion and wants AI to help decide what to do next. Handing over the whole recording can be cumbersome. A transcript makes the material searchable, and Alex can listen back and correct important details before asking AI to interpret them.'}),
+      body:'<p class="visual-phrase">Alex, a design student</p><p class="support-phrase">Records classes, discussions, and meetings throughout a project</p>',
+      side:`<dl class="persona-needs">
+        <div><dt>Recover the exact wording</dt><dd>Trace feedback back to the recording</dd></div>
+        <div><dt>Keep AI agents up to date</dt><dd>Share new context as the project changes</dd></div>
+      </dl>`,
+      talk:'Alex records classes, discussions, and meetings throughout a project. He wants to recover the exact wording and trace it back to the recording. He also regularly shares transcripts with his AI agents. When a critique changes the brief, the next AI conversation can start with what actually changed.'}),
     market,
     slide({title:'Three steps in Duowen', section:'Develop · The workflow', seconds:23,
       body:'<ol class="workflow-steps"><li><strong>Upload</strong><span>Audio or video</span></li><li><strong>Review</strong><span>Listen · correct</span></li><li><strong>Send to AI</strong><span>Recording or project</span></li></ol><p class="support-phrase">Production API · Deepgram Nova-3</p>',

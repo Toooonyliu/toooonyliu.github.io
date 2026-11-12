@@ -28,10 +28,6 @@ body.dark,.dark .deck-main,.dark .deck-header,.dark .deck-footer{background:var(
   .slide .deck-image img{max-height:35vh}
   .slide .lead{margin-top:12px}
 }
-.plan-comparison p{font-size:clamp(16px,1.8vw,23px);line-height:1.45;margin-top:8px;color:var(--soft)}
-.plan-comparison>div{padding:18px 0;border-top:1px solid var(--line)}
-.plan-comparison .duowen-plan{border-left:4px solid #245963;background:#e2efeb;padding-inline:16px}
-
 /* Project deck typography and app screenshots. */
 body[data-deck="product"] .slide .split {
   grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
@@ -54,39 +50,37 @@ body[data-deck="product"] .cover .deck-image img {
   color: var(--soft);
   font-size: clamp(15px, 1.55vw, 21px);
 }
-.scenario-visual {
+.persona-needs,
+.competitor-list {
   margin: 0;
-  padding: clamp(22px, 3.5vw, 52px);
-  background: #e2efeb;
+}
+.persona-needs {
+  padding: clamp(18px, 3vw, 40px);
   border-top: 4px solid #245963;
+  background: #e2efeb;
   color: #153e45;
 }
-.scenario-visual strong {
+.persona-needs > div + div {
+  border-top: 1px solid #afc8bf;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.persona-needs dt,
+.competitor-list dt {
   font-family: Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(66px, 10vw, 148px);
-  line-height: .9;
-  letter-spacing: -.07em;
+  font-size: clamp(23px, 2.6vw, 38px);
+  line-height: 1.15;
 }
-.scenario-visual strong span {
-  font-family: inherit;
-  font-size: .33em;
-  letter-spacing: 0;
-  margin-left: .22em;
-}
-.scenario-visual figcaption {
-  margin-top: 15px;
-  font-size: clamp(18px, 2vw, 29px);
-}
-.scenario-visual p {
-  margin-top: 9px;
-  font-size: clamp(14px, 1.5vw, 20px);
-  color: #35585b;
-}
-.plan-comparison small {
-  display: block;
-  margin-top: 5px;
+.persona-needs dd,
+.competitor-list dd {
+  margin: 7px 0 0;
+  font-size: clamp(16px, 1.65vw, 22px);
+  line-height: 1.35;
   color: var(--soft);
+}
+.competitor-list > div {
+  border-top: 1px solid var(--line);
+  padding: clamp(12px, 1.6vw, 21px) 0;
 }
 .workflow-steps {
   display: grid;
