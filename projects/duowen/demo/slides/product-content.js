@@ -15,7 +15,7 @@ window.DUOWEN_PRODUCT = ({app, link, shot, cover, slide}) => {
     '<a href="https://help.otter.ai/hc/en-us/articles/35287607569687-Otter-MCP-Server">Otter connector</a> · ' +
     '<a href="https://www.notta.ai/en/features/notta-mcp">Notta connector</a></p>';
   return {label:'Project video', target:'3–4 min · Aim 3:30', min:180, max:240, slides:[
-    cover({title:'Duowen 多问', lead:'From recordings to reviewed context for AI.', section:'Project video', seconds:14,
+    cover({title:'Duowen 多闻', lead:'From recordings to reviewed context for AI.', section:'Project video', seconds:14,
       image:shot('transcript.jpg','Duowen recording view with timestamps, speaker labels, and audio player'),
       talk:'Duowen is a browser tool for turning an audio or video recording into a transcript I can review and bring to ChatGPT or Claude.'}),
     slide({title:'Who it’s for', section:'Discover · Persona and scenario', seconds:27,
