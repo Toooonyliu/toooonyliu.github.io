@@ -3,120 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Duowen turns class and discussion recordings into editable transcripts you can bring to ChatGPT or Claude.">
-  <title>Duowen · Tony Liu</title>
+  <meta name="description" content="Duowen 多闻 is Tony Liu’s transcription tool for reviewing recorded feedback and bringing it into an AI workflow. Explore the research, journey, design, and working app.">
+  <title>Duowen 多闻 — Recordings you can work with · Tony Liu</title>
   <link rel="icon" href="../../favicon-tl.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="case-study.css">
+  <link rel="stylesheet" href="case-study.css?v=story2">
+  <script src="case-study.js?v=story2" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to case study</a>
+<div class="project-banner">An AI tool for my design process <a href="../../">Tony Liu ↗</a></div>
 <header class="wrap site-nav">
-  <a class="wordmark" href="../../">Tony Liu</a>
+  <a class="wordmark" href="#main">Duowen <span lang="zh">多闻</span></a>
   <nav class="nav-links" aria-label="Project navigation">
-    <a href="#design">Design</a>
-    <a href="ai-process.html">AI process</a>
-    <a href="#recording">Recording decks</a>
+    <a href="#idea">The idea</a><a href="#research">Research</a><a href="#features">Features</a><a href="ai-process.html">AI process ↗</a>
   </nav>
+  <a class="nav-action" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Try Duowen ↗</a>
 </header>
 <main id="main">
-  <section class="wrap hero two-col" aria-labelledby="title">
-    <div>
-      <p class="eyebrow">Duowen 多闻 · CMU AI Augmented Design</p>
-      <h1 id="title">Bring the class into the chat.</h1>
-      <p class="lede">Turn a class or discussion recording into a transcript you can review and bring to the AI assistant you already use.</p>
-      <div class="actions">
-        <a class="button primary" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Try Duowen ↗</a>
-        <a class="button" href="#recording">Recording decks ↓</a>
-      </div>
-    </div>
-    <figure>
-      <img class="screen" src="images/transcript.jpg" alt="Duowen’s recording view with a timestamped transcript, two speaker labels, playback, and a Send to AI button" width="1280" height="900" fetchpriority="high">
-      <figcaption>Duowen’s recording view with a synthetic transcript.</figcaption>
+  <section class="wrap hero home-hero" aria-labelledby="title">
+    <p class="eyebrow">Record · Review · Bring it into AI</p>
+    <h1 class="display-title" id="title">Keep the words.<br><span>Carry the context.</span></h1>
+    <p class="lede">A transcription website for recorded classes, critiques, and meetings.<br>Check what was said, then bring it to the AI chat where you work.</p>
+    <div class="actions"><a class="button primary" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Open the working tool ↗</a><a class="button secondary" href="#idea">Read the design story ↓</a></div>
+    <figure class="hero-preview">
+      <img src="images/transcript.jpg" alt="Duowen transcript with separate speaker turns, timestamps, audio playback, and a visible Send to AI action" width="1280" height="900" fetchpriority="high">
+      <figcaption>The built app · Example transcript data</figcaption>
     </figure>
   </section>
-
   <dl class="meta wrap">
-    <div><dt>My role</dt><dd>Product design, prototyping, evaluation</dd></div>
-    <div><dt>Course</dt><dd>CMU AI Augmented Design · 2026</dd></div>
-    <div><dt>AI backend</dt><dd>Deepgram Nova-3</dd></div>
+    <div><dt>Role</dt><dd>Product design &amp; development</dd></div>
+    <div><dt>Context</dt><dd>CMU · AI Augmented Design</dd></div>
+    <div><dt>Built with</dt><dd>Claude, Codex &amp; Deepgram</dd></div>
+    <div><dt>Outcome</dt><dd>Working web app · 2026</dd></div>
   </dl>
 
-  <section class="section wrap two-col" id="design">
-    <div class="copy">
-      <p class="eyebrow">Discover</p>
-      <h2>The context I lose after class</h2>
-      <p>I use AI to make sense of class sessions and discussions. When I ask it to summarize a class or help me decide what to do next, it only has the details I remembered to type. A recording carries the explanations and questions I missed.</p>
-      <p>I designed for students like me who have permission to record or access a replay and already work with an AI assistant.</p>
-    </div>
-    <figure class="visual-panel scenario">
-      <figcaption>What a class recording adds to the chat</figcaption>
-      <ul class="steps">
-        <li><strong>The original feedback</strong><span>What the instructor actually asked us to change.</span></li>
-        <li><strong>The reason behind it</strong><span>The examples and follow-up questions that shaped the discussion.</span></li>
-        <li><strong>The open question</strong><span>What I still need help deciding before the next class.</span></li>
-      </ul>
-    </figure>
+  <section class="section wrap split" id="idea" aria-labelledby="idea-title">
+    <div class="section-heading"><p class="eyebrow">The idea</p><h2 id="idea-title">I had the recording.<br>I needed it in my workflow.</h2></div>
+    <div class="prose"><p>I record classes and design discussions so I can return to the exact feedback. When I ask AI to help with the next step, I want it to understand the conversation too.</p><p>That means finding the relevant passage, checking the transcript, and moving it into a chat. Duowen brings those steps together.</p><p class="audience"><span aria-hidden="true">🎧</span> For students and designers who record discussions and already work with AI.</p></div>
   </section>
 
-  <section class="section wrap" aria-labelledby="comparison-title">
-    <p class="eyebrow">Define</p>
-    <h2 id="comparison-title">The handoff was the part I wanted to fix.</h2>
-    <p class="section-lede">Speaker-labeled transcripts already exist. I wanted a shorter path from an existing file to the chat where I was doing the rest of the work.</p>
-    <div class="comparison-grid">
-      <article>
-        <h3>Otter Basic</h3>
-        <p>Supports audio and video imports with speaker labels. Basic limits transcriptions to 30 minutes each and includes three lifetime file imports.</p>
-        <p class="source-links"><a href="https://help.otter.ai/hc/en-us/articles/360047538094-Conversation-import-and-app-limits-on-the-Basic-free-plan">Basic limits ↗</a> <a href="https://help.otter.ai/hc/en-us/articles/35287607569687-Otter-MCP-Server">AI connector ↗</a></p>
-      </article>
-      <article>
-        <h3>Notta Free</h3>
-        <p>Supports speaker identification and file uploads. Free is capped at three minutes per conversation. Transcript export starts on Pro.</p>
-        <p class="source-links"><a href="https://www.notta.ai/en/pricing">Plan comparison ↗</a> <a href="https://www.notta.ai/en/features/notta-mcp">AI connector ↗</a></p>
-      </article>
-    </div>
-    <p class="section-note">Both offer AI connectors. Duowen puts the handoff on the transcript and uses the clipboard or a Markdown file without connector setup.</p>
-  </section>
-
-  <section class="section wrap two-col" id="workflow">
-    <div class="copy">
-      <p class="eyebrow">Develop</p>
-      <h2>Upload, verify, and bring it to AI.</h2>
-      <ol class="steps">
-        <li><strong>Upload audio or video</strong><span>Duowen returns an editable transcript with speaker labels and timestamps.</span></li>
-        <li><strong>Check what was said</strong><span>Search for a passage and click its timestamp to hear the original.</span></li>
-        <li><strong>Send to AI</strong><span>For one recording, Copy and open gets you to a new ChatGPT or Claude chat with the transcript ready to paste. For a project, download one Markdown file to attach and copy the editable prompt separately.</span></li>
+  <section class="section journey-section" id="journey" aria-labelledby="journey-title">
+    <div class="wrap">
+      <div class="section-heading"><p class="eyebrow">User journey</p><h2 id="journey-title">What happens after I press record?</h2><p class="lede">The work continues between capturing a conversation and using it to make a design decision.</p></div>
+      <ol class="journey-line" aria-label="Four stages of my recording workflow">
+        <li><span aria-hidden="true">🎙️</span><strong>Capture</strong></li>
+        <li><span aria-hidden="true">📝</span><strong>Transcribe</strong></li>
+        <li><span aria-hidden="true">🎧</span><strong>Review</strong></li>
+        <li><span aria-hidden="true">💬</span><strong>Work with AI</strong></li>
       </ol>
-    </div>
-    <figure class="pack-shot">
-      <img class="screen" src="images/project-pack.jpg" alt="Send to AI dialog listing project recordings, a Markdown download, and a separate copyable prompt" width="600" height="738" loading="lazy">
-      <figcaption>The project handoff keeps each recording, speaker label, and timestamp together.</figcaption>
-    </figure>
-  </section>
-
-  <section class="section dark">
-    <div class="wrap two-col">
-      <div class="copy">
-        <p class="eyebrow">Deliver</p>
-        <h2>From real upload to usable transcript</h2>
-        <p>A live Deepgram test returned two speaker labels from a 90-second sample. I verified timestamp playback, project Markdown download, and prompt copying on the live site.</p>
-        <div class="actions"><a class="button primary" href="ai-process.html">How I built the backend ↗</a></div>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="User journey map, horizontally scrollable on small screens">
+        <table class="journey-table">
+          <caption>My recording workflow and the opportunities I designed for</caption>
+          <thead><tr><th scope="col">Stage</th><th scope="col">Capture</th><th scope="col">Transcribe</th><th scope="col">Review</th><th scope="col">Work with AI</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">What I do</th><td>Save the class or meeting</td><td>Upload the audio or video</td><td>Find the exact feedback</td><td>Ask what to do next</td></tr>
+            <tr class="friction-row"><th scope="row">Where it gets difficult</th><td>Details outgrow my notes</td><td>Check file and plan limits</td><td>Spot errors in a long transcript</td><td>Move files and explain the context again</td></tr>
+            <tr class="opportunity-row"><th scope="row">Duowen’s response</th><td>Use the recording I already have</td><td>Drop the file into one upload flow</td><td>Speaker turns, timestamps, playback, editing</td><td>Copy one recording or package a project</td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="test-summary">
-        <p><strong>Export test</strong><span>Ten synthetic transcripts stayed in order in the combined Markdown.</span></p>
-        <p><strong>Next test</strong><span>Take a full-length class through upload, transcription, and a chat follow-up. Check cited details against the recording.</span></p>
-      </div>
+      <p class="evidence-note">Mapped from my own workflow. The review step was reinforced by in-person playtest feedback.</p>
     </div>
   </section>
 
-  <section class="section wrap" id="recording">
-    <h2>Recording decks</h2>
-    <p class="section-lede">Press N for the talk track and timing on each slide.</p>
-    <div class="materials">
-      <a href="demo/slides/product.html"><strong>Project deck ↗</strong><span>3:30 target · user need and walkthrough</span></a>
-      <a href="demo/slides/process.html"><strong>AI process deck ↗</strong><span>2:45 target · backend decisions and testing</span></a>
+  <section class="section wrap" id="research" aria-labelledby="research-title">
+    <div class="section-heading"><p class="eyebrow">Competitive research</p><h2 id="research-title">Transcription is established.<br>The workflow still matters.</h2><p class="lede">I compared the cost of importing recordings, the tools for checking the text, and the ways to carry it into another AI assistant.</p></div>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Competitor comparison, horizontally scrollable on small screens">
+      <table class="decision-table competitor-table">
+        <caption>USD per user / month, billed annually · Checked November 12, 2026</caption>
+        <thead><tr><th scope="col">Product</th><th scope="col">Free plan</th><th scope="col">Entry paid plan</th><th scope="col">Reading &amp; checking</th><th scope="col">Taking it to AI</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><a href="https://otter.ai/pricing">Otter ↗</a></th><td>300 min/month<br>30 min per conversation<br>3 lifetime file imports</td><td><strong>$8.33</strong><br>Pro</td><td>Speaker labels, editable text, synchronized playback</td><td>TXT export on Free; AI connector available</td></tr>
+          <tr><th scope="row"><a href="https://www.notta.ai/en/pricing">Notta ↗</a></th><td>120 min/month<br>First 3 min per conversation<br>50 uploads/month</td><td><strong>$8.17</strong><br>Pro</td><td>Speaker blocks, timestamps, editing, click-to-play</td><td>Exports on Pro; AI connector available</td></tr>
+          <tr><th scope="row"><a href="https://fireflies.ai/pricing">Fireflies ↗</a></th><td>Limited upload credits<br>Downloads require a paid plan</td><td><strong>$10</strong><br>Pro</td><td>Speaker editing, transcript/audio sync, search, bookmarks</td><td>Paid Markdown export; AI connector available</td></tr>
+        </tbody>
+      </table>
     </div>
+    <details class="sources"><summary>Research method and feature sources</summary><p>The earlier research covered eight products and 100 sampled US App Store reviews. This comparison uses published plans and documented workflows. Readability has not been ranked through a same-task usability test.</p><ul><li><a href="https://help.otter.ai/hc/en-us/articles/360047733634-Export-conversations">Otter export formats</a> · <a href="https://help.otter.ai/hc/en-us/articles/35287607569687-Otter-MCP-Server">AI connector</a></li><li><a href="https://support.notta.ai/hc/en-us/articles/37437047511195-Records-detail-page-screen-layout-and-functions-Notta-Web">Notta transcript layout</a> · <a href="https://support.notta.ai/hc/en-us/articles/57137620216219-Notta-Remote-MCP-Integration-Guide">AI connector</a></li><li><a href="https://guide.fireflies.ai/articles/6653885315-learn-about-the-fireflies-notepad">Fireflies transcript layout</a> · <a href="https://guide.fireflies.ai/articles/4027724828-learn-about-the-fireflies-free-plan">Free limits</a> · <a href="https://guide.fireflies.ai/articles/3319752033">Exports</a></li></ul></details>
+    <aside class="design-decision"><p class="eyebrow">The direction I chose</p><p>Keep review and AI handoff together, for the recordings I already have.</p><span>Duowen’s course prototype has no visitor subscription. I cover the transcription API and hosting costs.</span></aside>
+  </section>
+
+  <section class="section dark" id="playtest" aria-labelledby="playtest-title"><div class="wrap split">
+    <div class="section-heading"><p class="eyebrow">What I learned from playtesting</p><h2 id="playtest-title">People wanted to check<br>the words first.</h2><p class="lede">I gave people transcript files to try in person. Before sending them to AI, they wanted to see who said what and when, and spot anything that looked wrong.</p></div>
+    <dl class="playtest-findings"><div><dt>Who said it?</dt><dd>Make speaker turns easy to scan.</dd></div><div><dt>When was it said?</dt><dd>Keep timestamps beside the words.</dd></div><div><dt>Does it look right?</dt><dd>Let people replay and correct a line.</dd></div></dl>
+  </div></section>
+
+  <section class="section wrap" id="features" aria-labelledby="features-title">
+    <div class="section-heading"><p class="eyebrow">The product</p><h2 id="features-title">Three things Duowen helps me do.</h2></div>
+    <div class="feature-tabs" role="tablist" aria-label="Explore Duowen features">
+      <button id="tab-review" role="tab" aria-selected="true" aria-controls="panel-review" data-feature="review"><span>01</span><strong>Review the recording</strong><small>Read, replay, correct</small></button>
+      <button id="tab-send" role="tab" aria-selected="false" aria-controls="panel-send" tabindex="-1" data-feature="send"><span>02</span><strong>Bring it into a chat</strong><small>Copy and open AI</small></button>
+      <button id="tab-project" role="tab" aria-selected="false" aria-controls="panel-project" tabindex="-1" data-feature="project"><span>03</span><strong>Bring sessions together</strong><small>One project attachment</small></button>
+    </div>
+    <section id="panel-review" class="feature-panel" role="tabpanel" aria-labelledby="tab-review" tabindex="0">
+      <div class="feature-copy"><h3>See the conversation<br>as it happened.</h3><ul class="feature-list"><li>Speaker colors make turn changes visible.</li><li>Click a timestamp to check the original audio.</li><li>Edit the text before it becomes context for AI.</li></ul></div>
+      <figure><a class="image-link" href="images/transcript.jpg" target="_blank" rel="noopener" aria-label="Enlarge the transcript screenshot"><img class="screen" src="images/transcript.jpg" alt="Color-coded speakers and timestamps next to editable transcript paragraphs" width="1280" height="900" loading="lazy"></a><figcaption>Actual app screen · Example transcript · Select image to enlarge ↗</figcaption></figure>
+    </section>
+    <section id="panel-send" class="feature-panel" role="tabpanel" aria-labelledby="tab-send" tabindex="0">
+      <div class="feature-copy"><h3>The next step is<br>beside the transcript.</h3><ul class="feature-list"><li>Send to AI is visible in the recording header.</li><li>Copy the transcript and prompt, then open Claude or ChatGPT.</li><li>Paste into your new chat to start working.</li></ul><p class="evidence-note">The handoff uses your clipboard. You choose what to paste.</p></div>
+      <figure class="dialog-shot"><a class="image-link" href="images/recording-send.jpg" target="_blank" rel="noopener" aria-label="Enlarge the Send to AI screenshot"><img class="screen" src="images/recording-send.jpg" alt="Recording Send to AI dialog with Copy and open Claude and Copy and open ChatGPT actions" width="599" height="618" loading="lazy"></a><figcaption>Single-recording handoff · Select image to enlarge ↗</figcaption></figure>
+    </section>
+    <section id="panel-project" class="feature-panel" role="tabpanel" aria-labelledby="tab-project" tabindex="0">
+      <div class="feature-copy"><h3>Keep a project’s<br>sessions in context.</h3><ul class="feature-list"><li>See which recordings will be included.</li><li>Download one Markdown file, or individual recordings.</li><li>Copy the prompt separately, then attach and paste in your chat.</li></ul><p class="evidence-note">Recording titles, speakers, and timestamps stay with the text.</p></div>
+      <figure class="dialog-shot"><a class="image-link" href="images/project-pack.jpg" target="_blank" rel="noopener" aria-label="Enlarge the project Markdown screenshot"><img class="screen" src="images/project-pack.jpg" alt="Project Send to AI dialog showing included recordings, individual exports, Download Markdown, and Copy prompt" width="600" height="738" loading="lazy"></a><figcaption>Project handoff · Example transcript data · Select image to enlarge ↗</figcaption></figure>
+    </section>
+    <noscript><p class="evidence-note">All three feature previews are shown below the feature navigation.</p></noscript>
+  </section>
+
+  <section class="section wrap" id="evaluation" aria-labelledby="evaluation-title">
+    <div class="section-heading"><p class="eyebrow">Built and tested</p><h2 id="evaluation-title">A working upload. A clear next test.</h2></div>
+    <div class="results-grid"><article><span class="result-mark" aria-hidden="true">✓</span><h3>Real transcription</h3><p>A 90-second live upload returned two speaker labels. Clicking a line played the corresponding audio.</p></article><article><span class="result-mark" aria-hidden="true">✓</span><h3>Usable exports</h3><p>Markdown download and prompt copying worked. Ten synthetic transcripts stayed in order in a combined export.</p></article><article><span class="result-mark next" aria-hidden="true">↗</span><h3>Full-length sessions</h3><p>Next, test a full class and see which word and speaker errors people find and correct.</p></article></div>
+    <div class="build-link"><div><p class="eyebrow">Behind the product</p><h3>How did the idea become a working website?</h3><p>Finding a speech tool, debugging it, connecting the backend, and refining the interface with Claude and Codex.</p></div><a class="button primary" href="ai-process.html">Read the AI process ↗</a></div>
+  </section>
+
+  <section class="section wrap" id="recording" aria-labelledby="recording-title">
+    <div class="section-heading"><p class="eyebrow">Explore the project</p><h2 id="recording-title">Try the tool. See the story.</h2><p class="lede">Open the live app with your own recording, or use the timed decks for a guided walkthrough.</p></div>
+    <a class="button primary" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Launch Duowen ↗</a>
+    <div class="materials"><a href="demo/slides/product.html"><strong>Project video deck ↗</strong><span>3:30 · The design and walkthrough</span></a><a href="demo/slides/process.html"><strong>AI process video deck ↗</strong><span>2:25 · Building and testing with AI</span></a></div>
   </section>
 </main>
-<footer class="wrap"><a href="../../">Tony Liu</a> · <a href="https://github.com/Toooonyliu/Duowen/tree/claude/tender-wozniak-a6q7cj">Duowen on GitHub</a></footer>
+<footer class="wrap footer"><a href="../../">Tony Liu ↗</a><div><a href="ai-process.html">AI process</a> · <a href="https://github.com/Toooonyliu/Duowen/tree/claude/tender-wozniak-a6q7cj">Duowen source ↗</a></div></footer>
 </body>
 </html>
