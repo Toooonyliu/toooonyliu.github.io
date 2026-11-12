@@ -37,3 +37,15 @@ body.dark,.dark .deck-main,.dark .deck-header,.dark .deck-footer{background:var(
 .deck-evidence dt{font-weight:680;font-size:clamp(16px,1.7vw,23px)}
 .deck-evidence dd{margin:0;color:var(--soft);font-size:clamp(16px,1.65vw,22px)}
 @media(max-width:520px){.deck-evidence>div{grid-template-columns:1fr;gap:3px}}
+.presentation-flow{display:grid;gap:15px;margin:0;padding:0;list-style:none}
+.presentation-flow li{padding:18px 20px;border-block-start:1px solid #84a5a8;color:#f4f9f6;font-size:clamp(20px,2.6vw,37px);line-height:1.2}
+.presentation-flow li+li::before{content:'↓';color:#b4dcd4;margin-right:14px}
+.persona-example{border-left:3px solid #245963;padding-left:23px}
+.persona-example p,.plan-comparison p{font-size:clamp(16px,1.8vw,23px);line-height:1.45;margin-top:8px;color:var(--soft)}
+.plan-comparison>div{padding:18px 0;border-top:1px solid var(--line)}
+.deck-evidence .selected-model{border-left:4px solid #245963;background:#e2efeb;padding-inline:14px}
+.selected-model dt{color:#184c53}
+.slide:has(.dw-demo) .split{grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)}
+@media(max-width:800px){.slide:has(.dw-demo) .split{grid-template-columns:1fr}}
+.plan-comparison .duowen-plan{border-left:4px solid #245963;background:#e2efeb;padding-inline:16px}
+.plan-comparison .plan-price{font-size:clamp(14px,1.35vw,18px);margin-top:4px}

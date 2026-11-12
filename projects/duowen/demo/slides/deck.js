@@ -93,7 +93,7 @@
     else if (index === 0 && event.target.closest('.slide') && !event.target.closest('a,button') && !hasStarted) start();
   });
   document.addEventListener('keydown', event => {
-    if (notes.open || event.target.closest('input,textarea,select,[contenteditable=true]') || event.altKey || event.metaKey || event.ctrlKey) return;
+    if (root.querySelector('dialog[open]') || event.target.closest('input,textarea,select,[contenteditable=true]') || event.altKey || event.metaKey || event.ctrlKey) return;
     if (event.target.closest('button,a') && ['Enter', ' '].includes(event.key)) return;
     if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); if (index === 0 && !hasStarted) start(); else go(index + 1); }
     else if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); go(index - 1); }
