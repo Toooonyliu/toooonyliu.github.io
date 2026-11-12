@@ -3,123 +3,118 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="How I used Claude and Codex to research transcription tools, connect a working backend, debug the prototype, and refine Duowen’s review experience.">
+  <meta name="description" content="From an idea to a working transcription website: how Tony Liu used Claude and Codex to research, build, debug, and evaluate Duowen.">
   <title>Building Duowen with AI · Tony Liu</title>
   <link rel="icon" href="../../favicon-tl.svg" type="image/svg+xml">
   <link rel="stylesheet" href="case-study.css?v=story2">
+  <link rel="stylesheet" href="ai-process.css?v=process3">
 </head>
-<body>
+<body class="process-page">
 <a class="skip" href="#main">Skip to AI process</a>
+<div class="project-banner">Duowen 多闻 · Behind the build <a href="../../">Tony Liu ↗</a></div>
 <header class="wrap site-nav">
   <a class="wordmark" href="./">Duowen <span lang="zh">多闻</span></a>
-  <nav class="nav-links" aria-label="Project navigation">
-    <a href="./">Design story</a>
-    <a href="ai-process.html" aria-current="page">AI process</a>
-    <a href="#materials">Recording decks</a>
-  </nav>
+  <nav class="nav-links" aria-label="Project navigation"><a href="./">Design story</a><a href="ai-process.html" aria-current="page">AI process</a><a href="#materials">Recording decks</a></nav>
 </header>
 <main id="main">
-  <section class="wrap hero" aria-labelledby="title">
-    <p class="eyebrow">Building with Claude &amp; Codex</p>
-    <h1 class="display-title" id="title">Making a real recording<br>work on the web.</h1>
-    <p class="lede">Duowen turns recordings into transcripts people can review and share with AI. My biggest ask for the coding agents was to find a transcription tool, get it running, and connect it to a public website.</p>
-    <div class="actions">
-      <a class="button primary" href="#research">Follow the build ↓</a>
-      <a class="button secondary" href="./">See the design story ↗</a>
-    </div>
-  </section>
-
-  <section class="section wrap" id="research" aria-labelledby="research-title">
-    <div class="section-heading">
-      <p class="eyebrow">Research the tool</p>
-      <h2 id="research-title">What does a free skill actually run?</h2>
-      <p class="lede">I asked the agents to read the source behind transcription skills. That showed me where the instructions ended and the actual speech recognition began.</p>
-    </div>
-    <div class="table-wrap" tabindex="0" role="region" aria-label="Transcription skill comparison, horizontally scrollable on small screens">
-      <table class="decision-table">
-        <caption>Three skill sources inspected during research</caption>
-        <thead><tr><th scope="col">Skill</th><th scope="col">What it calls</th><th scope="col">What I still needed</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">OpenClaw Whisper</th><td>Whisper on my computer</td><td>An installed speech engine and compute</td></tr>
-          <tr><th scope="row">OpenAI transcribe</th><td>A hosted speech API</td><td>An API key and paid usage</td></tr>
-          <tr><th scope="row">Deepgram speech-to-text</th><td>Deepgram’s hosted models</td><td>A server connection and the review UI</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="evidence-note">A skill gives the agent instructions. A speech engine or API does the transcription. <a href="https://github.com/openclaw/openclaw/blob/main/skills/openai-whisper/SKILL.md">OpenClaw source</a> · <a href="https://github.com/openai/skills/blob/main/skills/.curated/transcribe/SKILL.md">OpenAI source</a> · <a href="https://github.com/deepgram/skills">Deepgram source</a></p>
-  </section>
-
-  <section class="section dark" id="architecture" aria-labelledby="architecture-title">
-    <div class="wrap">
-      <div class="section-heading">
-        <p class="eyebrow">Connect the parts</p>
-        <h2 id="architecture-title">The backend has a specific job.</h2>
-        <p class="lede">The agents helped me map the upload path. Vercel hosts the website and server endpoint. That endpoint keeps the API key on the server and asks Deepgram to transcribe the file.</p>
+  <section class="process-cover" aria-labelledby="title">
+    <div class="wrap cover-grid">
+      <div class="cover-copy">
+        <p class="eyebrow">An idea, two coding agents, a working tool</p>
+        <h1 class="display-title" id="title">I had the idea.<br> <span>How did we<br> make it work?</span></h1>
+        <p class="lede">Duowen turns recordings into transcripts people can review and bring to AI. I used Claude and Codex to find a speech tool, connect a real backend, and work through the problems in between.</p>
+        <a class="button primary" href="#research">Follow the five steps ↓</a>
+        <p class="cover-credit">My role: direction, design decisions, and testing.<br> AI’s role: research, implementation, and debugging.</p>
       </div>
-      <ol class="architecture" aria-label="The live transcription path">
-        <li><span class="architecture-icon" aria-hidden="true">📎</span><strong>Browser</strong><p>Select an audio or video file</p></li>
-        <li><span class="architecture-icon" aria-hidden="true">⚙️</span><strong>Vercel API</strong><p>Forward the transcription request</p></li>
-        <li><span class="architecture-icon" aria-hidden="true">〰</span><strong>Deepgram Nova-3</strong><p>Return words, speakers, and times</p></li>
-        <li><span class="architecture-icon" aria-hidden="true">✎</span><strong>Duowen editor</strong><p>Read, replay, and correct</p></li>
-      </ol>
-      <p class="evidence-note">Files over 4 MiB take a private Vercel Blob upload path before transcription. That path is implemented and still needs a live large-file test.</p>
+      <figure class="build-board">
+        <div class="board-top"><span>FROM THE BUILD NOTEBOOK</span><span aria-hidden="true">↘</span></div>
+        <div class="idea-slip"><span class="slip-icon" aria-hidden="true">🎙️</span><div><small>THE STARTING QUESTION</small><p>Can my recordings become<br> context I can work with?</p></div></div>
+        <div class="board-path" aria-label="Research, build, and test"><span>Research</span><i aria-hidden="true">→</i><span>Build</span><i aria-hidden="true">→</i><span>Test ↺</span></div>
+        <img src="images/transcript.jpg" alt="The result: Duowen’s working transcript editor with speaker turns, timestamps, playback, and Send to AI" width="1280" height="900" fetchpriority="high">
+        <figcaption><span class="board-dot" aria-hidden="true"></span> The working app · Example transcript data</figcaption>
+      </figure>
     </div>
   </section>
 
-  <section class="section wrap" aria-labelledby="debug-title">
-    <div class="section-heading">
-      <p class="eyebrow">Try, debug, decide</p>
-      <h2 id="debug-title">Two routes. Different work to maintain.</h2>
+  <nav class="wrap chapter-map" aria-label="Five steps in the build">
+    <a href="#research"><span>01</span><strong>Find the tool</strong><small>Understand the options</small></a>
+    <a href="#debug"><span>02</span><strong>Make it run</strong><small>Test a real recording</small></a>
+    <a href="#architecture"><span>03</span><strong>Put it online</strong><small>Connect the backend</small></a>
+    <a href="#interface"><span>04</span><strong>Make it usable</strong><small>Review and revise</small></a>
+    <a href="#evaluation"><span>05</span><strong>Check the result</strong><small>Test the whole flow</small></a>
+  </nav>
+
+  <section class="section wrap process-chapter" id="research" aria-labelledby="research-title">
+    <header class="chapter-heading"><span class="step-number" aria-hidden="true">01</span><div><p class="eyebrow">Research · Understand what I need</p><h2 id="research-title">A skill was a starting point.<br> I still needed a speech engine.</h2></div></header>
+    <div class="chapter-intro"><p>I wanted to turn recorded classes and discussions into context for my AI agents. My first question was whether an existing free skill could do the transcription.</p><p>I asked the agents to inspect the tools behind those skills: what runs locally, what calls a paid API, and what would still need to be built for a website.</p></div>
+    <div class="skill-explainer" aria-label="The three parts of a working transcription tool">
+      <div><span aria-hidden="true">📖</span><strong>Skill</strong><p>Instructions an agent follows</p></div><b aria-hidden="true">+</b>
+      <div><span aria-hidden="true">〰</span><strong>Speech engine</strong><p>Turns the audio into words</p></div><b aria-hidden="true">+</b>
+      <div><span aria-hidden="true">▤</span><strong>My website</strong><p>Upload, review, and export</p></div>
     </div>
-    <div class="log-list">
-      <article>
-        <p class="chapter-label">Local experiment · WhisperX</p>
-        <h3>A crash became a working short-file test.</h3>
-        <p>WhisperX turns speech into timestamped text on a computer. On my Intel Mac, the agents traced incompatible packages and an OpenMP runtime conflict. Compatible versions and a corrected runtime produced text from a real 90-second clip. Speaker labels were still unverified.</p>
-      </article>
-      <article>
-        <p class="chapter-label">Live site · Deepgram + Vercel</p>
-        <h3>Recognition runs on the provider’s servers.</h3>
-        <p>I chose Deepgram to avoid maintaining a model server. Claude identified the build setting needed to enable it in the deployed website. Speech usage is billed by duration, with hosting and storage costs separate.</p>
-      </article>
-    </div>
+    <details class="process-detail"><summary>Three skill routes we considered <span aria-hidden="true">+</span></summary>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Transcription skill comparison, horizontally scrollable on small screens"><table class="decision-table"><caption>Routes compared during the project</caption><thead><tr><th scope="col">Skill source</th><th scope="col">What it uses</th><th scope="col">What I still needed</th></tr></thead><tbody>
+      <tr><th scope="row"><a href="https://github.com/openclaw/openclaw/blob/main/skills/openai-whisper/SKILL.md">OpenClaw Whisper ↗</a></th><td>Whisper on my computer</td><td>Compatible software and compute</td></tr>
+      <tr><th scope="row"><a href="https://github.com/openai/skills/blob/main/skills/.curated/transcribe/SKILL.md">OpenAI transcribe ↗</a></th><td>A hosted speech API</td><td>An API key and paid usage</td></tr>
+      <tr><th scope="row"><a href="https://github.com/deepgram/skills">Deepgram speech-to-text ↗</a></th><td>Deepgram’s hosted models</td><td>A server connection and a review interface</td></tr>
+      </tbody></table></div>
+    </details>
+    <p class="chapter-takeaway"><span>What I learned</span> A free skill does not remove the need for compute, hosting, or a usable interface.</p>
   </section>
 
-  <section class="section wrap split" aria-labelledby="interface-title">
-    <div class="prose">
-      <p class="eyebrow">Refine the interface</p>
-      <h2 id="interface-title">I reviewed the workflow. The agents made the changes.</h2>
-      <ul class="feature-list">
-        <li><strong>Make the handoff visible.</strong> I asked Codex to move Send to AI from the overflow menu into the recording header.</li>
-        <li><strong>Keep long projects manageable.</strong> I asked for an included-recordings list, one Markdown attachment, and a separately editable prompt.</li>
-      </ul>
-      <p>The in-person playtest reinforced the review step. People wanted to see who said what and when, and spot mistakes before sharing the text with AI.</p>
+  <section class="section experiment-section" id="debug" aria-labelledby="debug-title"><div class="wrap">
+    <header class="chapter-heading"><span class="step-number" aria-hidden="true">02</span><div><p class="eyebrow">Prototype · Get one real file through</p><h2 id="debug-title">The first local attempt crashed.<br> That gave us something concrete to debug.</h2></div></header>
+    <div class="debug-layout">
+      <div class="prose"><p><strong>WhisperX</strong> is an open-source tool that transcribes speech and aligns words with their timing. I tried it locally before choosing the online setup.</p><p>On my Intel Mac, the latest dependency stack did not fit the hardware. After the agents found compatible versions, loading the model still crashed.</p><p>They compared the speech engine running alone with the same engine running alongside PyTorch. That isolated a conflict between two parallel-processing runtimes.</p></div>
+      <figure class="debug-trace"><figcaption>Debugging sequence · Summarized from the build record</figcaption><ol>
+        <li><span class="trace-state issue">×</span><div><strong>Model loading crashes</strong><p>A real failure, before any transcript</p></div></li>
+        <li><span class="trace-state">↳</span><div><strong>Test the components separately</strong><p>Compare dependencies and runtime behavior</p></div></li>
+        <li><span class="trace-state">↳</span><div><strong>Correct the local environment</strong><p>Compatible versions + one OpenMP runtime</p></div></li>
+        <li><span class="trace-state success">✓</span><div><strong>A 90-second clip returns timed text</strong><p>Speaker separation remained unverified</p></div></li>
+      </ol></figure>
     </div>
-    <figure>
-      <img class="screen" src="images/project-pack.jpg" alt="Duowen project dialog listing the recordings to include, a Markdown download, and a separate Copy prompt action" width="600" height="738" loading="lazy">
-      <figcaption>Project handoff in the built app. Example transcript data.</figcaption>
-    </figure>
+    <div class="route-decision"><div><p class="eyebrow">My next decision</p><h3>Use a hosted engine for the public site.</h3></div><p>The local test showed that transcription could work. For the website, I chose <strong>Deepgram Nova-3</strong> so I would not need to maintain a model server. The tradeoff is usage-based API cost, plus hosting and storage.</p></div>
+  </div></section>
+
+  <section class="section dark" id="architecture" aria-labelledby="architecture-title"><div class="wrap">
+    <header class="chapter-heading"><span class="step-number" aria-hidden="true">03</span><div><p class="eyebrow">Build & deploy · Connect the pieces</p><h2 id="architecture-title">How does a file in the browser<br> reach the speech engine?</h2></div></header>
+    <p class="lede">I asked the agents to turn the local experiment into a working web flow. They helped separate the interface, the server endpoint, and the transcription service.</p>
+    <figure class="system-diagram"><figcaption>The production path · Vercel hosts the site and API; Deepgram runs speech recognition</figcaption><ol class="architecture">
+      <li><span class="architecture-icon" aria-hidden="true">📎</span><small>01 · INPUT</small><strong>Browser</strong><p>Choose an audio or video file.</p></li>
+      <li><span class="architecture-icon" aria-hidden="true">⚙️</span><small>02 · SERVER</small><strong>Vercel API</strong><p>Keep the key on the server. Send the transcription request.</p></li>
+      <li><span class="architecture-icon" aria-hidden="true">〰</span><small>03 · AI SERVICE</small><strong>Deepgram Nova-3</strong><p>Return text, speaker labels, and timestamps.</p></li>
+      <li><span class="architecture-icon" aria-hidden="true">✎</span><small>04 · OUTPUT</small><strong>Duowen editor</strong><p>Turn the response into a transcript people can check.</p></li>
+    </ol><div class="blob-path"><span>Large-file branch</span><p>Files over 4 MiB upload through private Vercel Blob storage before transcription.</p><small>Implemented · Live large-file test pending</small></div></figure>
+    <div class="deployment-note"><span aria-hidden="true">↳</span><div><h3>A deployment detail mattered.</h3><p>The frontend needed its Deepgram provider setting at build time. Claude identified that configuration and carried it into the Vercel deployment. Afterward, the live site was checked with a real upload.</p><details><summary>See the build setting</summary><code>VITE_TRANSCRIPTION_PROVIDER=deepgram</code><p>The API key stays in server-side environment variables.</p></details></div></div>
+  </div></section>
+
+  <section class="section wrap" id="interface" aria-labelledby="interface-title">
+    <header class="chapter-heading"><span class="step-number" aria-hidden="true">04</span><div><p class="eyebrow">Design & revise · Make the result useful</p><h2 id="interface-title">Getting text back was only<br> the beginning.</h2></div></header>
+    <p class="lede">In-person playtesting reinforced the need to check the transcript before sharing it with AI. People wanted to see who said what, when they said it, and where the text might be wrong.</p>
+    <div class="review-iteration">
+      <figure><a class="image-link" href="images/transcript.jpg" target="_blank" rel="noopener" aria-label="Enlarge the transcript review screenshot"><img class="screen" src="images/transcript.jpg" alt="Duowen transcript with colored speaker turns, timestamps, and a player fixed below the text" width="1280" height="900" loading="lazy"></a><figcaption>Actual app · Example transcript data · Select to enlarge ↗</figcaption></figure>
+      <div class="iteration-notes"><p class="eyebrow">Feedback → interface decision</p><ol>
+        <li><span>1</span><div><strong>Who said it?</strong><p>Stable speaker colors and clear turns.</p></div></li>
+        <li><span>2</span><div><strong>When was it said?</strong><p>A timestamp beside each paragraph.</p></div></li>
+        <li><span>3</span><div><strong>Does the text sound right?</strong><p>Replay and edit in the same view.</p></div></li>
+      </ol></div>
+    </div>
+    <div class="handoff-iteration"><div>
+      <p class="eyebrow">My review → the agents’ changes</p><h3>Make the next action easier to find.</h3>
+      <dl class="change-list"><div><dt>Send to AI was buried in a menu.</dt><dd>I asked Codex to move it into the recording header.</dd></div><div><dt>A project could become a very long paste.</dt><dd>I asked for an included-recordings list, one Markdown attachment, and a separate prompt.</dd></div><div><dt>Audio could disappear after a refresh.</dt><dd>Claude added browser storage so people could keep checking the original recording.</dd></div></dl>
+      <p class="evidence-note">The handoff still requires pasting text or attaching a file in your AI chat. It is not an account connection.</p>
+    </div><figure><a class="image-link" href="images/project-pack.jpg" target="_blank" rel="noopener" aria-label="Enlarge the project handoff screenshot"><img class="screen" src="images/project-pack.jpg" alt="Project handoff dialog showing included recordings, Download Markdown, and Copy prompt" width="600" height="738" loading="lazy"></a><figcaption>The revised project handoff · Example data</figcaption></figure></div>
   </section>
 
-  <section class="section wrap" aria-labelledby="evaluation-title">
-    <div class="section-heading">
-      <p class="eyebrow">Evaluate the result</p>
-      <h2 id="evaluation-title">Check what the code actually does.</h2>
-    </div>
-    <div class="process-evidence">
-      <div><h3>Verified</h3><p>A real 90-second upload returned two speaker labels and supported click-to-play. Ten synthetic transcripts stayed in order in a combined Markdown export.</p></div>
-      <div><h3>Next test</h3><p>Take a full class through transcription, correction, and AI handoff. Check word errors, speaker changes, and whether people can find and fix mistakes.</p></div>
-    </div>
-    <p class="evidence-note">My role was to choose the task, review the output, and test with people. Claude and Codex helped me research, implement, debug, and check the software.</p>
-    <div id="materials" class="materials">
-      <a href="demo/slides/product.html"><strong>Project video deck ↗</strong><span>3:30 · The design and walkthrough</span></a>
-      <a href="demo/slides/process.html"><strong>AI process video deck ↗</strong><span>2:25 · Building and testing with AI</span></a>
-    </div>
-  </section>
+  <section class="section evaluation-section" id="evaluation" aria-labelledby="evaluation-title"><div class="wrap">
+    <header class="chapter-heading"><span class="step-number" aria-hidden="true">05</span><div><p class="eyebrow">Evaluate · Separate evidence from assumptions</p><h2 id="evaluation-title">Test the whole workflow.<br> Keep the remaining questions visible.</h2></div></header>
+    <div class="validation-columns"><div><p class="status-label"><span aria-hidden="true">✓</span> VERIFIED IN THE PROJECT</p><ul><li><strong>Real backend:</strong> a live 90-second upload returned two speaker labels and supported click-to-play.</li><li><strong>Review continuity:</strong> audio remained playable after refreshing.</li><li><strong>AI handoff:</strong> Markdown download and prompt copying worked; ten synthetic transcripts stayed in order in a combined export.</li></ul></div><div><p class="status-label pending"><span aria-hidden="true">↗</span> STILL TO TEST</p><ul><li><strong>Long recordings:</strong> the live large-file route and a full class session.</li><li><strong>Correction quality:</strong> which word and speaker errors people find and fix.</li><li><strong>AI usefulness:</strong> how well several long sessions support the next conversation.</li></ul></div></div>
+    <div class="reflection"><p class="eyebrow">What changed in how I work with AI</p><h3>A concrete test made the collaboration useful.</h3><p>I turned a broad goal into a specific check: upload a recording, replay a line, and correct its text. That gave the agents a problem to investigate and gave me a result I could judge.</p><p>AI helped me understand unfamiliar tools and implement the pieces. Choosing the workflow, noticing confusing interactions, and evaluating the experience with people stayed with me.</p></div>
+    <div class="source-notes"><strong>Follow the actual collaboration</strong><p>This account is based on our build records and my playtest observations.</p><a href="https://github.com/Toooonyliu/Duowen/blob/claude/tender-wozniak-a6q7cj/claude-session-log.md">Claude prompt log ↗</a><a href="https://github.com/Toooonyliu/Duowen/blob/claude/tender-wozniak-a6q7cj/codex-session-log.md">Codex prompt log ↗</a></div>
+  </div></section>
+
+  <section class="section wrap" id="materials" aria-labelledby="materials-title"><p class="eyebrow">Keep exploring</p><h2 id="materials-title">The product and the process.</h2><div class="actions"><a class="button primary" href="./">Read the design story ↗</a><a class="button secondary" href="https://duowen-sandbox-trial.vercel.app/" target="_blank" rel="noopener">Try Duowen ↗</a></div><div class="materials"><a href="demo/slides/product.html"><strong>Project video deck ↗</strong><span>3:30 · The design and walkthrough</span></a><a href="demo/slides/process.html"><strong>AI process video deck ↗</strong><span>2:25 · Building and testing with AI</span></a></div></section>
 </main>
-<footer class="wrap footer">
-  <a href="./">← Design story</a>
-  <div><a href="https://github.com/Toooonyliu/Duowen/blob/claude/tender-wozniak-a6q7cj/claude-session-log.md">Claude prompt log ↗</a> · <a href="https://github.com/Toooonyliu/Duowen/blob/claude/tender-wozniak-a6q7cj/codex-session-log.md">Codex prompt log ↗</a></div>
-</footer>
+<footer class="wrap footer"><a href="./">← Design story</a><a href="#main">Back to top ↑</a></footer>
 </body>
 </html>
